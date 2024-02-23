@@ -1,0 +1,10 @@
+*.png
+*.h5
+*.npy
+*.pdf
+logs/
+Model/
+Semi/
+mlruns/
+*.csv
+*.txt

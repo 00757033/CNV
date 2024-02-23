@@ -1,0 +1,1833 @@
+{
+    "00016179_R": {
+        "pre_date": "20180321"
+    },
+    "00285176_L": {
+        "post_date": {
+            "20190116": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.96683291489816,
+                    "matching_psnr": 28.132244275810013,
+                    "matching_ssim": 11.183220396665245,
+                    "mse": 100.72883149634667,
+                    "psnr": 28.09926564915978,
+                    "ssim": 3.261918000060192
+                }
+            },
+            "20190522": {
+                "best_method": {
+                    "best_method": "crop_KAZE_BF_0.8",
+                    "matching_mse": 101.3476815315262,
+                    "matching_psnr": 28.072665428125546,
+                    "matching_ssim": 7.89426629878867,
+                    "mse": 103.49808914182945,
+                    "psnr": 27.981480292664713,
+                    "ssim": 5.876806285829374
+                }
+            }
+        },
+        "pre_date": "20161026"
+    },
+    "00468301_L": {
+        "pre_date": "20210505"
+    },
+    "00563175_L": {
+        "post_date": {
+            "20160711": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 94.85146293109082,
+                    "matching_psnr": 28.360363272984685,
+                    "matching_ssim": 36.0777433330021,
+                    "mse": 102.17793729984096,
+                    "psnr": 28.03723229680982,
+                    "ssim": 3.094201758032763
+                }
+            },
+            "20160808": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 93.5775900048575,
+                    "matching_psnr": 28.419085046780168,
+                    "matching_ssim": 40.64967564134995,
+                    "mse": 98.2682692633553,
+                    "psnr": 28.206670537015434,
+                    "ssim": 4.231755245643195
+                }
+            },
+            "20161107": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.58944308894311,
+                    "matching_psnr": 28.062317813297575,
+                    "matching_ssim": 5.523875244721296,
+                    "mse": 102.90524379024839,
+                    "psnr": 28.006428549962045,
+                    "ssim": 2.5563955861655416
+                }
+            }
+        },
+        "pre_date": "20160613"
+    },
+    "00871678_L": {
+        "post_date": {
+            "20170313": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 99.02411782480722,
+                    "matching_psnr": 28.173393787693616,
+                    "matching_ssim": 13.233232118895996,
+                    "mse": 100.74999160632548,
+                    "psnr": 28.098353422366657,
+                    "ssim": 0.6203547006761901
+                }
+            },
+            "20170828": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 98.09440179360011,
+                    "matching_psnr": 28.214361377848274,
+                    "matching_ssim": 17.737225216975453,
+                    "mse": 99.40641347917658,
+                    "psnr": 28.15665955859306,
+                    "ssim": 4.6283386406063025
+                }
+            },
+            "20171030": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.3532472844612,
+                    "matching_psnr": 28.158982946090365,
+                    "matching_ssim": 14.32808853167678,
+                    "mse": 101.26575921465255,
+                    "psnr": 28.07617737797159,
+                    "ssim": 5.47992926605979
+                }
+            },
+            "20180205": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 96.9068244170096,
+                    "matching_psnr": 28.267259986542168,
+                    "matching_ssim": 20.553133940141908,
+                    "mse": 99.41774119798811,
+                    "psnr": 28.15616469258589,
+                    "ssim": 3.5999792498813674
+                }
+            },
+            "20180917": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 98.13851385138514,
+                    "matching_psnr": 28.212408838587347,
+                    "matching_ssim": 19.432364860425523,
+                    "mse": 102.6121612161216,
+                    "psnr": 28.018815260563663,
+                    "ssim": 6.771943952272753
+                }
+            },
+            "20190327": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 97.01666286236019,
+                    "matching_psnr": 28.26234028996627,
+                    "matching_ssim": 14.175923868946027,
+                    "mse": 99.52448071216617,
+                    "psnr": 28.151504406196032,
+                    "ssim": 5.381255408469814
+                }
+            }
+        },
+        "pre_date": "20170120"
+    },
+    "01790839_R": {
+        "post_date": {
+            "20211102": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 97.30895393940905,
+                    "matching_psnr": 28.249275569041508,
+                    "matching_ssim": 11.831161139905777,
+                    "mse": 99.40872070543922,
+                    "psnr": 28.15655875986478,
+                    "ssim": 4.443970292030208
+                }
+            }
+        },
+        "pre_date": "20210708"
+    },
+    "01836108_L": {
+        "post_date": {
+            "20160921": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 99.76187943262411,
+                    "matching_psnr": 28.141157385657362,
+                    "matching_ssim": 7.385121678021006,
+                    "mse": 100.8896572104019,
+                    "psnr": 28.092337144197337,
+                    "ssim": 3.624311913846538
+                }
+            },
+            "20161205": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 98.21665559758598,
+                    "matching_psnr": 28.208952191016714,
+                    "matching_ssim": 15.133064962721473,
+                    "mse": 100.11250036094829,
+                    "psnr": 28.125920526309827,
+                    "ssim": 5.1909390876258215
+                }
+            },
+            "20170220": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.1677599077835,
+                    "matching_psnr": 28.080382270690237,
+                    "matching_ssim": 5.912924755499883,
+                    "mse": 101.3328164452739,
+                    "psnr": 28.07330247263732,
+                    "ssim": 4.151706382598682
+                }
+            },
+            "20170424": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 98.16012278308322,
+                    "matching_psnr": 28.211452679136105,
+                    "matching_ssim": 22.924404897287744,
+                    "mse": 101.00574351978172,
+                    "psnr": 28.08734290966186,
+                    "ssim": 3.982149174736329
+                }
+            }
+        },
+        "pre_date": "20160527"
+    },
+    "02875773_L": {
+        "post_date": {
+            "20220420": {
+                "best_method": {
+                    "best_method": "crop_BRISK_BF_0.8",
+                    "matching_mse": 96.83778553793456,
+                    "matching_psnr": 28.27035511321383,
+                    "matching_ssim": 31.260862508301912,
+                    "mse": 103.40317845147801,
+                    "psnr": 27.98546472373794,
+                    "ssim": 3.983968080923223
+                }
+            }
+        },
+        "pre_date": "20211103"
+    },
+    "03254241_L": {
+        "post_date": {
+            "20161017": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.40903967538323,
+                    "matching_psnr": 28.027420672372514,
+                    "matching_ssim": 5.732586909352943,
+                    "mse": 102.51179741508867,
+                    "psnr": 28.02306512476681,
+                    "ssim": 3.8979508575233717
+                }
+            },
+            "20161128": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.01849726744912,
+                    "matching_psnr": 28.04401438783713,
+                    "matching_ssim": 6.165899353271283,
+                    "mse": 101.99905695749491,
+                    "psnr": 28.04484204400595,
+                    "ssim": 3.736871324634191
+                }
+            },
+            "20161226": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.38825748237267,
+                    "matching_psnr": 28.1574528443697,
+                    "matching_ssim": 12.762282139538982,
+                    "mse": 100.33472215373996,
+                    "psnr": 28.116291085033854,
+                    "ssim": 4.013448200814865
+                }
+            },
+            "20170320": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.40424179302322,
+                    "matching_psnr": 28.070242387229307,
+                    "matching_ssim": 13.65794125172737,
+                    "mse": 102.87156943636634,
+                    "psnr": 28.007849952691913,
+                    "ssim": 4.1004569124497126
+                }
+            },
+            "20170807": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.05928769175215,
+                    "matching_psnr": 28.085041280445793,
+                    "matching_ssim": 5.990772355525944,
+                    "mse": 102.4163378850089,
+                    "psnr": 28.02711118219046,
+                    "ssim": 3.058037203676407
+                }
+            },
+            "20171013": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.39990352793001,
+                    "matching_psnr": 28.027808133814908,
+                    "matching_ssim": 5.527891827744391,
+                    "mse": 102.49200755697882,
+                    "psnr": 28.023903609321046,
+                    "ssim": 3.372537521399966
+                }
+            },
+            "20171115": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 99.111706166278,
+                    "matching_psnr": 28.169554084696813,
+                    "matching_ssim": 9.92658663956077,
+                    "mse": 100.57488204349477,
+                    "psnr": 28.10590828974742,
+                    "ssim": 3.113769270106835
+                }
+            },
+            "20180110": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.6270647626556,
+                    "matching_psnr": 28.06070978591312,
+                    "matching_ssim": 18.019394276436156,
+                    "mse": 103.11059116745717,
+                    "psnr": 27.997770840485696,
+                    "ssim": 2.351366659507914
+                }
+            },
+            "20180207": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.72121815853139,
+                    "matching_psnr": 28.099593912231377,
+                    "matching_ssim": 18.204571391824857,
+                    "mse": 102.69358448581445,
+                    "psnr": 28.015370478396537,
+                    "ssim": 2.8504040514529865
+                }
+            },
+            "20180314": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.2407514223539,
+                    "matching_psnr": 28.03456328177777,
+                    "matching_ssim": 7.2121384317336625,
+                    "mse": 103.49882016727406,
+                    "psnr": 27.981449617779973,
+                    "ssim": 3.253768617524237
+                }
+            },
+            "20180523": {
+                "best_method": {
+                    "best_method": "crop_FREAK_FLANN_0.8",
+                    "matching_mse": 100.2597588978186,
+                    "matching_psnr": 28.119537049702178,
+                    "matching_ssim": 7.944509186421442,
+                    "mse": 98.04735935706086,
+                    "psnr": 28.216444592649257,
+                    "ssim": 3.435633381626006
+                }
+            },
+            "20180627": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 100.8694667063713,
+                    "matching_psnr": 28.09320636134563,
+                    "matching_ssim": 17.25890865145125,
+                    "mse": 102.98099356526018,
+                    "psnr": 28.00323283263776,
+                    "ssim": 3.380231959763718
+                }
+            },
+            "20181003": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.53518910977338,
+                    "matching_psnr": 28.06463778838676,
+                    "matching_ssim": 16.43945896279151,
+                    "mse": 103.2494376763356,
+                    "psnr": 27.991926658153027,
+                    "ssim": 2.8908688474333895
+                }
+            },
+            "20190306": {
+                "best_method": {
+                    "best_method": "TM_CCORR",
+                    "matching_mse": 99.79503858587965,
+                    "matching_psnr": 28.13971410445629,
+                    "matching_ssim": 10.012616150647764,
+                    "mse": 100.4864036917301,
+                    "psnr": 28.109730573314256,
+                    "ssim": 3.3719505407751678
+                }
+            },
+            "20190605": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.02803383393751,
+                    "matching_psnr": 28.04360843354985,
+                    "matching_ssim": 13.485424196444551,
+                    "mse": 102.56790379193279,
+                    "psnr": 28.020688810550674,
+                    "ssim": 2.382883438764397
+                }
+            }
+        },
+        "pre_date": "20160815"
+    },
+    "03408585_R": {
+        "pre_date": "20210929"
+    },
+    "03860215_L": {
+        "pre_date": "20170301"
+    },
+    "03978730_R": {
+        "post_date": {
+            "20211124": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 95.68069434198466,
+                    "matching_psnr": 28.322560425952474,
+                    "matching_ssim": 26.23781613018286,
+                    "mse": 96.67906243712696,
+                    "psnr": 28.27747930761968,
+                    "ssim": 0.6841483540878001
+                }
+            }
+        },
+        "pre_date": "20210707"
+    },
+    "04851616_R": {
+        "pre_date": "20210902"
+    },
+    "04978848_R": {
+        "post_date": {
+            "20170111": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 97.52278682921272,
+                    "matching_psnr": 28.23974257600735,
+                    "matching_ssim": 15.555561872957204,
+                    "mse": 99.72417682579469,
+                    "psnr": 28.142799007593396,
+                    "ssim": 4.118172913984614
+                }
+            },
+            "20180801": {
+                "best_method": {
+                    "best_method": "crop_BRISK_BF_0.7",
+                    "matching_mse": 97.77356313882929,
+                    "matching_psnr": 28.22858918503654,
+                    "matching_ssim": 11.071615947337634,
+                    "mse": 99.27367850303408,
+                    "psnr": 28.16246246271854,
+                    "ssim": 7.308293058022045
+                }
+            },
+            "20200617": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.5389179229869,
+                    "matching_psnr": 28.107461541613,
+                    "matching_ssim": 10.986232775156388,
+                    "mse": 101.82324993916359,
+                    "psnr": 28.052334063700833,
+                    "ssim": 4.68892880912041
+                }
+            }
+        },
+        "pre_date": "20161107"
+    },
+    "05084585_L": {
+        "post_date": {
+            "20210930": {
+                "best_method": {
+                    "best_method": "TM_CCOEFF",
+                    "matching_mse": 95.9520311253957,
+                    "matching_psnr": 28.310261884955853,
+                    "matching_ssim": 11.432006536671324,
+                    "mse": 97.55206495734757,
+                    "psnr": 28.238438940047264,
+                    "ssim": 5.330789361172722
+                }
+            }
+        },
+        "pre_date": "20210322"
+    },
+    "05655586_L": {
+        "pre_date": "20210929"
+    },
+    "05655586_R": {
+        "pre_date": "20210929"
+    },
+    "06271674_L": {
+        "pre_date": "20211224"
+    },
+    "07838199_L": {
+        "post_date": {
+            "20220328": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 98.59602331709654,
+                    "matching_psnr": 28.192209620146244,
+                    "matching_ssim": 10.35187867183545,
+                    "mse": 99.6393264963895,
+                    "psnr": 28.146495775703837,
+                    "ssim": 4.597562276042409
+                }
+            }
+        },
+        "pre_date": "20211013"
+    },
+    "08476328_L": {
+        "pre_date": "20210610"
+    },
+    "08532554_R": {
+        "post_date": {
+            "20171206": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 93.12542941954706,
+                    "matching_psnr": 28.440120724902485,
+                    "matching_ssim": 29.86804206508518,
+                    "mse": 95.52666570313629,
+                    "psnr": 28.32955741627343,
+                    "ssim": 5.468046726700173
+                }
+            },
+            "20180103": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 107.920834450832,
+                    "matching_psnr": 27.799750661982184,
+                    "matching_ssim": 13.978285916920274,
+                    "mse": 110.04351831337384,
+                    "psnr": 27.71515893657196,
+                    "ssim": 4.515946686394553
+                }
+            },
+            "20190401": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 94.82781487664626,
+                    "matching_psnr": 28.361446176686652,
+                    "matching_ssim": 18.250378942784643,
+                    "mse": 103.2803399183825,
+                    "psnr": 27.99062702248248,
+                    "ssim": 5.742198410019611
+                }
+            },
+            "20190717": {
+                "best_method": {
+                    "best_method": "crop_AKAZE_BF_0.8",
+                    "matching_mse": 96.99445757784841,
+                    "matching_psnr": 28.263334421906006,
+                    "matching_ssim": 11.836071232134305,
+                    "mse": 99.71251795631666,
+                    "psnr": 28.14330677600491,
+                    "ssim": 4.6475364801612855
+                }
+            },
+            "20200814": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 95.15655997428361,
+                    "matching_psnr": 28.346416274941756,
+                    "matching_ssim": 16.72807207467457,
+                    "mse": 96.85330180014695,
+                    "psnr": 28.269659301427588,
+                    "ssim": 5.840858690204193
+                }
+            }
+        },
+        "pre_date": "20170830"
+    },
+    "08663464_R": {
+        "pre_date": "20220208"
+    },
+    "08707452_L": {
+        "post_date": {
+            "20170118": {
+                "best_method": {
+                    "best_method": "crop_KAZE_BF_0.7",
+                    "matching_mse": 100.24282520298628,
+                    "matching_psnr": 28.120270627304116,
+                    "matching_ssim": 15.674948795752695,
+                    "mse": 100.63731809683198,
+                    "psnr": 28.103213062093474,
+                    "ssim": 3.6680184789225976
+                }
+            },
+            "20170222": {
+                "best_method": {
+                    "best_method": "crop_KAZE_BF_0.7",
+                    "matching_mse": 95.27547977178423,
+                    "matching_psnr": 28.34099216473153,
+                    "matching_ssim": 35.43662874410105,
+                    "mse": 102.20956950207469,
+                    "psnr": 28.035888017875635,
+                    "ssim": 3.485317791177612
+                }
+            },
+            "20170329": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 98.8870801511588,
+                    "matching_psnr": 28.17940807244338,
+                    "matching_ssim": 13.012788047198923,
+                    "mse": 101.37133003884675,
+                    "psnr": 28.071652161910244,
+                    "ssim": 3.662913377326629
+                }
+            },
+            "20170503": {
+                "best_method": {
+                    "best_method": "crop_SIFT_BF_0.8",
+                    "matching_mse": 100.02618398529133,
+                    "matching_psnr": 28.129666601496876,
+                    "matching_ssim": 14.57888908502802,
+                    "mse": 102.70531921638242,
+                    "psnr": 28.014874241206762,
+                    "ssim": 4.201800921188942
+                }
+            },
+            "20170531": {
+                "best_method": {
+                    "best_method": "crop_BRISK_BF_0.8",
+                    "matching_mse": 98.74483625117358,
+                    "matching_psnr": 28.185659669112553,
+                    "matching_ssim": 11.828096617823146,
+                    "mse": 102.17838405036726,
+                    "psnr": 28.03721330828164,
+                    "ssim": 3.3372482022991408
+                }
+            },
+            "20170705": {
+                "best_method": {
+                    "best_method": "crop_FREAK_FLANN_0.8",
+                    "matching_mse": 99.71453590192644,
+                    "matching_psnr": 28.14321888595928,
+                    "matching_ssim": 14.813534530920855,
+                    "mse": 101.4371249748787,
+                    "psnr": 28.068834293330127,
+                    "ssim": 3.7259825036558536
+                }
+            },
+            "20170802": {
+                "best_method": {
+                    "best_method": "crop_KAZE_BF_0.7",
+                    "matching_mse": 97.7941159973076,
+                    "matching_psnr": 28.227676355974324,
+                    "matching_ssim": 19.236934196134577,
+                    "mse": 100.09187794480593,
+                    "psnr": 28.126815232174064,
+                    "ssim": 4.765571518716237
+                }
+            }
+        },
+        "pre_date": "20161130"
+    },
+    "09065071_R": {
+        "pre_date": "20211019"
+    },
+    "09227477_L": {
+        "post_date": {
+            "20170116": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.10163665161025,
+                    "matching_psnr": 28.12639182659796,
+                    "matching_ssim": 9.397083336331386,
+                    "mse": 101.75229659177567,
+                    "psnr": 28.05536140652427,
+                    "ssim": 3.151496628889741
+                }
+            },
+            "20171011": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.71050065019506,
+                    "matching_psnr": 28.100056059381,
+                    "matching_ssim": 21.63311756428277,
+                    "mse": 103.15333350005001,
+                    "psnr": 27.995970936844344,
+                    "ssim": 3.810167566034423
+                }
+            },
+            "20180207": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 98.55353674581794,
+                    "matching_psnr": 28.194081466448214,
+                    "matching_ssim": 30.82626828596552,
+                    "mse": 102.8830399097801,
+                    "psnr": 28.007365728952827,
+                    "ssim": 3.7269171690923244
+                }
+            },
+            "20180912": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.87405469802134,
+                    "matching_psnr": 28.050167689734998,
+                    "matching_ssim": 6.38070584701525,
+                    "mse": 102.53810991401637,
+                    "psnr": 28.02195053044185,
+                    "ssim": 3.942989217271476
+                }
+            },
+            "20190724": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.03509224616178,
+                    "matching_psnr": 28.0860811855199,
+                    "matching_ssim": 7.014422964643982,
+                    "mse": 102.19809056895885,
+                    "psnr": 28.03637579189681,
+                    "ssim": 3.053347039852901
+                }
+            }
+        },
+        "pre_date": "20161205"
+    },
+    "09958282_L": {
+        "post_date": {
+            "20161205": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.54566835236182,
+                    "matching_psnr": 28.06418958491829,
+                    "matching_ssim": 5.088301709325884,
+                    "mse": 101.69533820639091,
+                    "psnr": 28.057793158866,
+                    "ssim": 4.450760481916192
+                }
+            },
+            "20170109": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.37041081701811,
+                    "matching_psnr": 28.11474659143151,
+                    "matching_ssim": 8.116094113866627,
+                    "mse": 101.64469788230525,
+                    "psnr": 28.059956315142543,
+                    "ssim": 2.017768683136973
+                }
+            },
+            "20170220": {
+                "best_method": {
+                    "best_method": "crop_SIFT_BF_0.8",
+                    "matching_mse": 99.60411698117355,
+                    "matching_psnr": 28.148030711866458,
+                    "matching_ssim": 33.02966622640958,
+                    "mse": 100.87990856037543,
+                    "psnr": 28.092756809561603,
+                    "ssim": 2.892491224282613
+                }
+            },
+            "20170320": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.03823013564816,
+                    "matching_psnr": 28.043174437505005,
+                    "matching_ssim": 11.720185814185609,
+                    "mse": 102.15135537153387,
+                    "psnr": 28.038362275257484,
+                    "ssim": 6.784684063233737
+                }
+            },
+            "20170417": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 102.67930295038327,
+                    "matching_psnr": 28.015974491138266,
+                    "matching_ssim": 4.586723340027931,
+                    "mse": 103.706428236918,
+                    "psnr": 27.972746839263436,
+                    "ssim": 2.3767169596285798
+                }
+            },
+            "20170612": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 100.8121924861738,
+                    "matching_psnr": 28.095673008888625,
+                    "matching_ssim": 6.970993170374015,
+                    "mse": 101.98147606636577,
+                    "psnr": 28.04559067270204,
+                    "ssim": 2.5872252835599143
+                }
+            },
+            "20170807": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.77905969444006,
+                    "matching_psnr": 28.01175720776044,
+                    "matching_ssim": 23.535696447647652,
+                    "mse": 104.74826744369192,
+                    "psnr": 27.92933512483677,
+                    "ssim": 2.7977482871315265
+                }
+            },
+            "20171016": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.81074412305051,
+                    "matching_psnr": 28.09573540418182,
+                    "matching_ssim": 15.094302799792878,
+                    "mse": 101.35218784782288,
+                    "psnr": 28.07247232802068,
+                    "ssim": 2.276288014298194
+                }
+            },
+            "20171211": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.13272410308798,
+                    "matching_psnr": 28.081886553477776,
+                    "matching_ssim": 4.778902630092877,
+                    "mse": 101.32656369713187,
+                    "psnr": 28.073570462602923,
+                    "ssim": 3.721216518596323
+                }
+            },
+            "20180129": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 99.66465954839839,
+                    "matching_psnr": 28.145391733082832,
+                    "matching_ssim": 19.96750466842142,
+                    "mse": 101.42604586031857,
+                    "psnr": 28.069308662167288,
+                    "ssim": 2.8527140756484046
+                }
+            },
+            "20180326": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 102.41769243589438,
+                    "matching_psnr": 28.02705374310438,
+                    "matching_ssim": 7.107337965987762,
+                    "mse": 102.74452989214542,
+                    "psnr": 28.01321651496396,
+                    "ssim": 2.306980595658468
+                }
+            },
+            "20180521": {
+                "best_method": {
+                    "best_method": "crop_KAZE_BF_0.8",
+                    "matching_mse": 101.99661694781264,
+                    "matching_psnr": 28.044945936673926,
+                    "matching_ssim": 12.297472548159693,
+                    "mse": 105.15481823360498,
+                    "psnr": 27.912511838519794,
+                    "ssim": 2.30297424335062
+                }
+            },
+            "20180716": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 101.77278202907196,
+                    "matching_psnr": 28.054487144495486,
+                    "matching_ssim": 11.679570024280487,
+                    "mse": 105.19445177426202,
+                    "psnr": 27.910875262532752,
+                    "ssim": 3.374825415883873
+                }
+            },
+            "20180910": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 102.4370344708124,
+                    "matching_psnr": 28.026233636174407,
+                    "matching_ssim": 8.961420680435834,
+                    "mse": 105.08652924533749,
+                    "psnr": 27.915333122932008,
+                    "ssim": 2.7431961880709643
+                }
+            },
+            "20181212": {
+                "best_method": {
+                    "best_method": "TM_CCOEFF",
+                    "matching_mse": 101.07355579476139,
+                    "matching_psnr": 28.08442816302187,
+                    "matching_ssim": 21.436055731154628,
+                    "mse": 102.81440019136467,
+                    "psnr": 28.010264146360356,
+                    "ssim": 3.4670347221517814
+                }
+            },
+            "20190306": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.7",
+                    "matching_mse": 100.71900951406174,
+                    "matching_psnr": 28.099689146645748,
+                    "matching_ssim": 28.50314782192665,
+                    "mse": 104.84133150340784,
+                    "psnr": 27.92547832941777,
+                    "ssim": 2.57375285210449
+                }
+            },
+            "20190529": {
+                "best_method": {
+                    "best_method": "crop_BRISK_BF_0.8",
+                    "matching_mse": 101.40356708552898,
+                    "matching_psnr": 28.070271283724292,
+                    "matching_ssim": 10.903339473204756,
+                    "mse": 101.99520528113962,
+                    "psnr": 28.04500604487235,
+                    "ssim": 2.65868115290268
+                }
+            },
+            "20191106": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 103.99404623641453,
+                    "matching_psnr": 27.96071884652658,
+                    "matching_ssim": 7.108072796201189,
+                    "mse": 104.60996124552246,
+                    "psnr": 27.93507319663762,
+                    "ssim": 2.663262357773405
+                }
+            },
+            "20200422": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.76320643971155,
+                    "matching_psnr": 28.01242714112178,
+                    "matching_ssim": 25.617283207502435,
+                    "mse": 104.63959895546346,
+                    "psnr": 27.93384294373221,
+                    "ssim": 2.5085680116784386
+                }
+            },
+            "20200923": {
+                "best_method": {
+                    "best_method": "crop_BRISK_BF_0.8",
+                    "matching_mse": 101.83796066265133,
+                    "matching_psnr": 28.051706670194946,
+                    "matching_ssim": 11.232063163304073,
+                    "mse": 104.46097167856321,
+                    "psnr": 27.941262996131968,
+                    "ssim": 2.9066904366360604
+                }
+            },
+            "20210310": {
+                "best_method": {
+                    "best_method": "crop_SIFT_BF_0.7",
+                    "matching_mse": 101.50232632032863,
+                    "matching_psnr": 28.066043649585385,
+                    "matching_ssim": 17.690662061575225,
+                    "mse": 104.99630058328226,
+                    "psnr": 27.91906363365309,
+                    "ssim": 2.4564789858567107
+                }
+            }
+        },
+        "pre_date": "20160815"
+    },
+    "10006476_R": {
+        "pre_date": "20210714"
+    },
+    "10045360_R": {
+        "pre_date": "20170614"
+    },
+    "10284504_L": {
+        "post_date": {
+            "20160504": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.7",
+                    "matching_mse": 97.1787237126602,
+                    "matching_psnr": 28.25509169867912,
+                    "matching_ssim": 38.66129151441246,
+                    "mse": 101.69666735115416,
+                    "psnr": 28.057736397516436,
+                    "ssim": 2.318015683058896
+                }
+            },
+            "20160601": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 97.22377086152459,
+                    "matching_psnr": 28.25307899523411,
+                    "matching_ssim": 33.74342027025251,
+                    "mse": 101.22837167343256,
+                    "psnr": 28.07778109882583,
+                    "ssim": 2.8775460300521027
+                }
+            },
+            "20160622": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 97.96774460342404,
+                    "matching_psnr": 28.219972509568443,
+                    "matching_ssim": 24.245896847964207,
+                    "mse": 104.64520245282796,
+                    "psnr": 27.93361038331989,
+                    "ssim": 3.604051459372515
+                }
+            },
+            "20160715": {
+                "best_method": {
+                    "best_method": "crop_KAZE_BF_0.7",
+                    "matching_mse": 97.98766457806856,
+                    "matching_psnr": 28.219089539801626,
+                    "matching_ssim": 28.56190424698234,
+                    "mse": 100.56026355569402,
+                    "psnr": 28.106539579577735,
+                    "ssim": 3.5046583444608292
+                }
+            },
+            "20160817": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 96.95991664484097,
+                    "matching_psnr": 28.26488127402766,
+                    "matching_ssim": 14.775318287646954,
+                    "mse": 100.55991436737762,
+                    "psnr": 28.106554660168904,
+                    "ssim": 5.124071466505297
+                }
+            },
+            "20160919": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 98.35895426365657,
+                    "matching_psnr": 28.202664581247134,
+                    "matching_ssim": 22.078985606668013,
+                    "mse": 101.7545560884314,
+                    "psnr": 28.055264968795854,
+                    "ssim": 3.786535613318012
+                }
+            },
+            "20161017": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 97.68889061253435,
+                    "matching_psnr": 28.232351832290085,
+                    "matching_ssim": 30.944751763605066,
+                    "mse": 101.04691516709512,
+                    "psnr": 28.085573012685224,
+                    "ssim": 2.9131527863235926
+                }
+            },
+            "20161114": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 95.89777228032035,
+                    "matching_psnr": 28.312718423062293,
+                    "matching_ssim": 26.83728729144475,
+                    "mse": 99.90262003823231,
+                    "psnr": 28.135034827197487,
+                    "ssim": 3.373606118751883
+                }
+            },
+            "20170301": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF_NORMED",
+                    "matching_mse": 99.5311179249192,
+                    "matching_psnr": 28.151214788130055,
+                    "matching_ssim": 8.18417719296619,
+                    "mse": 101.12023345842853,
+                    "psnr": 28.08242297263558,
+                    "ssim": 4.933786418122065
+                }
+            },
+            "20170405": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 97.29527346309943,
+                    "matching_psnr": 28.249886178118217,
+                    "matching_ssim": 14.418138045986256,
+                    "mse": 99.80993825953988,
+                    "psnr": 28.13906573925347,
+                    "ssim": 5.28321288249592
+                }
+            },
+            "20170515": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 97.43801624210454,
+                    "matching_psnr": 28.243519273676718,
+                    "matching_ssim": 12.869288479833404,
+                    "mse": 98.6337428564818,
+                    "psnr": 28.190548472507885,
+                    "ssim": 4.22816174264294
+                }
+            },
+            "20170612": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 95.51671483065542,
+                    "matching_psnr": 28.330009838021873,
+                    "matching_ssim": 20.186996423722743,
+                    "mse": 99.56386544908104,
+                    "psnr": 28.149786116354733,
+                    "ssim": 5.942326552486878
+                }
+            },
+            "20170710": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 96.87863684870943,
+                    "matching_psnr": 28.268523415220194,
+                    "matching_ssim": 18.46548382222194,
+                    "mse": 99.39137827917395,
+                    "psnr": 28.157316477802286,
+                    "ssim": 6.1129237669606455
+                }
+            },
+            "20170807": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 99.29764205643603,
+                    "matching_psnr": 28.16141425102005,
+                    "matching_ssim": 8.322999770596828,
+                    "mse": 100.60428343641283,
+                    "psnr": 28.10463888764357,
+                    "ssim": 4.396247978040571
+                }
+            },
+            "20171016": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 98.58006110003656,
+                    "matching_psnr": 28.192912778728964,
+                    "matching_ssim": 12.980666086510167,
+                    "mse": 100.59565458427205,
+                    "psnr": 28.105011398978228,
+                    "ssim": 5.088717189731377
+                }
+            },
+            "20171120": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 103.27276131120612,
+                    "matching_psnr": 27.990945715085896,
+                    "matching_ssim": 11.391574307097049,
+                    "mse": 104.05953329951446,
+                    "psnr": 27.95798487087059,
+                    "ssim": 5.616103201648225
+                }
+            },
+            "20180108": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 104.9719148059558,
+                    "matching_psnr": 27.92007241572592,
+                    "matching_ssim": 6.5896678738183185,
+                    "mse": 105.61062979960401,
+                    "psnr": 27.893727283616087,
+                    "ssim": 5.849605339750703
+                }
+            },
+            "20180305": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 98.29898886032562,
+                    "matching_psnr": 28.205313103261055,
+                    "matching_ssim": 11.783363035456732,
+                    "mse": 100.33097972007998,
+                    "psnr": 28.116453077668613,
+                    "ssim": 4.686711209702212
+                }
+            },
+            "20180514": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 97.64324415440556,
+                    "matching_psnr": 28.23438160637393,
+                    "matching_ssim": 10.272585926339072,
+                    "mse": 99.31620391552484,
+                    "psnr": 28.16060249361611,
+                    "ssim": 4.744469594864986
+                }
+            },
+            "20180709": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.99853723404256,
+                    "matching_psnr": 28.002493038879287,
+                    "matching_ssim": 11.867473341816858,
+                    "mse": 105.4159090909091,
+                    "psnr": 27.90174202467604,
+                    "ssim": 4.491168643405396
+                }
+            },
+            "20181217": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.19582087292274,
+                    "matching_psnr": 28.079177832386865,
+                    "matching_ssim": 9.468546572711936,
+                    "mse": 103.53869351806286,
+                    "psnr": 27.97977680244053,
+                    "ssim": 4.79255537066876
+                }
+            },
+            "20190308": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 98.76925853728973,
+                    "matching_psnr": 28.184585673440388,
+                    "matching_ssim": 10.48859183267162,
+                    "mse": 100.88322142805573,
+                    "psnr": 28.09261419082318,
+                    "ssim": 3.8903797334440173
+                }
+            }
+        },
+        "pre_date": "20160406"
+    },
+    "10306095_L": {
+        "post_date": {
+            "20220307": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.75042028915894,
+                    "matching_psnr": 28.01296753882926,
+                    "matching_ssim": 4.97361865829329,
+                    "mse": 103.7918247754455,
+                    "psnr": 27.96917213470457,
+                    "ssim": 3.0585913196316024
+                }
+            }
+        },
+        "pre_date": "20210929"
+    },
+    "10439969_L": {
+        "post_date": {
+            "20200512": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.30539026716275,
+                    "matching_psnr": 28.117560888606164,
+                    "matching_ssim": 9.950265772580451,
+                    "mse": 101.86907816088866,
+                    "psnr": 28.050379847326354,
+                    "ssim": 3.936203052077505
+                }
+            }
+        },
+        "pre_date": "20161122"
+    },
+    "10713526_R": {
+        "pre_date": "20210728"
+    },
+    "11990421_L": {
+        "post_date": {
+            "20210713": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF_NORMED",
+                    "matching_mse": 98.71908419537525,
+                    "matching_psnr": 28.186792430557684,
+                    "matching_ssim": 10.01480486978913,
+                    "mse": 100.20547760933023,
+                    "psnr": 28.121888985134774,
+                    "ssim": 4.4852960650228795
+                }
+            },
+            "20220106": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 107.76557174756141,
+                    "matching_psnr": 27.80600323469749,
+                    "matching_ssim": 8.53013225922756,
+                    "mse": 108.92390410153955,
+                    "psnr": 27.759571617349717,
+                    "ssim": 5.942455656638726
+                }
+            }
+        },
+        "pre_date": "20210304"
+    },
+    "12291088_L": {
+        "pre_date": "20210830"
+    },
+    "12522028_L": {
+        "pre_date": "20170118"
+    },
+    "12682926_R": {
+        "post_date": {
+            "20171225": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.27514704416309,
+                    "matching_psnr": 28.033102482983523,
+                    "matching_ssim": 5.992288672492286,
+                    "mse": 102.67439686970391,
+                    "psnr": 28.0161820046887,
+                    "ssim": 3.709740212917581
+                }
+            },
+            "20190625": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.39159698443723,
+                    "matching_psnr": 28.02816044199133,
+                    "matching_ssim": 6.465872806282535,
+                    "mse": 102.65692829955766,
+                    "psnr": 28.016920957075367,
+                    "ssim": 2.899474685665803
+                }
+            }
+        },
+        "pre_date": "20161219"
+    },
+    "13319575_L": {
+        "post_date": {
+            "20220215": {
+                "best_method": {
+                    "best_method": "crop_SIFT_FLANN_0.8",
+                    "matching_mse": 100.15095277346781,
+                    "matching_psnr": 28.124252756128403,
+                    "matching_ssim": 9.500320510094392,
+                    "mse": 102.34670771916214,
+                    "psnr": 28.030064839954015,
+                    "ssim": 3.2155935706467034
+                }
+            }
+        },
+        "pre_date": "20211014"
+    },
+    "13319575_R": {
+        "post_date": {
+            "20220215": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 98.5140514099367,
+                    "matching_psnr": 28.19582180983794,
+                    "matching_ssim": 7.131773593905008,
+                    "mse": 98.63351237291387,
+                    "psnr": 28.190558620947535,
+                    "ssim": 4.184150408764398
+                }
+            }
+        },
+        "pre_date": "20211014"
+    },
+    "13790698_L": {
+        "post_date": {
+            "20161214": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 110.52893986013986,
+                    "matching_psnr": 27.696043563669306,
+                    "matching_ssim": 6.793513099608134,
+                    "mse": 110.59462937062938,
+                    "psnr": 27.693463233326145,
+                    "ssim": 4.131074131439156
+                }
+            },
+            "20170301": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 107.92709293179009,
+                    "matching_psnr": 27.79949881580706,
+                    "matching_ssim": 15.851691670605003,
+                    "mse": 108.61076525452297,
+                    "psnr": 27.77207487190351,
+                    "ssim": 6.341883060722318
+                }
+            },
+            "20170405": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 102.60494895694629,
+                    "matching_psnr": 28.01912052208504,
+                    "matching_ssim": 11.859548289348105,
+                    "mse": 102.92804039059033,
+                    "psnr": 28.005466563875633,
+                    "ssim": 7.572564791835866
+                }
+            },
+            "20170531": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 97.7501253607604,
+                    "matching_psnr": 28.22963037833749,
+                    "matching_ssim": 24.762426229822665,
+                    "mse": 100.69671610523618,
+                    "psnr": 28.10065053180527,
+                    "ssim": 3.5596936127802006
+                }
+            },
+            "20170621": {
+                "best_method": {
+                    "best_method": "crop_BRISK_BF_0.8",
+                    "matching_mse": 98.96911673160722,
+                    "matching_psnr": 28.175806665279396,
+                    "matching_ssim": 9.694954929200904,
+                    "mse": 101.06129389251377,
+                    "psnr": 28.08495506637362,
+                    "ssim": 3.424093521617104
+                }
+            },
+            "20170726": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.8",
+                    "matching_mse": 99.70880772281873,
+                    "matching_psnr": 28.14346837697004,
+                    "matching_ssim": 11.96920114088179,
+                    "mse": 102.80301896068201,
+                    "psnr": 28.01074492330116,
+                    "ssim": 3.9105111127471734
+                }
+            },
+            "20170809": {
+                "best_method": {
+                    "best_method": "crop_KAZE_FLANN_0.7",
+                    "matching_mse": 97.82820602970907,
+                    "matching_psnr": 28.22616271346601,
+                    "matching_ssim": 11.657937106815785,
+                    "mse": 111.65615935659665,
+                    "psnr": 27.651976755491233,
+                    "ssim": 4.202593855980359
+                }
+            },
+            "20190709": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.75160568760056,
+                    "matching_psnr": 28.141604656755202,
+                    "matching_ssim": 5.322041670836069,
+                    "mse": 99.85677659031748,
+                    "psnr": 28.137028180916648,
+                    "ssim": 4.227761801389258
+                }
+            },
+            "20191231": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 99.43658360255743,
+                    "matching_psnr": 28.155341662725917,
+                    "matching_ssim": 7.519369060921706,
+                    "mse": 102.11524297946366,
+                    "psnr": 28.03989785796111,
+                    "ssim": 4.182658214467219
+                }
+            }
+        },
+        "pre_date": "20161021"
+    },
+    "13820694_R": {
+        "post_date": {
+            "20211129": {
+                "best_method": {
+                    "best_method": "TM_CCORR_NORMED",
+                    "matching_mse": 100.39598481362172,
+                    "matching_psnr": 28.113640166660538,
+                    "matching_ssim": 7.54566039126638,
+                    "mse": 100.99131385181776,
+                    "psnr": 28.087963386540547,
+                    "ssim": 5.236300170612077
+                }
+            }
+        },
+        "pre_date": "20210804"
+    },
+    "14112463_R": {
+        "post_date": {
+            "20201022": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.14812777264055,
+                    "matching_psnr": 28.08122512372418,
+                    "matching_ssim": 5.141141181761812,
+                    "mse": 101.33863963573795,
+                    "psnr": 28.073052908190977,
+                    "ssim": 4.752613560663072
+                }
+            },
+            "20210408": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 104.58536800352579,
+                    "matching_psnr": 27.936094319755313,
+                    "matching_ssim": 6.619760965401332,
+                    "mse": 104.47596801611786,
+                    "psnr": 27.94063957102874,
+                    "ssim": 4.0678291704155205
+                }
+            }
+        },
+        "pre_date": "20200506"
+    },
+    "16006979_R": {
+        "pre_date": "20161026"
+    },
+    "16086122_L": {
+        "pre_date": "20220111"
+    },
+    "16095800_R": {
+        "post_date": {
+            "20210930": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.13340016632301,
+                    "matching_psnr": 28.16860358612241,
+                    "matching_ssim": 31.59097337736119,
+                    "mse": 101.84464747496611,
+                    "psnr": 28.05142151617837,
+                    "ssim": 2.3510872571981216
+                }
+            }
+        },
+        "pre_date": "20210420"
+    },
+    "16710355_R": {
+        "pre_date": "20220208"
+    },
+    "17263001_L": {
+        "post_date": {
+            "20170515": {
+                "best_method": {
+                    "best_method": "TM_CCOEFF",
+                    "matching_mse": 93.61716560084457,
+                    "matching_psnr": 28.417248727898723,
+                    "matching_ssim": 37.428915250956926,
+                    "mse": 99.92387967333666,
+                    "psnr": 28.134110731318188,
+                    "ssim": 4.853820005784345
+                }
+            },
+            "20170612": {
+                "best_method": {
+                    "best_method": "crop_SIFT_BF_0.8",
+                    "matching_mse": 95.92163976911297,
+                    "matching_psnr": 28.311637665007385,
+                    "matching_ssim": 19.15762484308545,
+                    "mse": 99.35311579691366,
+                    "psnr": 28.158988693698596,
+                    "ssim": 4.989119977278331
+                }
+            },
+            "20170816": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.7",
+                    "matching_mse": 93.24373644371653,
+                    "matching_psnr": 28.43460692712046,
+                    "matching_ssim": 39.00801380915237,
+                    "mse": 99.30418086848745,
+                    "psnr": 28.161128274793718,
+                    "ssim": 4.505257836074738
+                }
+            },
+            "20171018": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.7",
+                    "matching_mse": 93.22348891520659,
+                    "matching_psnr": 28.43555008374455,
+                    "matching_ssim": 38.993386153915175,
+                    "mse": 99.28907901581644,
+                    "psnr": 28.16178878575949,
+                    "ssim": 4.545981354218082
+                }
+            },
+            "20171115": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_BF_0.7",
+                    "matching_mse": 95.99430582990323,
+                    "matching_psnr": 28.308348884532947,
+                    "matching_ssim": 15.52074965113746,
+                    "mse": 98.08024807159646,
+                    "psnr": 28.21498805243436,
+                    "ssim": 4.088696442682415
+                }
+            },
+            "20171213": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.4993117986236,
+                    "matching_psnr": 28.152602839723745,
+                    "matching_ssim": 6.9131548070374995,
+                    "mse": 101.13723107446215,
+                    "psnr": 28.081693014818367,
+                    "ssim": 3.3872912985461525
+                }
+            },
+            "20180117": {
+                "best_method": {
+                    "best_method": "crop_BRIEF_FLANN_0.8",
+                    "matching_mse": 96.8188788434907,
+                    "matching_psnr": 28.271203116366248,
+                    "matching_ssim": 12.168711234206487,
+                    "mse": 99.95909658969364,
+                    "psnr": 28.132580384623566,
+                    "ssim": 5.152863026785804
+                }
+            },
+            "20180425": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 94.35143289776232,
+                    "matching_psnr": 28.383318607668976,
+                    "matching_ssim": 35.98968797557616,
+                    "mse": 98.67710167685492,
+                    "psnr": 28.188639758693647,
+                    "ssim": 4.3021881155793436
+                }
+            }
+        },
+        "pre_date": "20170320"
+    },
+    "17634105_R": {
+        "post_date": {
+            "20170503": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 101.89004366160391,
+                    "matching_psnr": 28.049486125246904,
+                    "matching_ssim": 9.469168654765898,
+                    "mse": 103.21433369407023,
+                    "psnr": 27.993403475692137,
+                    "ssim": 4.469703207090474
+                }
+            },
+            "20170531": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 97.81046755663256,
+                    "matching_psnr": 28.22695025928754,
+                    "matching_ssim": 9.6385484950474,
+                    "mse": 99.34645924836106,
+                    "psnr": 28.159279675931977,
+                    "ssim": 4.061293165185345
+                }
+            },
+            "20170705": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 109.75170564771018,
+                    "matching_psnr": 27.726690825447985,
+                    "matching_ssim": 6.820877925266386,
+                    "mse": 110.95418183403449,
+                    "psnr": 27.67936685546211,
+                    "ssim": 4.900649845733186
+                }
+            },
+            "20170830": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 99.40143772000509,
+                    "matching_psnr": 28.156876948876075,
+                    "matching_ssim": 13.56955950832665,
+                    "mse": 101.38843886509181,
+                    "psnr": 28.070919248385255,
+                    "ssim": 3.740211421867537
+                }
+            }
+        },
+        "pre_date": "20170111"
+    },
+    "17768873_R": {
+        "pre_date": "20170501"
+    },
+    "18289838_L": {
+        "pre_date": "20190418"
+    },
+    "20256047_L": {
+        "post_date": {
+            "20210818": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 100.54481063045132,
+                    "matching_psnr": 28.10720700382872,
+                    "matching_ssim": 6.693528550711417,
+                    "mse": 101.1587543171574,
+                    "psnr": 28.08076888124721,
+                    "ssim": 3.4781169697936245
+                }
+            }
+        },
+        "pre_date": "20210208"
+    },
+    "20256047_R": {
+        "post_date": {
+            "20210630": {
+                "best_method": {
+                    "best_method": "TM_CCORR",
+                    "matching_mse": 100.97139702584273,
+                    "matching_psnr": 28.0888199573014,
+                    "matching_ssim": 5.291004988892498,
+                    "mse": 101.15481489148812,
+                    "psnr": 28.080938011853426,
+                    "ssim": 3.2635624616050296
+                }
+            },
+            "20210818": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.67993107409535,
+                    "matching_psnr": 28.14472631855288,
+                    "matching_ssim": 6.433172120944036,
+                    "mse": 100.75589890867317,
+                    "psnr": 28.09809878873717,
+                    "ssim": 3.149891040714191
+                }
+            }
+        },
+        "pre_date": "20210208"
+    },
+    "20307089_R": {
+        "post_date": {
+            "20210720": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 97.80233968025867,
+                    "matching_psnr": 28.227311165294736,
+                    "matching_ssim": 26.985258767111247,
+                    "mse": 99.74989895814622,
+                    "psnr": 28.141678964283404,
+                    "ssim": 5.8769817510583255
+                }
+            }
+        },
+        "pre_date": "20210408"
+    },
+    "20342007_L": {
+        "post_date": {
+            "20211123": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 94.75142993870064,
+                    "matching_psnr": 28.364945880346486,
+                    "matching_ssim": 7.776273628541238,
+                    "mse": 94.82005560239729,
+                    "psnr": 28.361801552149952,
+                    "ssim": 6.090202311962127
+                }
+            }
+        },
+        "pre_date": "20210406"
+    },
+    "20354860_R": {
+        "post_date": {
+            "20211108": {
+                "best_method": {
+                    "best_method": "TM_SQDIFF",
+                    "matching_mse": 102.53715993151069,
+                    "matching_psnr": 28.021990766610788,
+                    "matching_ssim": 25.900256746017515,
+                    "mse": 105.16709379231621,
+                    "psnr": 27.91200488160168,
+                    "ssim": 2.3594585779277213
+                }
+            }
+        },
+        "pre_date": "20210415"
+    },
+    "20402196_L": {
+        "pre_date": "20211129"
+    },
+    "20724856_R": {
+        "pre_date": "20210819"
+    },
+    "20724924_R": {
+        "post_date": {
+            "20211209": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.1398415418512,
+                    "matching_psnr": 28.16832140443973,
+                    "matching_ssim": 24.67005387672608,
+                    "mse": 100.43681703870207,
+                    "psnr": 28.111874199137603,
+                    "ssim": 8.196846253999022
+                }
+            }
+        },
+        "pre_date": "20210819"
+    },
+    "20770192_L": {
+        "post_date": {
+            "20211224": {
+                "best_method": {
+                    "best_method": "PHASE_CORRELATE",
+                    "matching_mse": 99.09875958059258,
+                    "matching_psnr": 28.17012142413668,
+                    "matching_ssim": 5.7314033111390845,
+                    "mse": 99.09049397130735,
+                    "psnr": 28.170483674706766,
+                    "ssim": 3.9647369562209454
+                }
+            }
+        },
+        "pre_date": "20210901"
+    },
+    "20770192_R": {
+        "post_date": {
+            "20211224": {
+                "best_method": {
+                    "best_method": "crop_AKAZE_BF_0.8",
+                    "matching_mse": 99.49847683953233,
+                    "matching_psnr": 28.152639284161488,
+                    "matching_ssim": 8.243917167027472,
+                    "mse": 101.34590793608747,
+                    "psnr": 28.072741430796793,
+                    "ssim": 4.049166824986611
+                }
+            }
+        },
+        "pre_date": "20210901"
+    },
+    "avg": {
+        "mse": 99.7,
+        "mse_std": 3.05,
+        "psnr": 28.15,
+        "psnr_std": 0.13,
+        "ssim": 15.03,
+        "ssim_std": 15.03
+    },
+    "best_case": {
+        "matching_mse": 97.82820602970907,
+        "matching_psnr": 28.22616271346601,
+        "matching_ssim": 11.657937106815785,
+        "mse": 111.65615935659665,
+        "patient": [
+            "13790698",
+            "L",
+            "20170809"
+        ],
+        "psnr": 27.651976755491233,
+        "ssim": 4.202593855980359
+    },
+    "original": {
+        "mse": 99.7,
+        "mse_std": 3.05,
+        "psnr": 28.15,
+        "psnr_std": 0.13,
+        "ssim": 15.03,
+        "ssim_std": 15.03
+    },
+    "worst_case": {
+        "matching_mse": 101.14812777264055,
+        "matching_psnr": 28.08122512372418,
+        "matching_ssim": 5.141141181761812,
+        "mse": 101.33863963573795,
+        "patient": [
+            "14112463",
+            "R",
+            "20201022"
+        ],
+        "psnr": 28.073052908190977,
+        "ssim": 4.752613560663072
+    }
+}

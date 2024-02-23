@@ -1,0 +1,1399 @@
+{
+    "00016179_R": {},
+    "00285176_L": {
+        "20190116": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190522": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "00468301_L": {},
+    "00563175_L": {
+        "20160711": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20160808": {
+            "matching": [
+                101.27443704513578,
+                28.07580523121103,
+                3.9590134271523225
+            ],
+            "mse": "worse",
+            "original": [
+                98.16353576516582,
+                28.211301679577883,
+                4.126218562760752
+            ],
+            "psnr": "worse",
+            "rotation_angle": -0.004707892542270847,
+            "scale": 1.0079215248016138,
+            "ssim": "worse",
+            "translation": [
+                1.7905528828734292,
+                -4.436577969721148
+            ]
+        },
+        "20161107": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "00871678_L": {
+        "20170313": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170828": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171030": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180205": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180917": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190327": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "01790839_R": {
+        "20211102": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "01836108_L": {
+        "20160921": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20161205": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170220": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170424": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "02875773_L": {
+        "20220420": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "03254241_L": {
+        "20161017": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20161128": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20161226": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170320": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170807": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171013": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171115": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180110": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180207": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180314": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180523": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180627": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20181003": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190306": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190605": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "03408585_R": {},
+    "03860215_L": {},
+    "03978730_R": {
+        "20211124": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "04851616_R": {},
+    "04978848_R": {
+        "20170111": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180801": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20200617": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "05084585_L": {
+        "20210930": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "05655586_L": {},
+    "05655586_R": {},
+    "06271674_L": {},
+    "07838199_L": {
+        "20220328": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "08476328_L": {},
+    "08532554_R": {
+        "20171206": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180103": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190401": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190717": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20200814": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "08663464_R": {},
+    "08707452_L": {
+        "20170118": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170222": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170329": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170503": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170531": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170705": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170802": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "09065071_R": {},
+    "09227477_L": {
+        "20170116": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171011": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180207": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180912": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190724": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "09958282_L": {
+        "20161205": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170109": {
+            "matching": [
+                103.35464797862947,
+                27.987503487378795,
+                3.385217451815553
+            ],
+            "mse": "worse",
+            "original": [
+                101.61122847019638,
+                28.061386588924336,
+                1.978676060275158
+            ],
+            "psnr": "worse",
+            "rotation_angle": 0.0012028207475081876,
+            "scale": 1.037570263443435,
+            "ssim": "better",
+            "translation": [
+                -18.991680220694878,
+                -12.04911292788788
+            ]
+        },
+        "20170220": {
+            "matching": [
+                103.15915627996165,
+                27.995725794033227,
+                2.4674858411207112
+            ],
+            "mse": "worse",
+            "original": [
+                100.84118932417668,
+                28.094424017504398,
+                3.0473026507796073
+            ],
+            "psnr": "worse",
+            "rotation_angle": -0.008099567524956027,
+            "scale": 0.9762596267835694,
+            "ssim": "worse",
+            "translation": [
+                -1.8516279517206342,
+                -3.35201601914806
+            ]
+        },
+        "20170320": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170417": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170612": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170807": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171016": {
+            "matching": [
+                102.84129851430068,
+                28.009128092911443,
+                3.093350715397409
+            ],
+            "mse": "worse",
+            "original": [
+                101.23860200274888,
+                28.077342214844577,
+                2.3569345691832777
+            ],
+            "psnr": "worse",
+            "rotation_angle": 0.01283788626343387,
+            "scale": 1.0127190509963804,
+            "ssim": "better",
+            "translation": [
+                -6.792193198484045,
+                46.681476594269114
+            ]
+        },
+        "20171211": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180129": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180326": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180521": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180716": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180910": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20181212": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190306": {
+            "matching": [
+                103.75485934261178,
+                27.970719148933085,
+                2.5805568291109187
+            ],
+            "mse": "better",
+            "original": [
+                104.90212614746817,
+                27.922960703411242,
+                2.8431610442073474
+            ],
+            "psnr": "better",
+            "rotation_angle": -0.012897539342765189,
+            "scale": 0.9451758260771473,
+            "ssim": "worse",
+            "translation": [
+                -18.2147468906801,
+                2.049508493619497
+            ]
+        },
+        "20190529": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20191106": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20200422": {
+            "matching": [
+                103.60111815044206,
+                27.977159181619164,
+                2.8157786342478377
+            ],
+            "mse": "better",
+            "original": [
+                104.6232802231573,
+                27.934520286549475,
+                2.875103141426566
+            ],
+            "psnr": "better",
+            "rotation_angle": -0.01778525529421825,
+            "scale": 0.963150146788557,
+            "ssim": "worse",
+            "translation": [
+                -14.494224313597414,
+                -1.8167154686176874
+            ]
+        },
+        "20200923": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20210310": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "10006476_R": {},
+    "10045360_R": {},
+    "10284504_L": {
+        "20160504": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20160601": {
+            "matching": [
+                101.86488936834374,
+                28.050558430162628,
+                4.3414916611279715
+            ],
+            "mse": "worse",
+            "original": [
+                101.31758400661036,
+                28.073955357019017,
+                2.764610500854398
+            ],
+            "psnr": "worse",
+            "rotation_angle": 0.009857142552901123,
+            "scale": 1.0306373063520082,
+            "ssim": "better",
+            "translation": [
+                -17.082308419771763,
+                -1.5793380783028594
+            ]
+        },
+        "20160622": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20160715": {
+            "matching": [
+                102.18325340427766,
+                28.037006348349188,
+                4.269611171282134
+            ],
+            "mse": "worse",
+            "original": [
+                100.6846244501231,
+                28.101172063649734,
+                3.5248392984370462
+            ],
+            "psnr": "worse",
+            "rotation_angle": 0.007879433838739291,
+            "scale": 1.0159599894377593,
+            "ssim": "better",
+            "translation": [
+                -21.97446940860235,
+                -1.6128547506424733
+            ]
+        },
+        "20160817": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20160919": {
+            "matching": [
+                102.53345883963718,
+                28.022147528587467,
+                4.539689761254789
+            ],
+            "mse": "worse",
+            "original": [
+                101.16225968395231,
+                28.08061839154512,
+                4.10599991295917
+            ],
+            "psnr": "worse",
+            "rotation_angle": -0.014140128409751955,
+            "scale": 0.6552939307198038,
+            "ssim": "better",
+            "translation": [
+                60.24300852407783,
+                42.12524892094634
+            ]
+        },
+        "20161017": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20161114": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170301": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170405": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170515": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170612": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170710": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170807": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171016": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171120": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180108": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180305": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180514": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180709": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20181217": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190308": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "10306095_L": {
+        "20220307": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "10439969_L": {
+        "20200512": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "10713526_R": {},
+    "11990421_L": {
+        "20210713": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20220106": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "12291088_L": {},
+    "12522028_L": {},
+    "12682926_R": {
+        "20171225": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190625": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "13319575_L": {
+        "20220215": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "13319575_R": {
+        "20220215": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "13790698_L": {
+        "20161214": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170301": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170405": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170531": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170621": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170726": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170809": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20190709": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20191231": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "13820694_R": {
+        "20211129": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "14112463_R": {
+        "20201022": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20210408": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "16006979_R": {},
+    "16086122_L": {},
+    "16095800_R": {
+        "20210930": {
+            "matching": [
+                102.4388203585448,
+                28.02615792191436,
+                4.277434557976074
+            ],
+            "mse": "worse",
+            "original": [
+                101.30338749902144,
+                28.07456392827128,
+                2.764608610022124
+            ],
+            "psnr": "worse",
+            "rotation_angle": -0.002100707297373729,
+            "scale": 1.0154033361540176,
+            "ssim": "better",
+            "translation": [
+                3.951567640104458,
+                -3.492557657096159
+            ]
+        }
+    },
+    "16710355_R": {},
+    "17263001_L": {
+        "20170515": {
+            "matching": [
+                99.61081068204017,
+                28.14773886251711,
+                5.315913675698492
+            ],
+            "mse": "worse",
+            "original": [
+                99.46219358219977,
+                28.154223277478984,
+                5.199174095319507
+            ],
+            "psnr": "worse",
+            "rotation_angle": 0.001800014738433884,
+            "scale": 1.0009489892622379,
+            "ssim": "better",
+            "translation": [
+                15.277237651078973,
+                -9.135495549511642
+            ]
+        },
+        "20170612": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170816": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171018": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171115": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20171213": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180117": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20180425": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "17634105_R": {
+        "20170503": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170531": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170705": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20170830": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "17768873_R": {},
+    "18289838_L": {},
+    "20256047_L": {
+        "20210818": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "20256047_R": {
+        "20210630": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        },
+        "20210818": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "20307089_R": {
+        "20210720": {
+            "matching": [
+                101.09842999813226,
+                28.08335949574061,
+                2.103983207322474
+            ],
+            "mse": "worse",
+            "original": [
+                99.44730221162614,
+                28.154873547095768,
+                5.996908169028028
+            ],
+            "psnr": "worse",
+            "rotation_angle": -0.004889633763989752,
+            "scale": 0.9687955872667539,
+            "ssim": "worse",
+            "translation": [
+                1.8512170781399775,
+                2.906490441201717
+            ]
+        }
+    },
+    "20342007_L": {
+        "20211123": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "20354860_R": {
+        "20211108": {
+            "matching": [
+                103.6257021692311,
+                27.976128745140265,
+                2.7713119691877486
+            ],
+            "mse": "better",
+            "original": [
+                105.1408446013455,
+                27.913088994635096,
+                2.2954635170687574
+            ],
+            "psnr": "better",
+            "rotation_angle": 0.014825521326767772,
+            "scale": 0.9922178325533901,
+            "ssim": "better",
+            "translation": [
+                2.4392972264252895,
+                2.7546836127375793
+            ]
+        }
+    },
+    "20402196_L": {},
+    "20724856_R": {},
+    "20724924_R": {
+        "20211209": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    },
+    "20770192_L": {
+        "20211224": {
+            "matching": [
+                99.797569274563,
+                28.139603973711225,
+                5.678538023033456
+            ],
+            "mse": "worse",
+            "original": [
+                99.09365965396077,
+                28.170344931171243,
+                4.030052728494575
+            ],
+            "psnr": "worse",
+            "rotation_angle": 0.007317085778174673,
+            "scale": 1.3577690499129682,
+            "ssim": "better",
+            "translation": [
+                -35.18103054223612,
+                -79.6325549567929
+            ]
+        }
+    },
+    "20770192_R": {
+        "20211224": {
+            "rotation_angle": 0.0,
+            "scale": 1.0,
+            "translation": [
+                0.0,
+                0.0
+            ]
+        }
+    }
+}

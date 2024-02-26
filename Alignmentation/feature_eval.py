@@ -324,21 +324,23 @@ class finding():
         if matcher == 'BF': 
             # Need to draw only good matches, so create a mask
             matches = sorted(matches, key=lambda x: x[0].distance)
-            min_dist = matches[0][0].distance
-            # Apply ratio test
-            good = []
-            pts1 = []
-            pts2 = []
-            for i, mn in enumerate(matches):
-                if len(mn)== 2 :
-                    m,n = mn
-                    if m.distance < distance* n.distance:
-                        good.append([m])
-                        pts2.append(kp2[m.trainIdx].pt)
-                        pts1.append(kp1[m.queryIdx].pt)
+            if matches:
+                min_dist = matches[0][0].distance
 
-                    if m.distance > 1.5 * min_dist:
-                        break
+                # Apply ratio test
+                good = []
+                pts1 = []
+                pts2 = []
+                for i, mn in enumerate(matches):
+                    if len(mn)== 2 :
+                        m,n = mn
+                        if m.distance < distance* n.distance:
+                            good.append([m])
+                            pts2.append(kp2[m.trainIdx].pt)
+                            pts1.append(kp1[m.queryIdx].pt)
+
+                        if m.distance > 1.5 * min_dist:
+                            break
             # Draw matches
             img3 = cv2.drawMatchesKnn(img1 , kp1, img2, kp2, good, None, flags=2)
             
@@ -347,7 +349,7 @@ class finding():
             matchesMask = [[0, 0] for i in range(len(matches))]
             pts1 = []
             pts2 = []
-            if matches:
+            if matches and matches[0]:
                 # matches = sorted(matches, key=lambda x: x[0].distance)
                 min_dist = matches[0][0].distance
                 # ratio test as per Lowe's paper
@@ -662,17 +664,18 @@ class finding():
                                 os.makedirs(self.output_label_path + '/' + match_par + '/' + label +'_move/')
                                 
                             mask_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(self.image_path))),label,'masks')
-
-                            if os.path.exists(mask_path + '/'+ label + '_' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
-                                pre_label = cv2.imread(mask_path + '/'+ label + '_' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                            print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                            if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
+                                print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                                pre_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.resize(pre_label, self.image_size)
                                 pre_label = cv2.normalize(pre_label, None, 0, 255, cv2.NORM_MINMAX)
                                 
                                 # print('pre_label',self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 cv2.imwrite(self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png', pre_label)
                                 
-                                if os.path.exists(mask_path + '/'+ label + '_' + patient_id + '_' + eye + '_' + post_treatment + '.png'):
-                                    post_label = cv2.imread(mask_path + '/'+ label + '_' + patient_id + '_' + eye + '_' + post_treatment + '.png')
+                                if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png'):
+                                    post_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png')
                                     post_label = cv2.resize(post_label, self.image_size)
                                     post_label = cv2.normalize(post_label, None, 0, 255, cv2.NORM_MINMAX)
                                     height, width, channels = post_label.shape
@@ -940,11 +943,11 @@ if __name__ == '__main__':
 
     label_path = PATH_DATA + 'labeled' + '/'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
-    output_image_path = PATH_BASE + 'ALL/inpaint/'
-    image_path = output_image_path + 'MATCH/' 
+    output_image_path = PATH_BASE + 'inpaint/'
+    image_path = PATH_BASE + 'inpaint/MATCH/' 
     output_label_path = output_image_path + 'MATCH_LABEL/' 
-    distances = [0.6,0.65,0.7,0.75,0.8,0.85]
-    features = ['SIFT','KAZE','AKAZE','ORB','BRISK','BRIEF','FREAK']
+    distances = [0.8]
+    features = ['SIFT','KAZE','AKAZE','ORB','BRISK']
     matchers = ['BF','FLANN']
     patient_list = get_data_from_txt_file('PCV.txt')
     setFolder('./record/'+ disease + '_' + date + '/') 

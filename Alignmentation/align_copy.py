@@ -81,7 +81,7 @@ class Matching():
         self.output_image_path = output_image_path
         self.output_label_path = output_label_path
         self.image_size = (304, 304)
-        self.data_list = ['1','2', '3', '4', '1_OCT', '2_OCT', '3_OCT', '4_OCT']
+        self.data_list = ['1','2', '3', '4']
         self.label_list = ['CC', 'OR']
         self.eval_list = ['mse','psnr','ssim','matching_mse','matching_psnr','matching_ssim']
         self.layers = layers
@@ -91,29 +91,29 @@ class Matching():
         self.template_matching_name = ['TM_SQDIFF', 'TM_SQDIFF_NORMED', 'TM_CCORR' , 'TM_CCORR_NORMED', 'TM_CCOEFF', 'TM_CCOEFF_NORMED']
         
         # feature matching
-        self.features_matching = ['SIFT','KAZE','AKAZE','ORB','BRISK','BRIEF','FREAK']
+        self.features_matching = ['SIFT','KAZE','AKAZE','ORB','BRISK']
         self.features_matching_matchers = ['BF','FLANN']# 
-        self.features_matching_distances = [0.7,0.8]# 
+        self.features_matching_distances = [0.8]# 
         setFolder('./record/'+ disease + '_' + date + '/')
         
         # phase matching
         self.phase_matching = 'PHASE_CORRELATE'
         
-        for data in self.data_list: 
-            for template_matching in self.template_matching_name:
-                setFolder( os.path.join(self.output_image_path,template_matching,data))
-                setFolder( os.path.join(self.output_label_path,template_matching,data))
+        # for data in self.data_list: 
+        #     for template_matching in self.template_matching_name:
+        #         setFolder( os.path.join(self.output_image_path,template_matching,data))
+        #         setFolder( os.path.join(self.output_label_path,template_matching,data))
                 
-            for features_matching in self.features_matching:
-                for features_matching_matchers in self.features_matching_matchers : 
-                    for features_matching_distances in self.features_matching_distances:
-                        features_matching_distances = str(features_matching_distances)
+        #     for features_matching in self.features_matching:
+        #         for features_matching_matchers in self.features_matching_matchers : 
+        #             for features_matching_distances in self.features_matching_distances:
+        #                 features_matching_distances = str(features_matching_distances)
                         
-                        setFolder( os.path.join(self.output_image_path,features_matching+ '_'+features_matching_matchers+'_'+features_matching_distances ,data))
-                        setFolder( os.path.join(self.output_label_path,features_matching+ '_'+features_matching_matchers+'_'+features_matching_distances ,data))
+        #                 setFolder( os.path.join(self.output_image_path,features_matching+ '_'+features_matching_matchers+'_'+features_matching_distances ,data))
+        #                 setFolder( os.path.join(self.output_label_path,features_matching+ '_'+features_matching_matchers+'_'+features_matching_distances ,data))
                 
-            setFolder( os.path.join(self.output_image_path,self.phase_matching,data))
-            setFolder( os.path.join(self.output_label_path,self.phase_matching,data))
+        #     setFolder( os.path.join(self.output_image_path,self.phase_matching,data))
+        #     setFolder( os.path.join(self.output_label_path,self.phase_matching,data))
             
     def evaluates(self, pre_treatment_img, post_treatment_img,matching_img):
 
@@ -291,8 +291,8 @@ class Matching():
                     matching_all = {}
                     if 'pre_date' in patient[patient_id + '_' + eye] and post_treatment in patient[patient_id + '_' + eye]['post_date']:
                         for template_matching in self.template_matching_name:
-                            match_path = os.path.join(self.output_image_path,template_matching)
-                            self.process_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, template_matching)
+                            # match_path = os.path.join(self.output_image_path,template_matching)
+                            # self.process_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, template_matching)
                             features_name = f"crop_{template_matching}"
                             match_path = os.path.join(self.output_image_path,features_name)
                             self.process_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, features_name)
@@ -304,9 +304,9 @@ class Matching():
                         for features_matching in self.features_matching:
                             for features_matching_matchers in self.features_matching_matchers:
                                 for features_matching_distances in self.features_matching_distances:
-                                    features_name = f"{features_matching}_{features_matching_matchers}_{features_matching_distances}"
-                                    match_path = os.path.join(self.output_image_path, features_name)
-                                    self.process_features_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, features_name)
+                                    # features_name = f"{features_matching}_{features_matching_matchers}_{features_matching_distances}"
+                                    # match_path = os.path.join(self.output_image_path, features_name)
+                                    # self.process_features_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, features_name)
                                     features_name = f"crop_{features_matching}_{features_matching_matchers}_{features_matching_distances}"
                                     match_path = os.path.join(self.output_image_path, features_name)
                                     self.process_features_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, features_name)
@@ -319,8 +319,8 @@ class Matching():
                         #             self.process_features_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, features_name)
 
 
-                        match_path = os.path.join(self.output_image_path, self.phase_matching)
-                        self.process_phase_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, self.phase_matching)
+                        # match_path = os.path.join(self.output_image_path, self.phase_matching)
+                        # self.process_phase_matching(match_path, matching_all, patient_id, eye, pre_treatment, post_treatment, self.phase_matching)
                     
                         
                         best_method = self.find_best_method(matching_all)
@@ -522,14 +522,14 @@ class Matching():
 
                 
 if __name__ == '__main__':
-    date = '1120'
+    date = '0205'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
 
     PATH_LABEL = PATH_DATA + 'labeled' + '/'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
-    image_path = PATH_BASE + 'ALL/'
+    image_path = PATH_BASE + 'inpaint/'
     PATH_MATCH = image_path + 'MATCH/' 
     PATH_MATCH_LABEL = image_path + 'MATCH_LABEL/' 
     

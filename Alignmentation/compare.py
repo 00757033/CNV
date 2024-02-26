@@ -46,7 +46,7 @@ def compare(date,filename,crop =False):
                     
 if __name__ == '__main__':
 
-    date = '1121'
+    date = '0205'
     disease = 'PCV'
     
     PATH_BASE = disease + '_' + date

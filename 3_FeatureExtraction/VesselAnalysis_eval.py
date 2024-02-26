@@ -55,7 +55,7 @@ class VesselAnalysis():
                 if date[key] < len(self.layers):
                     del date[key]
                     
-            if len(date) < 3:
+            if len(date) < 2:
                 del patient_feature[patient.name]
             else :
                 # date 排序
@@ -64,7 +64,7 @@ class VesselAnalysis():
                 # 將msk 做聯集
                 msk_CC = np.zeros((304,304), dtype=np.uint8)
                 msk_OR = np.zeros((304,304), dtype=np.uint8)
-                for item in range(3):# len(date)
+                for item in range(1):# len(date)
                     print('item',item)
                     CC_post = cv2.imread(os.path.join(patient, 'masks', list(date.keys())[item] + '_CC.png'), cv2.IMREAD_GRAYSCALE)
                     OR_post = cv2.imread(os.path.join(patient, 'masks', list(date.keys())[item] + '_OR.png'), cv2.IMREAD_GRAYSCALE)
@@ -87,14 +87,14 @@ class VesselAnalysis():
                 cv2.imwrite(os.path.join(patient, 'concat_masks_rm_small', 'CC.png'), msk_CC_rm_small)
                 cv2.imwrite(os.path.join(patient, 'concat_masks_rm_small', 'OR.png'), msk_OR_rm_small)
                 
-                # Dilation 
-                msk_CC_rm_small = cv2.dilate(msk_CC_rm_small, np.ones((4,4), np.uint8), iterations=1)
-                msk_OR_rm_small = cv2.dilate(msk_OR_rm_small, np.ones((4,4), np.uint8), iterations=1)
+                # # Dilation 
+                # msk_CC_rm_small = cv2.dilate(msk_CC_rm_small, np.ones((4,4), np.uint8), iterations=1)
+                # msk_OR_rm_small = cv2.dilate(msk_OR_rm_small, np.ones((4,4), np.uint8), iterations=1)
                 
                 
-                tools.makefolder(os.path.join(patient, 'all_msk'))
-                cv2.imwrite(os.path.join(patient, 'all_msk', 'CC.png'), msk_CC_rm_small)
-                cv2.imwrite(os.path.join(patient, 'all_msk', 'OR.png'), msk_OR_rm_small)
+                # tools.makefolder(os.path.join(patient, 'all_msk'))
+                # cv2.imwrite(os.path.join(patient, 'all_msk', 'CC.png'), msk_CC_rm_small)
+                # cv2.imwrite(os.path.join(patient, 'all_msk', 'OR.png'), msk_OR_rm_small)
                 
                 
                 for item in range(len(date)):
@@ -122,12 +122,12 @@ class VesselAnalysis():
                             msk_rm_small = msk_CC_rm_small
                         else :
                             msk_rm_small = msk_OR_rm_small                           
-                        # area, center,VD ,VLD ,VAPR,VLA,VDI= process_image(img = img, msk = msk,all_msk = msk_rm_small,img_name = img_name,patient = patient)
-                        # feature[item]['VD_' + layer] = VD
-                        # feature[item]['VLD_' + layer] = VLD
+                        area, center,VD ,VLD ,VAPR,VLA,VDI= process_image(img = img, msk = msk,all_msk = msk_rm_small,img_name = img_name,patient = patient)
+                        feature[item]['VD_' + layer] = VD
+                        feature[item]['VLD_' + layer] = VLD
                         # feature[item]['VAPR_' + layer] = VAPR
                         # feature[item]['VLA_' + layer] = VLA
-                        # feature[item]['VDI_' + layer] = VDI
+                        feature[item]['VDI_' + layer] = VDI
                         # feature[item]['center_' + layer] = center
                         # feature[item]['Date'] = list(date.keys())[item]
                         print('Texture feature')
@@ -236,15 +236,15 @@ def  HOG(img, msk , bin = 8):
 
     hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
     
-    # 可视化
-    fig,  ax = plt.subplots(1, 2, figsize=(12, 6), sharex=True, sharey=True)
-    ax[0].imshow(img, cmap=plt.cm.gray)
-    ax[0].set_title('Input image')
-    ax[0].axis('off')
-    ax[1].imshow(hog_image_rescaled, cmap=plt.cm.gray)
-    ax[1].set_title('Histogram of Oriented Gradients')
-    ax[1].axis('off')
-    plt.show()
+    # # 可视化
+    # fig,  ax = plt.subplots(1, 2, figsize=(12, 6), sharex=True, sharey=True)
+    # ax[0].imshow(img, cmap=plt.cm.gray)
+    # ax[0].set_title('Input image')
+    # ax[0].axis('off')
+    # ax[1].imshow(hog_image_rescaled, cmap=plt.cm.gray)
+    # ax[1].set_title('Histogram of Oriented Gradients')
+    # ax[1].axis('off')
+    # plt.show()
     
     features ,labels = pyfeats.hog_features(img_roi, ppc=8, cpb=3)
     # features, labels = pyfeats.tas_features(img_roi)
@@ -482,43 +482,43 @@ def Texture_features(img, msk,layer = 'CC'):
     if img_roi.max() == 0:
         return feature
     
-    # GLCM_feature = GLCM(img , msk,layer)
+    GLCM_feature = GLCM(img , msk,layer)
     
-    # # feature 整合
-    # feature= {**feature, **GLCM_feature}
+    # feature 整合
+    feature= {**feature, **GLCM_feature}
     
-    # # print('GLRLM')
-    # GLRLM_feature = GLRLM(img , msk ,layer)
+    # print('GLRLM')
+    GLRLM_feature = GLRLM(img , msk ,layer)
     
-    # feature = {**feature, **GLRLM_feature}
+    feature = {**feature, **GLRLM_feature}
 
     
-    # # print('GLSZM')
-    # GLSZM_feature = GLSZM(img , msk,layer)
-    # feature = {**feature, **GLSZM_feature}
+    # print('GLSZM')
+    GLSZM_feature = GLSZM(img , msk,layer)
+    feature = {**feature, **GLSZM_feature}
     
-    # # print('GLDM')
-    # GLDM_feature = GLDM(img , msk,layer)
-    # feature = {**feature, **GLDM_feature}
+    # print('GLDM')
+    GLDM_feature = GLDM(img , msk,layer)
+    feature = {**feature, **GLDM_feature}
     
-    # # print('NGTDM')
-    # NGTDM_feature = NGTDM(img , msk,layer)
-    # feature = {**feature, **NGTDM_feature}
+    # print('NGTDM')
+    NGTDM_feature = NGTDM(img , msk,layer)
+    feature = {**feature, **NGTDM_feature}
     
     # # # # print('Statistical Feature Matrix')
     # #  SFM 特徵如下：1) 粗糙度，2) 對比度，3) 週期性，4) 粗糙度。
-    # SFM_feature = SFM(img , msk)
-    # feature = {**feature, **SFM_feature}
+    SFM_feature = SFM(img , msk)
+    feature = {**feature, **SFM_feature}
     
     # # FDTA
     # # print('FDTA')
-    # FDTA_feature = FDTA(img , msk,layer)
-    # feature = {**feature, **FDTA_feature}
+    FDTA_feature = FDTA(img , msk,layer)
+    feature = {**feature, **FDTA_feature}
     
     # # HOG
     # print('HOG')
-    # fd  = HOG(img, msk )
-    # feature['HOG' + '_' + layer] = fd
+    fd  = HOG(img, msk )
+    feature['HOG' + '_' + layer] = fd
     
     
     GLDS_feature = GLDS(img , msk,layer) # 'GLDS_Homogeneity', 'GLDS_Contrast', 'GLDS_ASM', 'GLDS_Entopy', 'GLDS_Mean'

@@ -16,7 +16,7 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="tensorflow")
 # Disable NumPy deprecation warnings for TensorFlow
 os.environ['TF_NUMPY_BANNER'] = 'off'
 #Get label data
-train_signal = True
+train_signal = False
 train_data = True
 postprocess_signal = True
 result= True
@@ -60,7 +60,7 @@ def main(data_class):
         tools.makefolder(PATH_DATASET)
         
         Train = train(data_class, data_date, PATH_MODEL, PATH_RESULT, image_size, models, batchs, epochs, datas, lrns, filters, predict_threshold)
-        Train.run(PATH_DATASET, train_signal,postprocess_signal)
+        Train.run(PATH_DATASET, train_signal,postprocess_signal = True)
 
     #Result--------------------------------------------------------------------------------------------------------
     if result :

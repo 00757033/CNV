@@ -611,15 +611,15 @@ class template_matcher():
                 mask_path = os.path.join(os.path.dirname(os.path.dirname(self.image_path)),label,'masks')
                 
                 # label_path = os.path.join(path,'masks',label+ '_'+ )
-                if os.path.exists(mask_path + '/' + label + '_' +patient_id + '_' + eye + '_' + pre_treatment + '.png'):
-                    pre_label = cv2.imread(mask_path + '/' + label + '_' +patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
+                    pre_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                     pre_label = cv2.resize(pre_label, self.image_size)
                     pre_label = cv2.normalize(pre_label, None, 0, 255, cv2.NORM_MINMAX)
                     # print('post_treatment',self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                     cv2.imwrite(self.output_label_path+ output_match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png', pre_label)                    
                     
-                    if os.path.exists(mask_path + '/' + label + '_' +patient_id + '_' + eye + '_' + post_treatment + '.png'):
-                        post_label = cv2.imread(mask_path + '/' + label + '_' +patient_id + '_' + eye + '_' + post_treatment + '.png')
+                    if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png'):
+                        post_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png')
                         post_label = cv2.resize(post_label, self.image_size)
                         label_result = cv2.warpAffine(post_label, M, (image.shape[1], image.shape[0]))
                         
@@ -682,7 +682,7 @@ if __name__ == '__main__':
 
     PATH_LABEL = PATH_DATA + 'labeled' + '/'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
-    image_path = PATH_BASE + 'ALL/inpaint/'
+    image_path = PATH_BASE + 'inpaint/'
     PATH_MATCH = image_path + 'MATCH/' 
     PATH_MATCH_LABEL = image_path + 'MATCH_LABEL/' 
     
@@ -693,9 +693,9 @@ if __name__ == '__main__':
     json_file = './record/' + disease + '_' + date + '/' + 'crop_template_matching.json'
     tools.write_to_json_file(json_file, shift_patient_dict)
 
-    evals= Match.avg_evaluate() 
-    for method, eval in evals.items():
-        print(method,eval)
+    # evals= Match.avg_evaluate() 
+    # for method, eval in evals.items():
+    #     print(method,eval)
     # json_file = './' + disease + '_' + date + '_eval.json'
     # tools.write_to_json_file(json_file, evals)
 

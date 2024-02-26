@@ -1,0 +1,113 @@
+{
+    "Contrast": {
+        "OR": {
+            "Pre-treatment": [
+                0.07,
+                0.02
+            ],
+            "1-injection": [
+                0.03,
+                0.01
+            ]
+        },
+        "CC": {
+            "Pre-treatment": [
+                60.99,
+                5.53
+            ],
+            "1-injection": [
+                38.86,
+                9.85
+            ]
+        }
+    },
+    "Autocorrelation": {
+        "OR": {
+            "Pre-treatment": [
+                11.4,
+                2.26
+            ],
+            "1-injection": [
+                7.46,
+                6.01
+            ]
+        },
+        "CC": {
+            "Pre-treatment": [
+                15.38,
+                4.01
+            ],
+            "1-injection": [
+                22.12,
+                6.1
+            ]
+        }
+    },
+    "Energy": {},
+    "Homogeneity": {
+        "OR": {
+            "Pre-treatment": [
+                0.1,
+                0.02
+            ],
+            "1-injection": [
+                0.11,
+                0.02
+            ]
+        },
+        "CC": {
+            "Pre-treatment": [
+                0.06,
+                0.03
+            ],
+            "1-injection": [
+                0.05,
+                0.01
+            ]
+        }
+    },
+    "DifferenceEntropy": {
+        "OR": {
+            "Pre-treatment": [
+                2.09,
+                0.1
+            ],
+            "1-injection": [
+                1.52,
+                0.26
+            ]
+        },
+        "CC": {
+            "Pre-treatment": [
+                2.23,
+                0.08
+            ],
+            "1-injection": [
+                2.07,
+                0.17
+            ]
+        }
+    },
+    "Dissimilarity": {
+        "OR": {
+            "Pre-treatment": [
+                16.31,
+                2.44
+            ],
+            "1-injection": [
+                13.7,
+                2.4
+            ]
+        },
+        "CC": {
+            "Pre-treatment": [
+                34.1,
+                4.96
+            ],
+            "1-injection": [
+                30.74,
+                4.0
+            ]
+        }
+    }
+}

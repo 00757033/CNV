@@ -26,14 +26,14 @@ model_classes = {
     'UNetPlusPlus': UNetPlusPlus,
     'AttUNet': AttentionUNet,
     'BCDUNet': BCDUNet,
-    'RecurrentUNet': RecurrentUNet,
-    'ResUNet': ResUNet,
+    # 'RecurrentUNet': RecurrentUNet,
+    # 'ResUNet': ResUNet,
     'R2UNet': R2UNet,
-    'R2AttentionUNet': R2AttentionUNet,
+    # 'R2AttentionUNet': R2AttentionUNet,
     'DenseUNet': DenseUNet,
     'MultiResUNet': MultiResUNet,
     'DCUNet': DCUNet,
-    'CARUNet': CARUNet,
+    # 'CARUNet': CARUNet,
 }
 # ['SegNet','PSPNet','FCN8','FCN32','DeepLabV3Plus','DeepLabV3','DeepLabV2','DeepLabV1']
 
@@ -374,9 +374,12 @@ class train():
 
     # 訓練模型
     def run(self, PATH_DATASET, train_signal = True, postprocess_signal = False):
+        print("train_signal", train_signal)
+        print("postprocess_signal", postprocess_signal)
         if train_signal:
             self.record_model()
-
+            
+        print("train_signal")
         # 讀取資料集
         for dataset in glob.glob(r"%s/*" %PATH_DATASET): #讀取資料集
             dataset_name = dataset.replace(PATH_DATASET + '\\', "")
@@ -387,6 +390,7 @@ class train():
                 f.close()
                                             # 預測
             if postprocess_signal:
+                print("postprocess_signal")
                 if not os.path.isdir(os.path.join("record","CRF")):
                     os.makedirs(os.path.join("record","CRF"))
                 if not os.path.isdir(os.path.join("record","Morphology")):

@@ -119,23 +119,25 @@ class Statistic:
                 if feature_names == "LBP":
                     ArrayMannWhitney(OR_0, OR_1, OR_2, feature_name ,'OR', injection, self.disease,feature_names)     
                 else:
-                    OR_0_avg,OR_1_avg,OR_2_avg = MannWhitney(OR_0, OR_1, OR_2, feature_name ,'OR', injection, self.disease,feature_names)
+                    # OR_0_avg,OR_1_avg,OR_2_avg = MannWhitney(OR_0, OR_1, OR_2, feature_name ,'OR', injection, self.disease,feature_names)
+                    OR_0_avg,OR_1_avg = MannWhitney2(OR_0, OR_1, feature_name ,'OR', injection, self.disease,feature_names)
                     feature_avg[feature_name]['OR'] = {}
                     feature_avg[feature_name]['OR']['Pre-treatment'] = OR_0_avg
                     feature_avg[feature_name]['OR']['1-injection'] = OR_1_avg
-                    feature_avg[feature_name]['OR']['2-injection'] = OR_2_avg  
+                    # feature_avg[feature_name]['OR']['2-injection'] = OR_2_avg  
  
                     
             if len(CC_0) != 0 and len(CC_1) != 0 and len(CC_2) != 0:
                 if feature_names == "LBP":
                     ArrayMannWhitney(CC_0, CC_1, CC_2, feature_name ,'CC', injection, self.disease,feature_names)
                 else:
-                    CC_0_avg,CC_1_avg,CC_2_avg = MannWhitney(CC_0, CC_1, CC_2, feature_name ,'CC', injection, self.disease,feature_names)
+                    # CC_0_avg,CC_1_avg,CC_2_avg = MannWhitney(CC_0, CC_1, CC_2, feature_name ,'CC', injection, self.disease,feature_names)
+                    CC_0_avg,CC_1_avg = MannWhitney2(CC_0, CC_1,  feature_name ,'CC', injection, self.disease,feature_names)
             
                     feature_avg[feature_name]['CC'] = {}
                     feature_avg[feature_name]['CC']['Pre-treatment'] = CC_0_avg
                     feature_avg[feature_name]['CC']['1-injection'] = CC_1_avg
-                    feature_avg[feature_name]['CC']['2-injection'] = CC_2_avg
+                    # feature_avg[feature_name]['CC']['2-injection'] = CC_2_avg
             
 
         # save feature_avg
@@ -272,7 +274,65 @@ def MannWhitney( data_0, data_1, data_2, feature_name,layer, injection,disease,f
     return data0,data1,data2
     
     
-                  
+def MannWhitney2( data_0, data_1, feature_name,layer, injection,disease,feature_names):
+    print(feature_name,layer)
+    statistic_0 , pvalue_0 = stats.mannwhitneyu(data_0, data_1)
+    
+    #plot boxplot
+    order = ["Pre-treatment", "1st Post-treatment"]
+    df2 = pd.DataFrame( list(zip( data_0, data_1)), columns=['Pre-treatment', '1st Post-treatment'])
+    group_pairs = [("Pre-treatment", "1st Post-treatment")]
+    ax = sns.boxplot(data=df2, palette="Set3")
+    
+    
+   
+    feature_vis = feature_name
+    if feature_name == 'avg_LH' or feature_name == 'avg_HL' or feature_name == 'std_LH' or feature_name == 'std_HL':
+        if 'avg' in feature_name:
+            feature_vis = 'Average of ' + feature_name[4:]
+        else:
+            feature_vis = 'Standard deviation of ' + feature_name[4:]
+                    
+    if layer == 'OR':
+        ax.set_title('Outer Retina : ' + feature_vis)
+        
+    elif layer == 'CC':
+        ax.set_title('Choriocapillaris : ' + feature_vis)
+    
+    annotator = Annotator( ax,pairs = group_pairs , data=df2, order=order)
+    annotator.configure(test='Mann-Whitney', text_format='star', loc='inside', verbose=3)
+    annotator.apply_and_annotate()
+    # legend 在外面 內容為 order 並標註顏色
+    # ax.legend(loc='upper right', labels=order)
+    # add average and std in new row
+    df2.loc['mean'] = df2.mean().round(2) 
+    df2.loc['std'] = df2.std().round(2)
+    # relative change
+    relative1 = (df2['1st Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean']
+
+    
+    
+    # show title p < 0.05 p < 0.01 p < 0.001
+    tools.makefolder('./record/'+ disease+ '/'+ feature_names )
+    plt.savefig('./record/'+ disease+ '/'+ feature_names + '/'+ feature_name + '_' + layer + '.png')
+    plt.show()
+    plt.clf()
+    
+    # save df2
+    df2.to_csv('./record/'+ disease+ '/'+ feature_names + '/'+ feature_name + '_' + layer + '.csv')
+    
+    data_0_avg = round(sum(data_0)/len(data_0),2)
+    data_1_avg = round(sum(data_1)/len(data_1),2)
+    
+    data_0_std = round(np.std(data_0),2)
+    data_1_std = round(np.std(data_1),2)
+    
+    # return avg and std
+    
+    data0 = [data_0_avg,data_0_std]
+    data1 = [data_1_avg,data_1_std]
+    
+    return data0,data1         
                     
                 
             
@@ -289,7 +349,7 @@ def MannWhitney( data_0, data_1, data_2, feature_name,layer, injection,disease,f
 if __name__ == '__main__':
     PATH_BASE = '../../Data/'
     data_class = 'PCV'
-    data_date = '1120'
+    data_date = '0205'
     PATH_BASE  =  PATH_BASE + data_class + '_' + data_date + '/'
     path = PATH_BASE +  '/compare/'
     disease = data_class + '_' + data_date
@@ -297,5 +357,5 @@ if __name__ == '__main__':
     statistic = Statistic(PATH_BASE,disease,path)
     feature_list = ['Morphology','GLCM','GLRLM','GLSZM','NGTDM','GLDM','SFM','DWT']
     
-    statistic.stat('VesselFeature_Morphology.json','DWT')
+    statistic.stat('VesselFeature_Morphology.json','GLCM')
     

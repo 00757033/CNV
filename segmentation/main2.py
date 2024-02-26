@@ -44,7 +44,7 @@ def main(data_class):
 
     #HyperParameter
     image_size   = 304
-    models       = ['UNet','UNetPlusPlus','AttUNet','R2AttentionUNet','R2UNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet','RecurrentUNet'] # 
+    models       = ['UNet','UNetPlusPlus','AttUNet','R2UNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet'] # 
     epochs       = [150] #50、100、200、400
     datas        = ['train']
     batchs       = [2,4,8]

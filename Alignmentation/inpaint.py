@@ -11,6 +11,7 @@ class inpaint():
         self.path = path
         self.points = []
         self.layers = layers
+        self.data_list = ['1','2', '3', '4']
 
     def get_points(self, im,large = 4):
         # new a window and bind it to the callback function
@@ -114,9 +115,9 @@ class inpaint():
             self.mask = mask
             # remove the unnecessary parts
             remove_img[self.y:self.y+self.height, self.x:self.x+self.width] = 0
-            cv2.imshow('remove_img', remove_img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            # cv2.imshow('remove_img', remove_img)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
             # inpainting
             remove_img = cv2.cvtColor(remove_img, cv2.COLOR_RGB2BGR)
             mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
@@ -154,19 +155,30 @@ class inpaint():
                 image[y:y+height, x:x+width] = window
         
         return image
+
+    def all_inpaint(self):
+        for data in self.data_list:
+            tools.makefolder(self.path + '/inpaint/' + data)
+            for file in Path(self.path + '/' + data).iterdir():
+                if file.suffix == '.png':
+                    print(file)
+                    dst = self.extraneous_information(str(file))
+                    print(self.path + '/inpaint/' + data +'/'+ file.name)
+                    cv2.imwrite(self.path + '/inpaint/' + data +'/'+ file.name, dst)
+                    # print("Save the file: ", file)
+                    # print("--------------------------------------------------")
+                    # cv2.imshow('dst', dst)
+                    # cv2.waitKey(0)
+                    # cv2.destroyAllWindows()
+
 if __name__ == "__main__":
     date = '0205'
     disease = 'PCV'
     PATH = "../../Data/"
-    PATH_BASE =  PATH + "/" + disease + "_"+ date
+    PATH_BASE =  PATH + "/" + disease + "_"+ date+ "/" +"ALL"
     preprocess = inpaint(PATH_BASE)
-    file1 = "..\\..\\Data\\OCTA\\00294362\\20210511\\L\\4.png"
-    file2 = "..\\..\\Data\\OCTA\\00294362\\20221222\\L\\3.png"
-    dst = preprocess.extraneous_information(file2)
-    preprocess.print_points()
-    img = cv2.imread(file1)
-    cv2.imshow('img', img)
-    cv2.imshow('dst', dst)
-    cv2.imwrite("../../Data/PPT/00294362_20221222_3.png", dst)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # file1 = "..\\..\\Data\\OCTA\\00294362\\20210511\\L\\4.png"
+    # file2 = "..\\..\\Data\\OCTA\\00294362\\20221222\\L\\3.png"
+    # dst = preprocess.extraneous_information(file2)
+    # preprocess.print_points()
+    preprocess.all_inpaint()

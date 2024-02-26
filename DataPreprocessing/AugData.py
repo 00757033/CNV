@@ -101,6 +101,6 @@ if __name__ == "__main__":
     PATH_LABEL = PATH + "/" + "new_label"
     PATH_IMAGE = PATH + "/" + "OCTA"
     preprocess = Augment(PATH_BASE + '/' + 'trainset')
-    augment_time = [2,5]
+    augment_time = [3,4,5]
     for time in augment_time:
         preprocess.augumentation(disease + "_"+ date +  '_bil510_clahe7_concate_42','aug' + str(time),time)    

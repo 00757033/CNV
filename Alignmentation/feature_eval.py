@@ -131,24 +131,31 @@ class finding():
         
         image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
-        image = cv2.equalizeHist(image)
-        image = cv2.equalizeHist(image)
-        image = cv2.GaussianBlur(image, (3, 3), 0)
-        image = cv2.equalizeHist(image)
-        image = cv2.GaussianBlur(image, (3, 3), 0)
-        image = cv2.equalizeHist(image)
-        image = cv2.GaussianBlur(image, (3, 3), 0)
-        image = cv2.equalizeHist(image)
+        
+        image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        imageequal = cv2.GaussianBlur(image, (3, 3), 0)
+        imageequal = cv2.equalizeHist(imageequal)
+
+        # top hat
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (40, 40))
+        tophat = cv2.morphologyEx(imageequal, cv2.MORPH_TOPHAT, kernel)
+        # black hat
+        blackhat = cv2.morphologyEx(image, cv2.MORPH_BLACKHAT, kernel)
+        # add and subtract between morphological gradient and image
+        image = tophat
+        image = cv2.add(image, tophat)
         image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
 
         return image
+
 
     def find_center(self,image):
         image2 = image.copy()
         image2 = self.preprocess(image2)
         
-        ret1,image2 = cv2.threshold(image2, 32 ,255, cv2.THRESH_BINARY_INV)
-
+        rst,image2 = cv2.threshold(image2, 0, 255,  cv2.THRESH_BINARY  + cv2.THRESH_OTSU)
+        
+        image2 = cv2.bitwise_not(image2)
         # 找到影像中 最白的最大面積的圓
         _, labels, stats, centroids = cv2.connectedComponentsWithStats(image2, connectivity=4)
 
@@ -768,7 +775,7 @@ class finding():
                     post_treatment =  date 
 
                     if pre_treatment_file != '' and post_treatment_file != '':
-                        patient[patient_id + '_' + eye][date]['pre_treatment_file'] = pre_treatment_file
+                        patient[patient_id + '_' + eye][date]['pre_treatment'] = pre_treatment
                         pre_treatment_img = self.output_image_path+ '1/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'
                         post_treatment_img = self.output_image_path + '1/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
                         matching_img = match_path  + '/1_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
@@ -933,10 +940,10 @@ if __name__ == '__main__':
 
     label_path = PATH_DATA + 'labeled' + '/'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
-    output_image_path = PATH_BASE + 'ALL/'
+    output_image_path = PATH_BASE + 'ALL/inpaint/'
     image_path = output_image_path + 'MATCH/' 
     output_label_path = output_image_path + 'MATCH_LABEL/' 
-    distances = [0.7,0.8]
+    distances = [0.6,0.65,0.7,0.75,0.8,0.85]
     features = ['SIFT','KAZE','AKAZE','ORB','BRISK','BRIEF','FREAK']
     matchers = ['BF','FLANN']
     patient_list = get_data_from_txt_file('PCV.txt')
@@ -960,7 +967,7 @@ if __name__ == '__main__':
                     csv_writer = csv.writer(f)
                     csv_writer.writerow(['patient', 'eye','post_treatment', 'pre_treatment', 'mse', 'psnr', 'ssim', 'matching_mse', 'matching_psnr', 'matching_ssim'])
                     for patient_eye in eval:
-                        print("patient_eye",patient_eye)
+                        # print("patient_eye",patient_eye)
                         if "best_case" not in patient_eye and "worst_case" not in patient_eye and "avg" not in patient_eye and "std" not in patient_eye:
                             patient, eye = patient_eye.split('_')
                             
@@ -968,14 +975,15 @@ if __name__ == '__main__':
                                 if treatment != "pre_treatment":
                                     # print('date',eval[patient_eye][date]['pre_treatment'])
                                     cases += 1
-                                    csv_writer.writerow([patient,eye, treatment, 
-                                                            eval[patient_eye][treatment]['pre_treatment'],
-                                                            eval[patient_eye][treatment]['original'][0],
-                                                            eval[patient_eye][treatment]['original'][1],
-                                                            eval[patient_eye][treatment]['original'][2],
-                                                            eval[patient_eye][treatment]['matching'][0],
-                                                            eval[patient_eye][treatment]['matching'][1],
-                                                            eval[patient_eye][treatment]['matching'][2]])
+                                    if 'original' in eval[patient_eye][treatment] and 'matching' in eval[patient_eye][treatment]:
+                                        csv_writer.writerow([patient,eye, treatment, 
+                                                                eval[patient_eye][treatment]['pre_treatment'],
+                                                                eval[patient_eye][treatment]['original'][0],
+                                                                eval[patient_eye][treatment]['original'][1],
+                                                                eval[patient_eye][treatment]['original'][2],
+                                                                eval[patient_eye][treatment]['matching'][0],
+                                                                eval[patient_eye][treatment]['matching'][1],
+                                                                eval[patient_eye][treatment]['matching'][2]])
                         
                 aligment_file = './record/'+ disease + '_' + date + '/' + 'evaluations.csv'
                 if not os.path.exists(aligment_file):

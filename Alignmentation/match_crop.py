@@ -5,14 +5,52 @@ import pathlib as pl
 import shutil
 import pandas as pd
 import csv
+from sklearn.cluster import DBSCAN
 from matplotlib import pyplot as plt
 from skimage.metrics import mean_squared_error
 from skimage.metrics import structural_similarity
 from skimage.metrics import peak_signal_noise_ratio
 import math
 # Entropy
-
+from sklearn.decomposition import PCA
 import tools.tools as tools
+
+# pip install opencv-contrib-python
+def mean_squared_error_ignore_zeros(img1, img2,img3):
+    # 對於兩張影像 計算每個pixel 的差異
+    # 找出兩影像中相應像素都為零的位置
+    both_zeros_mask  = (img1 == 0) & (img2 == 0) & (img3 == 0)
+
+    
+    diff = img1[~both_zeros_mask] - img2[~both_zeros_mask]
+    mse = np.mean(diff ** 2)
+    return mse
+def psnr_ignore_zeros(img1, img2,img3):
+    
+    both_zeros_mask  = (img1 == 0) & (img2 == 0) & (img3 == 0)
+    diff = img1[~both_zeros_mask] - img2[~both_zeros_mask] 
+    mse = np.mean(diff**2)
+    # 如果 MSE 為 0，則 PSNR 為無窮大
+    if mse == 0:
+        return float('inf')
+    max_pixel_value = 255.0
+    # 計算 PSNR
+    psnr = 20 * np.log10(max_pixel_value / np.sqrt(mse))
+    return psnr
+
+def ssim_ignore_zeros(img1, img2,img3):
+    both_zeros_mask  = (img1 == 0) & (img2 == 0) & (img3 == 0)
+    # 提取非零区域
+    img1_non_zero = img1[~both_zeros_mask]
+    img2_non_zero = img2[~both_zeros_mask]
+    
+    
+    # SSIM
+    ssim_index, _ = structural_similarity(img1_non_zero, img2_non_zero, full=True)
+    return ssim_index
+    
+    
+    
 class template_matcher():
 
         
@@ -55,31 +93,97 @@ class template_matcher():
         elements = (elements[0] - offset_x, elements[1] - offset_y)
         return elements, r
 
-    def preprocess(self, image):
-        
-        
+    def preprocess(self,patient_id, eye, pre_treatment, post_treatment, image):
+        # image = cv2.imread(self.image_path + '4/' + patient_id + '_' + eye + '_' + post_treatment + '.png', cv2.IMREAD_GRAYSCALE)
+        image2 = image.copy()
         image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
-        image = cv2.equalizeHist(image)
-        image = cv2.equalizeHist(image)
-        image = cv2.GaussianBlur(image, (3, 3), 0)
-        image = cv2.equalizeHist(image)
-        image = cv2.GaussianBlur(image, (3, 3), 0)
-        image = cv2.equalizeHist(image)
-        image = cv2.GaussianBlur(image, (3, 3), 0)
-        image = cv2.equalizeHist(image)
+        imageequal = cv2.GaussianBlur(image, (3, 3), 0)
+        imageequal = cv2.equalizeHist(imageequal)
+        # imageequal = cv2.GaussianBlur(imageequal, (3, 3), 0)
+        # imageequal = cv2.equalizeHist(imageequal)
+        # imageequal = cv2.GaussianBlur(imageequal, (5, 5), 0)
+        # imageequal = cv2.equalizeHist(imageequal)
+        # top hat
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (40, 40))
+        tophat = cv2.morphologyEx(imageequal, cv2.MORPH_TOPHAT, kernel)
+        # black hat
+        blackhat = cv2.morphologyEx(image, cv2.MORPH_BLACKHAT, kernel)
+        # add and subtract between morphological gradient and image
+        image = tophat
+        image = cv2.add(image, tophat)
         image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        # image = cv2.GaussianBlur(image, (3, 3), 0)
+        # image = cv2.equalizeHist(image)
+        # image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        # image = cv2.GaussianBlur(image, (5, 5), 0)
+        # image = cv2.equalizeHist(image)
+        # fig, ax = plt.subplots(2, 5, figsize=(20, 20))
+        # ax[0, 0].imshow(image2, cmap='gray')
+        # ax[0, 0].set_title('Original Image')
+        # ax[0, 1].imshow(tophat, cmap='gray')
+        # ax[0, 1].set_title('Top Hat')
+        # ax[0, 2].imshow(blackhat, cmap='gray')
+        # ax[0, 2].set_title('blackhat')
+        # ax[0, 3].imshow(image, cmap='gray')
+        # ax[0, 3].set_title('Add and Subtract')
+        # ax[0, 4].imshow(imageequal ,cmap='gray')
+        # ax[0, 4].set_title('EqualizeHist')
+        
+        # ax[1, 0].hist(image2.ravel(), 256, [0, 256])
+        # ax[1, 0].set_title('Original Image')
+        # ax[1, 1].hist(tophat.ravel(), 256, [0, 256])
+        # ax[1, 1].set_title('Top Hat')
+        # ax[1, 2].hist(blackhat.ravel(), 256, [0, 256])
+        # ax[1, 2].set_title('Black Hat')
+        # ax[1, 3].hist(image.ravel(), 256, [0, 256])
+        # ax[1, 3].set_title('Add and Subtract')
+        # ax[1, 4].hist(imageequal.ravel(), 256, [0, 256])
+        # ax[1, 4].set_title('EqualizeHist')
+        # plt.show()
+
+
+        
+        # image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        # image = cv2.equalizeHist(image)
+        # image = cv2.equalizeHist(image)
+        # image = cv2.GaussianBlur(image, (3, 3), 0)
+        # image = cv2.equalizeHist(image)
+        # image = cv2.GaussianBlur(image, (3, 3), 0)
+        # image = cv2.equalizeHist(image)
+        # image = cv2.GaussianBlur(image, (3, 3), 0)
+        # image = cv2.equalizeHist(image)
+        # image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
 
         return image
 
 
-    def find_center(self,image):
-        image2 = image.copy()
-        image2 = self.preprocess(image2)
+    def find_center(self,patient_id, eye, pre_treatment, post_treatment,image):
+        image_1 = image.copy()
+        image_1 = self.preprocess(patient_id, eye, pre_treatment, post_treatment,image_1)
+        # image_1 = cv2.GaussianBlur(image_1, (5, 5), 0)
+        rst,image_1 = cv2.threshold(image_1, 0, 255,  cv2.THRESH_BINARY  + cv2.THRESH_OTSU)
         
-        ret1,image2 = cv2.threshold(image2, 32 ,255, cv2.THRESH_BINARY_INV)
+        # image_1 = cv2.adaptiveThreshold(image_1, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        image_1 = cv2.bitwise_not(image_1)
+        # image_2 = cv2.imread(self.image_path + '1_OCT/' + patient_id + '_' + eye + '_' + post_treatment + '.png', cv2.IMREAD_GRAYSCALE)
+        # image_2 = self.preprocess(patient_id, eye, pre_treatment, post_treatment,image_2)
+        # image_2 = cv2.GaussianBlur(image_2, (3, 3), 0)
+        # image_2 = cv2.threshold(image_2, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
+        # inverse the image
+        # image_2 = cv2.bitwise_not(image_2)
+        image_1[ image_1 > 0] = 1
+        # image_2[ image_2 > 0] = 1
+        # print('image_2',np.count_nonzero(image_2))
+        # image_add = np.multiply(image_1, image_2) * 255
+        # print(image_add)
+       
+        # cv2.imshow('img',image_add)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+
 
         # 找到影像中 最白的最大面積的圓
-        _, labels, stats, centroids = cv2.connectedComponentsWithStats(image2, connectivity=4)
+        _, labels, stats, centroids = cv2.connectedComponentsWithStats(image_1, connectivity=4)
 
         # 找到最大的區域（排除背景區域）
         label_area = dict()
@@ -117,14 +221,17 @@ class template_matcher():
 
         # # 畫出黃斑中心
         # # draw the circle
-        # cv2.rectangle(draw_image, (int(center[0] - max_radius), int(center[1] - max_radius)), (int(center[0] + max_radius), int(center[1] + max_radius)), (255, 0, 255), 3)
-        # cv2.circle(draw_image, center, 5, (0, 255, 255), -1)
+        cv2.rectangle(draw_image, (int(center[0] - max_radius), int(center[1] - max_radius)), (int(center[0] + max_radius), int(center[1] + max_radius)), (255, 0, 255), 3)
+        cv2.circle(draw_image, center, 5, (0, 255, 255), -1)
         t = 40
-        # cv2.rectangle(draw_image, (int(center[0] - max_radius-t), int(center[1] - max_radius-t)), (int(center[0] + max_radius+ t), int(center[1] + max_radius+ t)), (255, 255, 0), 3)
+        cv2.rectangle(draw_image, (int(center[0] - max_radius-t), int(center[1] - max_radius-t)), (int(center[0] + max_radius+ t), int(center[1] + max_radius+ t)), (255, 255, 0), 3)
 
         # cv2.imshow('img',draw_image)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
+        
+        setFolder(self.output_image_path + 'crop/')
+        cv2.imwrite(self.output_image_path + 'crop/' + patient_id + '_' + eye + '_' + post_treatment + '.png', draw_image)
 
         if int(center[0] - max_radius) < t :
             t = int(center[0] - max_radius)
@@ -141,85 +248,10 @@ class template_matcher():
 
         return  crop_img , center , max_radius + t
     #將術後的影像切成4個角落跟中央，並分別跟術前影像做getPoints，找到5個template中R最高的位置，並回傳要位移的x跟y
-    def pointMatch(self,image, template, method = cv2.TM_CCOEFF_NORMED):
-        crop_img ,center,radius = self.find_center(template)
+    def pointMatch(self,patient_id, eye, pre_treatment, post_treatment,image, template, method = cv2.TM_CCOEFF_NORMED):
+        crop_img ,center,radius = self.find_center(patient_id, eye, pre_treatment, post_treatment,template)
         elements_c, r_c = self.get_element(image, crop_img, center[0] - radius, center[1] - radius, method)
-        # print(elements_c, r_c)
         
-        
-        
-        
-        # # template_total      = template
-        # template_center     = template[52:52+199, 52:52+199]
-        # template_left_up    = template[0:199, 0:199]
-        # template_right_up   = template[104:104+199, 0:199]
-        # template_left_down  = template[0:199, 104:104+199]
-        # template_right_down = template[104:104+199, 104:104+199]
-
-        # # elements_total, r_t = self.get_element(image, template_total,0,0,method)
-        # elements_c, r_c = self.get_element(image, template_center, 52, 52, method)
-        # elements_TL, r_1 = self.get_element(image, template_left_up, 0, 0, method)
-        # elements_TR, r_2 = self.get_element(image, template_right_up, 0, 104, method)
-        # elements_DL, r_3 = self.get_element(image, template_left_down, 104, 0, method)
-        # elements_DR, r_4 = self.get_element(image, template_right_down, 104, 104, method)
-        # #----------------------------------------可視化用----------------------------------------
-        # show template
-        # fig ,ax = plt.subplots(2,3) 
-        # ax[0,0].imshow(image, cmap='gray')
-        # ax[0,0].set_title('image')
-        # ax[0,0].axis('off' )
-        
-        # ax[0,1].imshow(crop_img, cmap='gray')
-        # ax[0,1].set_title('template')
-        # ax[0,1].axis('off')
-        
-        # ax[0,2].imshow(image)
-        # ax[0,2].set_title('image')
-        # ax[0,2].axis('off')
-        # plt.show()
-        # plt rgb 
-        # template_total = cv2.cvtColor(template_total,cv2.COLOR_GRAY2BGR)
-        # template_center = cv2.cvtColor(template_center,cv2.COLOR_GRAY2BGR)
-        # template_left_up = cv2.cvtColor(template_left_up,cv2.COLOR_GRAY2BGR)
-        # template_right_up = cv2.cvtColor(template_right_up,cv2.COLOR_GRAY2BGR)
-        # template_left_down = cv2.cvtColor(template_left_down,cv2.COLOR_GRAY2BGR)
-        # template_right_down = cv2.cvtColor(template_right_down,cv2.COLOR_GRAY2BGR)
-
-
-        # ax[0,0].imshow(template_total)
-        # ax[0,0].set_title('template_total')
-        # ax[0,0].axis('off' )
-
-        # ax[0,1].imshow(template_center, cmap='gray') 
-        # ax[0,1].set_title('template_center')
-        # ax[0,1].axis('off')
-
-        # ax[0,2].imshow(template_left_up)
-        # ax[0,2].set_title('template_left_up')
-        # ax[0,2].axis('off')
-
-        # ax[1,0].imshow(template_right_up)
-        # ax[1,0].set_title('template_right_up')
-        # ax[1,0].axis('off')
-
-        # ax[1,1].imshow(template_left_down)
-        # ax[1,1].set_title('template_left_down')
-        # ax[1,1].axis('off')
-        # ax[1,2].imshow(template_right_down)
-        # ax[1,2].set_title('template_right_down')
-        # ax[1,2].axis('off')
-
-        # plt.show()
-        # plt.pause(0.1)
-
-        # print('Total : ', round(r_t,3) , " shift(x,y) :" + str(elements_total))
-        # print('Center : ', round(r_c,3), " shift(x,y) :" + str(elements_c))
-        # print('TL : ', round(r_1,3), " shift(x,y) :" + str(elements_TL))
-        # print('TR : ', round(r_2,3), " shift(x,y) :" + str(elements_TR))
-        # print('DL : ', round(r_3,3), " shift(x,y) :" + str(elements_DL))
-        # print('DR : ', round(r_4,3), " shift(x,y) :" + str(elements_DR))
-        #----------------------------------------可視化用----------------------------------------
-
         # 選擇最高的相關係數的位置
         e = [elements_c]
         r = [r_c]
@@ -479,122 +511,6 @@ class template_matcher():
         return eval
 
 
-
-
-
-
-
-            # for patient, eyes in patient_dict.items():
-            #     for eye,date_list in eyes.items():
-            #         if len(date_list) > 1:
-            #             path_pre_date = pl.Path(self.image_path + method + '/' +patient + '/'+date_list[0] + '/' + eye )
-            #             if path_pre_date.exists() and path_pre_date.is_dir() :
-            #                 for date in date_list[1:]:
-            #                     path_date = pl.Path(self.image_path + method + '/' +patient + '/'+date + '/' + eye )
-            #                     if path_date.exists() and path_date.is_dir() :
-            #                         img_avg_mse = -1
-            #                         img_avg_psnr = -1
-            #                         img_avg_ssim = -1
-            #                         img_avg_ncc = -1
-            #                         img_avg_o_mse = -1
-            #                         img_avg_o_psnr = -1
-            #                         img_avg_o_ssim = -1
-            #                         img_avg_o_ncc = -1
-            #                         img_mse = []
-            #                         img_psnr = []
-            #                         img_ssim = []
-            #                         img_ncc = []
-            #                         img_o_mse = []
-            #                         img_o_psnr = []
-            #                         img_o_ssim = []
-            #                         img_o_ncc = []
-            #                         for img in self.data_list:
-
-            #                             pre_treatment_original =  self.image_path + patient + '/'+date_list[0] + '/' + eye + '/'  + img + '.png'
-            #                             pre_treatment =  self.image_path + method + '/' +patient + '/'+date_list[0] + '/' + eye + '/' + img + '.png'
-
-            #                             post_tratment_original = self.image_path + patient + '/'+date + '/' + eye + '/' + img + '.png'
-            #                             post_tratment = self.image_path + method + '/' +patient + '/'+date + '/' + eye + '/' +img + '.png'
-
-            #                             mse,psnr,ssim,ncc = self.evaluate(pre_treatment,post_tratment)
-
-            #                             mse_o ,psnr_o,ssim_o,ncc = self.evaluate(pre_treatment_original,post_tratment_original)
-                                        
-
-            #                             img_mse.append(mse)
-            #                             img_psnr.append(psnr)
-            #                             img_ssim.append(ssim)
-            #                             img_ncc.append(ncc)
-            #                             img_o_mse.append(mse_o)
-            #                             img_o_psnr.append(psnr_o)
-            #                             img_o_ssim.append(ssim_o)
-            #                             img_o_ncc.append(ncc)
-
-            #                         img_avg_mse = sum(img_mse)/len(img_mse)
-            #                         img_avg_psnr = sum(img_psnr)/len(img_psnr)
-            #                         img_avg_ssim = sum(img_ssim)/len(img_ssim)
-            #                         img_avg_ncc = sum(img_ncc)/len(img_ncc)
-            #                         img_avg_o_mse = sum(img_o_mse)/len(img_o_mse)
-            #                         img_avg_o_psnr = sum(img_o_psnr)/len(img_o_psnr)
-            #                         img_avg_o_ssim = sum(img_o_ssim)/len(img_o_ssim)
-            #                         img_avg_o_ncc = sum(img_o_ncc)/len(img_o_ncc)
-            #                         # print('img_avg_mse',sum(img_mse),len(img_mse),img_mse)
-            #                         # print('img_avg_o_mse',sum(img_o_mse),len(img_o_mse),img_o_mse)
-            #                         # print('img_avg_psnr',sum(img_psnr),len(img_psnr),  img_psnr)
-            #                         # print('img_avg_o_psnr',sum(img_o_psnr),len(img_o_psnr),img_o_psnr)
-
-            #                         # print('img_avg_ssim',sum(img_ssim),len(img_ssim),img_ssim)
-            #                         # print('img_avg_o_ssim',sum(img_o_ssim),len(img_o_ssim),img_o_ssim)
-            #                         # print('img_avg_psnr - img_avg_o_psnr',img_avg_psnr - img_avg_o_psnr)
-            #                         mse_list.append(img_avg_mse)
-            #                         psnr_list.append(img_avg_psnr)
-            #                         ssim_list.append(img_avg_ssim)
-            #                         ncc_list.append(img_avg_ncc)
-            #                         # print('mse_list',mse_list)
-            #                         # print('psnr_list',psnr_list)
-            #                         # print('ssim_list',ssim_list)
-            #                         # print('best_differece_ssim',best_differece_ssim)
-            #                         if img_avg_ssim - img_avg_o_ssim > best_differece_ssim:
-            #                             best_differece_ssim = img_avg_psnr - img_avg_o_psnr
-            #                             best_case['mse']= [img_avg_o_mse , img_avg_mse]
-            #                             best_case['psnr']= [img_avg_o_psnr , img_avg_psnr]
-            #                             best_case['ssim']= [img_avg_o_ssim , img_avg_ssim]
-            #                             best_case['ncc'] = [img_avg_o_ncc , img_avg_ncc]
-            #                             best_case['patient']= [patient,eye,date]
-
-            #                         if img_avg_ssim - img_avg_o_ssim < worst_differece_ssim:
-            #                             worst_differece_ssim = img_avg_psnr - img_avg_o_psnr
-            #                             worst_case['mse']= [img_avg_o_mse , img_avg_mse]
-            #                             worst_case['psnr']= [img_avg_o_psnr , img_avg_psnr]
-            #                             worst_case['ssim']= [img_avg_o_ssim , img_avg_ssim]
-            #                             worst_case['ncc'] = [img_avg_o_ncc , img_avg_ncc]
-            #                             worst_case['patient']= [patient,eye,date]
-
-            # avg_mse = round(sum(mse_list)/len(mse_list),5)
-            # avg_psnr = round(sum(psnr_list)/len(psnr_list),5)
-            # avg_ssim = round(sum(ssim_list)/len(ssim_list),5)
-            # avg_ncc = round(sum(ncc_list)/len(ncc_list),5)
-            # mse_std = round(np.std(mse_list, ddof=1),5)
-            # psnr_std = round(np.std(psnr_list, ddof=1),5)
-            # ssim_std = round(np.std(ssim_list, ddof=1),5)
-            # ncc_std = round(np.std(ncc_list, ddof=1),5)
-            # eval[method]['mse'] = avg_mse
-            # eval[method]['psnr'] = avg_psnr
-            # eval[method]['ssim'] = avg_ssim
-            # eval[method]['ncc'] = avg_ncc
-            # eval[method]['best_case'] = best_case
-            # eval[method] ['worst_case'] = worst_case
-            # eval[method] ['mse_std'] = mse_std
-            # eval[method] ['psnr_std'] = psnr_std
-            # eval[method] ['ssim_std'] = ssim_std
-            # eval[method] ['ncc_std'] = ncc_std
-
-        return eval 
-
-
-
-
-
     def alignment(self,file_path):
         # patient_dict = read_patient_list(file_path)
         method_dict = {}
@@ -646,7 +562,7 @@ class template_matcher():
             
             # print method name
             shift[match_par]= []
-            shift_x, shift_y = self.pointMatch(gray_pre, gray_post, method)
+            shift_x, shift_y = self.pointMatch(patient_id, eye, pre_treatment, post_treatment, gray_pre, gray_post, method)
             shift[match_par] = [shift_x, shift_y]
             # 進行平移變換
             M = np.float32([[1, 0, shift_x], [0, 1, shift_y]]) # 平移矩陣
@@ -677,13 +593,13 @@ class template_matcher():
 
                         cv2.imwrite(self.output_image_path  + output_match_par+ '/' + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png', result)
 
-                        # vis_img = result.copy()
-                        # vis_img[:,:,0] = 0
-                        # vis_img[:,:,2] = 0
-                        # add = cv2.addWeighted(pre_image, 0.5, vis_img, 1.0, 0)
-                        # if not os.path.exists(self.output_image_path  + match_par+ '/' + data + '_vis' ):
-                        #     os.makedirs(self.output_image_path  + match_par+ '/' + data + '_vis' )
-                        # cv2.imwrite(self.output_image_path  + match_par+ '/' + data + '_vis' + '/' + patient_id + '_' + eye + '_' + post_treatment +'_vis.png', add)
+                        vis_img = result.copy()
+                        vis_img[:,:,0] = 0
+                        vis_img[:,:,2] = 0
+                        add = cv2.addWeighted(pre_image, 0.5, vis_img, 1.0, 0)
+                        if not os.path.exists(self.output_image_path  + match_par+ '/' + data + '_vis' ):
+                            os.makedirs(self.output_image_path  + match_par+ '/' + data + '_vis' )
+                        cv2.imwrite(self.output_image_path  + match_par+ '/' + data + '_vis' + '/' + patient_id + '_' + eye + '_' + post_treatment +'_vis.png', add)
 
 
             for label in self.label_list:
@@ -759,14 +675,14 @@ if __name__ == '__main__':
     # pre_treatment = "..\\..\\Data\\PPT\\00294362_20210511_1.png"
     # post_treatment = "..\\..\\Data\\PPT\\00294362_20221222_1.png"
     # matching().template_matching(pre_treatment, post_treatment)
-    date = '1120'
+    date = '0205'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
 
     PATH_LABEL = PATH_DATA + 'labeled' + '/'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
-    image_path = PATH_BASE + 'ALL/'
+    image_path = PATH_BASE + 'ALL/inpaint/'
     PATH_MATCH = image_path + 'MATCH/' 
     PATH_MATCH_LABEL = image_path + 'MATCH_LABEL/' 
     
@@ -777,7 +693,9 @@ if __name__ == '__main__':
     json_file = './record/' + disease + '_' + date + '/' + 'crop_template_matching.json'
     tools.write_to_json_file(json_file, shift_patient_dict)
 
-    # evals= Match.avg_evaluate() 
+    evals= Match.avg_evaluate() 
+    for method, eval in evals.items():
+        print(method,eval)
     # json_file = './' + disease + '_' + date + '_eval.json'
     # tools.write_to_json_file(json_file, evals)
 

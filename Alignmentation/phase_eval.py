@@ -80,9 +80,6 @@ class phase_correlate():
                 setFolder(os.path.join(self.output_label_path, label))    
 
 
-
-
-
     def alignment(self, patient_id, eye, pre_treatment, post_treatment):
         img1 = cv2.imread(self.image_path + '1/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
         img1 = cv2.resize(img1, (304, 304))

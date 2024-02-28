@@ -9,6 +9,7 @@ import tensorflow as tf
 
 import sklearn.metrics as metrics
 from sklearn.metrics import confusion_matrix 
+import pathlib as pl
 
 import pydensecrf.densecrf as dcrf
 from pydensecrf.utils import unary_from_softmax, create_pairwise_bilateral, create_pairwise_gaussian, unary_from_labels
@@ -20,8 +21,6 @@ from skimage import img_as_uint
 
 
 def jaccard_index(y_true, y_pred):
-    y_true = np.array(y_true).ravel()
-    y_pred = np.array(y_pred).ravel()
     score = metrics.jaccard_score(y_true, y_pred)
     return score
 
@@ -49,8 +48,8 @@ class postprocessing():
 def crf(original_image, predict_image,output_image, use_2d = True):
     # 用在血管分割上
     # 將分割結果轉成rgb
-    original_image = original_image[:,:,0]
-    original_image = gray2rgb(original_image)
+    # original_image = original_image[:,:,0]
+    # original_image = gray2rgb(original_image)
     annotated_image = predict_image.copy()
     if(len(annotated_image.shape)>2):
         annotated_image = annotated_image[:,:,0]
@@ -176,19 +175,26 @@ def crf(original_image, predict_image,output_image, use_2d = True):
 
 if __name__ == '__main__':
     list = ['PCV_1011_otsu_bil_clahe_42_CC','PCV_1011_otsu_bil_clahe_42_OR','PCV_1011_otsu_bil_clahe_42_aug_CC']# ,'PCV_1011_otsu_bil_clahe_42_aug_OR'
-    for i in os.listdir('./Result/PCV_1011/'): # list
-        for j in os.listdir('./Result/PCV_1011/'+i):
-            for k in os.listdir('./Result/PCV_1011/'+i+'/'+j):
-                if not k.endswith('_1') and not k.endswith('_2') :
-                    images_path = './Result/PCV_1011/'+i+'/'+j+'/'+k+'/images/'
-                    results_path = './Result/PCV_1011/'+i+'/'+j+'/'+k+'/results/'
-                    postcrf_path = './Result/PCV_1011/'+i+'/'+j+'/'+k+'/postcrf/'
-                    if not os.path.exists(postcrf_path):
-                        os.makedirs(postcrf_path)
-                    print(images_path)
-                    postprocess= postprocessing(images_path,results_path,postcrf_path)
-                    postprocess.postprocessing()
-                    print("finish")
+    
+    file ='./Result/PCV_0205/' 
+    for i in pl.Path(file).iterdir():
+        print(i)
+    for j in pl.Path(file+'PCV_0205_bil510_clahe7_concate_42_aug2_OR').iterdir():
+        print(j)
+        for k in j.iterdir():
+            print(k)
+            model_name = k.name
+            if not model_name.endswith('_2') and not model_name.endswith('_3') :
+                images_path = str(k)+'/images/'
+                results_path =  str(k)+'/predict/'
+                postcrf_path = str(k)+'/postcrf/'
+                print(images_path,results_path,postcrf_path)
+                if not os.path.exists(postcrf_path):
+                    os.makedirs(postcrf_path)
+                print(images_path)
+                postprocess= postprocessing(images_path,results_path,postcrf_path)
+                postprocess.postprocessing()
+                print("finish")
 
 
     # postprocessing = postprocessing('./Result/PCV_1011/trainset/images/','./Result/PCV_1011/trainset/results/','./Result/PCV_1011/trainset/post/')

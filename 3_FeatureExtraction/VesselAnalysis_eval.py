@@ -125,7 +125,7 @@ class VesselAnalysis():
                         area, center,VD ,VLD ,VAPR,VLA,VDI= process_image(img = img, msk = msk,all_msk = msk_rm_small,img_name = img_name,patient = patient)
                         feature[item]['VD_' + layer] = VD
                         feature[item]['VLD_' + layer] = VLD
-                        # feature[item]['VAPR_' + layer] = VAPR
+                        feature[item]['VAPR_' + layer] = VAPR
                         # feature[item]['VLA_' + layer] = VLA
                         feature[item]['VDI_' + layer] = VDI
                         # feature[item]['center_' + layer] = center
@@ -134,9 +134,9 @@ class VesselAnalysis():
                         
 
                             
-                        texture_features = Texture_features(img, msk_rm_small,layer)    
+                        # texture_features = Texture_features(img, msk_rm_small,layer)    
                         
-                        feature[item] = {**feature[item], **texture_features}
+                        # feature[item] = {**feature[item], **texture_features}
                         len_feature = len(feature[item])
                             
                                 
@@ -145,6 +145,7 @@ class VesselAnalysis():
         print('patient_feature',len(patient_feature))
         print('cout',cout)
         print('len_feature',len_feature)
+        tools.makefolder(os.path.join( 'record', self.disease))
         file = './record/' + self.disease + '/' + 'VesselFeature_Morphology.json'
         tools.write_to_json_file(file, patient_feature)
         return patient_feature
@@ -210,7 +211,7 @@ class VesselAnalysis():
                             # Texture feature
                         
                             print('Texture feature')
-                            Texture_features_ratio(pre_name = img_pre_name, post_name = img_post_name, patient = patient)
+                            # Texture_features_ratio(pre_name = img_pre_name, post_name = img_post_name, patient = patient)
                             
                 patient_feature[patient.name] = feature
         print(cout)
@@ -965,6 +966,7 @@ def process_image(img, msk,all_msk,img_name , patient , min_area = 50):
     img_roi_all = img.copy()
     img_roi_all[all_msk == 0] = 0
 
+
     
     
     # 畫出all_msk 輪廓 
@@ -977,14 +979,24 @@ def process_image(img, msk,all_msk,img_name , patient , min_area = 50):
     cv2.imwrite(os.path.join(patient, 'ROI_all', img_name), msk_contours)
     
     # 真正的血管區域
-    label = msk.copy()
+    label = all_msk.copy()
+    label[msk == 0] = 0
     # 刪除小面積
     msk_rm_small = remove_small_area(label, min_area)
     # save remove small ROI
     tools.makefolder(os.path.join(patient, 'ROI_rm_small'))
     cv2.imwrite(os.path.join(patient, 'ROI_rm_small', img_name), msk_rm_small)
         
-   
+    # fig, ax = plt.subplots(1, 4, figsize=(12, 4))
+    # ax[0].imshow(img_roi_all, cmap='gray')
+    # ax[0].set_title('Original Mask')
+    # ax[1].imshow(all_msk, cmap='gray')
+    # ax[1].set_title('all_msk')
+    # ax[2].imshow(label, cmap='gray')
+    # ax[2].set_title('label')
+    # ax[3].imshow(msk_rm_small, cmap='gray')
+    # ax[3].set_title('msk_rm_small')
+    # plt.show()
     
     if np.sum(msk_rm_small) == 0:
         return 0, 0, 0, 0, 0 , 0, 0
@@ -1025,9 +1037,7 @@ def process_image(img, msk,all_msk,img_name , patient , min_area = 50):
     # save ROI
     tools.makefolder(os.path.join(patient, 'ROI'))
     cv2.imwrite(os.path.join(patient, 'ROI', img_name), img_roi)
-    
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+
    
     # 血管亮度指數 : Vessel Luminosity Average (VLA)
 
@@ -1063,6 +1073,8 @@ def process_image(img, msk,all_msk,img_name , patient , min_area = 50):
 
 
 def vessel_feature(patient,img_pre_name, img_post_name, min_area = 50):   
+    print("img_pre_name",img_pre_name)
+    print("img_post_name",img_post_name)
     img_pre = cv2.imread(os.path.join(patient, 'images', img_pre_name), cv2.IMREAD_GRAYSCALE)
         
     img_post = cv2.imread(os.path.join(patient, 'images', img_post_name), cv2.IMREAD_GRAYSCALE)

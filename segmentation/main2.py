@@ -18,8 +18,8 @@ os.environ['TF_NUMPY_BANNER'] = 'off'
 #Get label data
 train_signal = False
 train_data = True
-postprocess_signal = True
-result= True
+postprocess_signal = False
+result= False
 #data_class為病徵的名稱，如:PED, CNV
 def main(data_class):
     #Date time
@@ -44,10 +44,10 @@ def main(data_class):
 
     #HyperParameter
     image_size   = 304
-    models       = ['UNet','UNetPlusPlus','AttUNet','R2UNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet'] # 
+    models       = ['AttUNet'] # 'UNet','UNetPlusPlus', #,'R2UNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet'
     epochs       = [150] #50、100、200、400
     datas        = ['train']
-    batchs       = [2,4,8]
+    batchs       = [8]
     lrns         = [0.001]
     filters      = [16,32, 64, 128, 256]
 

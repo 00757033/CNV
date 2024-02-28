@@ -24,7 +24,7 @@ def calculate_best_worst(folder_name, result_path):
         os.remove(result_path + folder_name +'/result2.txt')
 
     f = open(result_path + folder_name +'/result2.txt', 'w')
-
+    print('result_path folder_name ',result_path + folder_name )
     for i in index:
         lines = [ i + '\n']
         f.writelines(lines)
@@ -50,22 +50,22 @@ def calculate_best_worst(folder_name, result_path):
         if score < worst:
             worst = score
             worst_case = i
-        arr_JI.append(round(score, 3)) # np.std(arr, ddof=1)
-        arr_DC.append(round(dice_score,3))
+        arr_JI.append(score) # np.std(arr, ddof=1)
+        arr_DC.append(dice_score)
         lines = ['Image : ' + i + ',  JI Score : ' + str(round(score, 3)) + ',  DC Score : ' + str(round(dice_score, 3)) + '\n']
         f.writelines(lines)
         count = count + 1 
-        ji_score = round(sum(arr_JI) / len(arr_JI), 3)
-        ji_var   = round(np.var(arr_JI), 3)
-        dc_score = round(sum(arr_DC) / len(arr_DC), 3)
-        dc_var   = round(np.var(arr_DC), 3)
-    lines = ['Avg JI Score : ' + str(round(sum(arr_JI)/len(arr_JI), 3)) + '\n',
-            'Avg DC Score : ' + str(round(sum(arr_DC)/len(arr_DC), 3)) + '\n',
-            'Best Case : ' + best_case + ',  JI Score : ' + str(round(best, 3)) + '\n',
-            'Worst Case : ' + worst_case + ',  JI Score : ' + str(round(worst, 3))]
+        # ji_score = round(sum(arr_JI) / len(arr_JI), 2)
+        # ji_var   = round(np.std(arr_JI, ddof=1), 2)
+        # dc_score = round(sum(arr_DC) / len(arr_DC), 3)
+        # dc_var   = round(np.std(arr_DC, ddof=1), 3)
+    lines = ['Avg JI Score : ' + str(round(sum(arr_JI) / len(arr_JI),4)) + '\t' + 'JI Variance : ' + str(round(np.std(arr_JI, ddof=1), 4)) + '\n',
+            'Avg DC Score : ' + str(round(sum(arr_DC) / len(arr_DC), 4)) + '\t' + 'DC Variance : ' + str(round(np.std(arr_DC, ddof=1), 4)) + '\n',
+            'Best Case : ' + best_case + ',  JI Score : ' + str(round(best, 4)) + '\n',
+            'Worst Case : ' + worst_case + ',  JI Score : ' + str(round(worst, 4))]
     f.writelines(lines)
     f.close()
-    return  str(round(sum(arr_JI)/len(arr_JI), 5)),str(round(np.var(arr_JI), 5)) , str(round(sum(arr_DC)/len(arr_DC), 5)) ,str(round(np.var(arr_DC), 5)),best_case,str(round(best, 5)),worst_case, str(round(worst, 5))
+    return  str(round(sum(arr_JI) / len(arr_JI),4)),str(round(np.std(arr_JI, ddof=1), 4)) , str(round(sum(arr_DC) / len(arr_DC), 4)) ,str(round(np.std(arr_DC, ddof=1), 4)),best_case,str(round(best, 5)),worst_case, str(round(worst, 5))
 
 def getResult(PATH):
     path = Path(PATH)
@@ -115,6 +115,7 @@ def getResult(PATH):
                         for learning_rate in df[dataset][model][epoch][batch]:
                             for i in df[dataset][model][epoch][batch][learning_rate]:
                                 csv_writer.writerow([str(dataset), str(model), str(batch), str(epoch), str(learning_rate), str(i[0]), str(i[1]), str(i[2]), str(i[3]), str(i[4]), str(i[5]), str(i[6]), str(i[7])])
+
 
 '''
 def main():

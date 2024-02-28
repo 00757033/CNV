@@ -32,21 +32,25 @@ class Augment():
             ], p=0.2), 
         ],is_check_shapes=False)
         
+
         # Augment an image
         augmented = transform(image=image, mask=mask)
         aug_image = augmented['image']
         aug_mask = augmented['mask']
-        # # show the augmented image
-        # fig, ax = plt.subplots(2, 2, figsize=(10, 10))
-        # ax[0, 0].imshow(image)
-        # ax[0, 0].set_title('Original image')
-        # ax[0, 1].imshow(mask)
-        # ax[0, 1].set_title('Original mask')
-        # ax[1, 0].imshow(aug_image)
-        # ax[1, 0].set_title('Augmented image')
-        # ax[1, 1].imshow(aug_mask)
-        # ax[1, 1].set_title('Augmented mask')
-        # plt.show()
+        # show the augmented image
+        fig, ax = plt.subplots(2, 2, figsize=(10, 10))
+        ax[0, 0].imshow(image)
+        ax[0, 0].axis('off')
+        ax[0, 1].imshow(mask)
+        ax[0, 1].axis('off')
+        ax[1, 0].imshow(aug_image)
+        ax[1, 0].axis('off')
+        ax[1, 1].imshow(aug_mask)
+        ax[1, 1].axis('off')
+        plt.show()
+        
+            
+            
         
         
         
@@ -101,6 +105,6 @@ if __name__ == "__main__":
     PATH_LABEL = PATH + "/" + "new_label"
     PATH_IMAGE = PATH + "/" + "OCTA"
     preprocess = Augment(PATH_BASE + '/' + 'trainset')
-    augment_time = [3,4,5]
+    augment_time = [10]
     for time in augment_time:
-        preprocess.augumentation(disease + "_"+ date +  '_bil510_clahe7_concate_42','aug' + str(time),time)    
+        preprocess.augumentation(disease + "_"+ date +  '_42','aug' + str(time),time)    

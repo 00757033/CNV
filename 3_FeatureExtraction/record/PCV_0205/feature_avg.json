@@ -1,112 +1,90 @@
 {
-    "Contrast": {
+    "VD": {
         "OR": {
             "Pre-treatment": [
-                0.07,
-                0.02
+                1.56,
+                0.69
             ],
             "1-injection": [
-                0.03,
-                0.01
+                0.39,
+                0.65
             ]
         },
         "CC": {
             "Pre-treatment": [
-                60.99,
-                5.53
+                4.9,
+                3.64
             ],
             "1-injection": [
-                38.86,
-                9.85
+                1.33,
+                1.66
             ]
         }
     },
-    "Autocorrelation": {
+    "VLD": {
         "OR": {
             "Pre-treatment": [
-                11.4,
-                2.26
+                0.57,
+                0.26
             ],
             "1-injection": [
-                7.46,
-                6.01
-            ]
-        },
-        "CC": {
-            "Pre-treatment": [
-                15.38,
-                4.01
-            ],
-            "1-injection": [
-                22.12,
-                6.1
-            ]
-        }
-    },
-    "Energy": {},
-    "Homogeneity": {
-        "OR": {
-            "Pre-treatment": [
-                0.1,
-                0.02
-            ],
-            "1-injection": [
-                0.11,
-                0.02
-            ]
-        },
-        "CC": {
-            "Pre-treatment": [
-                0.06,
-                0.03
-            ],
-            "1-injection": [
-                0.05,
-                0.01
-            ]
-        }
-    },
-    "DifferenceEntropy": {
-        "OR": {
-            "Pre-treatment": [
-                2.09,
-                0.1
-            ],
-            "1-injection": [
-                1.52,
+                0.16,
                 0.26
             ]
         },
         "CC": {
             "Pre-treatment": [
-                2.23,
-                0.08
+                1.93,
+                1.26
             ],
             "1-injection": [
-                2.07,
-                0.17
+                0.42,
+                0.51
             ]
         }
     },
-    "Dissimilarity": {
+    "VAPR": {
         "OR": {
             "Pre-treatment": [
-                16.31,
-                2.44
+                100.0,
+                0.0
             ],
             "1-injection": [
-                13.7,
-                2.4
+                18.15,
+                27.15
             ]
         },
         "CC": {
             "Pre-treatment": [
-                34.1,
-                4.96
+                100.0,
+                0.0
             ],
             "1-injection": [
-                30.74,
-                4.0
+                20.22,
+                21.64
+            ]
+        }
+    },
+    "VLA": {},
+    "VDI": {
+        "OR": {
+            "Pre-treatment": [
+                2.98,
+                0.71
+            ],
+            "1-injection": [
+                1.06,
+                1.06
+            ]
+        },
+        "CC": {
+            "Pre-treatment": [
+                2.48,
+                0.28
+            ],
+            "1-injection": [
+                1.25,
+                0.93
             ]
         }
     }

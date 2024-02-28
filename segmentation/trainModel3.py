@@ -8,7 +8,9 @@ import numpy as np
 import os
 import tensorflow.keras as keras
 from tensorflow.keras.optimizers import *
-
+from matplotlib import pyplot as plt
+from img2video import img2video
+from tf_explain.core.grad_cam import GradCAM
 import tensorflow as tf
 from tensorflow.keras.optimizers import *
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
@@ -26,16 +28,14 @@ model_classes = {
     'UNetPlusPlus': UNetPlusPlus,
     'AttUNet': AttentionUNet,
     'BCDUNet': BCDUNet,
-    # 'RecurrentUNet': RecurrentUNet,
-    # 'ResUNet': ResUNet,
+    'RecurrentUNet': RecurrentUNet,
+    'ResUNet': ResUNet,
     'R2UNet': R2UNet,
-    # 'R2AttentionUNet': R2AttentionUNet,
+    'R2AttentionUNet': R2AttentionUNet,
     'DenseUNet': DenseUNet,
     'MultiResUNet': MultiResUNet,
     'DCUNet': DCUNet,
-    # 'CARUNet': CARUNet,
 }
-# ['SegNet','PSPNet','FCN8','FCN32','DeepLabV3Plus','DeepLabV3','DeepLabV2','DeepLabV1']
 
 # 評估指標
 def dice_coef(y_true, y_pred):
@@ -162,6 +162,7 @@ class train():
 
     def evaluateModel(self,dataset_name, model, test_dataset, result_path,model_path, model_name, feature,predict_threshold = 0.5,postprocess_signal = False):
         print("evaluateModel" , model_name)
+        test_dataset2 = test_dataset
         # make folder
         img_path = os.path.join(result_path,model_name+'_' + feature, "images")
         mask_path = os.path.join(result_path,model_name+'_' + feature, "masks")
@@ -184,6 +185,9 @@ class train():
 
         # load model
         model.load_weights(os.path.join(model_path, model_name+'_' + feature + '.h5'))
+
+        self.gradcam(model, test_dataset2, result_path,model_name+'_' + feature)
+        
         print("load model")
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "w", newline='') as f:
             writer = csv.writer(f)
@@ -374,12 +378,9 @@ class train():
 
     # 訓練模型
     def run(self, PATH_DATASET, train_signal = True, postprocess_signal = False):
-        print("train_signal", train_signal)
-        print("postprocess_signal", postprocess_signal)
         if train_signal:
             self.record_model()
-            
-        print("train_signal")
+
         # 讀取資料集
         for dataset in glob.glob(r"%s/*" %PATH_DATASET): #讀取資料集
             dataset_name = dataset.replace(PATH_DATASET + '\\', "")
@@ -390,7 +391,6 @@ class train():
                 f.close()
                                             # 預測
             if postprocess_signal:
-                print("postprocess_signal")
                 if not os.path.isdir(os.path.join("record","CRF")):
                     os.makedirs(os.path.join("record","CRF"))
                 if not os.path.isdir(os.path.join("record","Morphology")):
@@ -492,4 +492,75 @@ class train():
 
 
 
+    def get_gradcam(self, model, img, layer_name):
+        # 載入圖片
+        img = cv2.imread(img)
+        img = cv2.resize(img, (self.image_size, self.image_size))
+        img = np.expand_dims(img, axis=0)
+        img = img / 255.0
+        # 取得模型的最後一層
+        layer = model.get_layer(layer_name)
+        # 取得模型的權重
+        model_gradcam = tf.keras.models.Model([model.inputs], [model.output, layer.output])
+        # 取得梯度
+        with tf.GradientTape() as tape:
+            conv_output, pred = model_gradcam(img)
+            class_out = pred[:, :, :, 0]
+            grads = tape.gradient(class_out, conv_output)
+            pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+        heatmap = tf.reduce_mean(tf.multiply(pooled_grads, conv_output), axis=-1)
+        heatmap = np.maximum(heatmap, 0)
+        heatmap /= np.max(heatmap)
+        heatmap = heatmap[0]
+        return heatmap
 
+    def gradcam(self, model, test_dataset, result_path,model_name):
+        # 建立資料夾
+        print("gradcam")
+        gradcam_path = os.path.join(result_path,model_name, "gradcam")
+        print(gradcam_path)
+        if not os.path.isdir(gradcam_path):
+            os.makedirs(gradcam_path)
+        # 取得測試資料
+
+
+        test_path = os.path.join(test_dataset, "test")
+        test_ids = os.listdir(os.path.join(test_path, "images"))
+        test_dataset = DataGenerator(test_ids, test_path, batch_size=1, image_size=self.image_size)
+        # 取得gradcam
+        explainer = GradCAM()
+        for i in test_ids:
+            for layer_name in [layer.name for layer in model.layers]:
+                # index layer_name
+                index =  [layer.name for layer in model.layers].index(layer_name)
+                save_img_name = i.split('.')[0] 
+                gradcam_img_path = os.path.join(gradcam_path, save_img_name, 'img')
+                if not os.path.isdir(gradcam_img_path):
+                    os.makedirs(gradcam_img_path)
+                    
+                img = cv2.imread(os.path.join(test_path, "images", i))
+                img = cv2.resize(img, (self.image_size, self.image_size))
+
+                # print("layer_name",layer_name)
+                if 'reshape' in layer_name or 'concatenate' in layer_name :
+                    continue
+                else:
+                    grid = explainer.explain(((np.expand_dims(img, axis=0)/255.0).astype(np.float32),None), model, class_index=1, layer_name=layer_name)
+                    # Resize the heatmap to the original image size
+                    
+                    heatmap = cv2.resize(grid, (self.image_size, self.image_size))
+                    heatmap = (heatmap - np.min(heatmap)) / (np.max(heatmap) - np.min(heatmap))
+                    
+                    
+                    # Apply colormap to the heatmap
+                    fig, ax = plt.subplots()
+                    ax.imshow(img, alpha=0.4)
+                    colorbar = ax.imshow(heatmap, cmap='hot', alpha=0.6, interpolation='bilinear')
+                    plt.axis('off')
+                    plt.colorbar(colorbar)
+                    plt.savefig(os.path.join(gradcam_img_path,str(index) + '.png'), bbox_inches='tight')
+                    # plt.show()
+                    plt.close()
+            # print("img2video")
+            # img to video
+            img2video(gradcam_img_path, os.path.join(gradcam_path,save_img_name, save_img_name + '.mp4'))

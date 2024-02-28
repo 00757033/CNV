@@ -307,9 +307,10 @@ def MannWhitney2( data_0, data_1, feature_name,layer, injection,disease,feature_
     # add average and std in new row
     df2.loc['mean'] = df2.mean().round(2) 
     df2.loc['std'] = df2.std().round(2)
+    df2.loc['relative change'] = [0,(df2['1st Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean'] * 100]
     # relative change
     relative1 = (df2['1st Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean']
-
+    print("relative1",relative1)
     
     
     # show title p < 0.05 p < 0.01 p < 0.001
@@ -357,5 +358,5 @@ if __name__ == '__main__':
     statistic = Statistic(PATH_BASE,disease,path)
     feature_list = ['Morphology','GLCM','GLRLM','GLSZM','NGTDM','GLDM','SFM','DWT']
     
-    statistic.stat('VesselFeature_Morphology.json','GLCM')
+    statistic.stat('VesselFeature_Morphology.json','Morphology')
     

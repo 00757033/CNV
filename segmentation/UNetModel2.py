@@ -34,17 +34,20 @@ class Model():
     def dice_coef_loss(self, y_true, y_pred):
         return 1.0 - self.dice_coef(y_true, y_pred)
 
-    def upsampling_block(self, inputs, filters):
+    def upsampling_block(self, inputs, filters,name = 'upsampling_block'):
         upsampling = keras.layers.UpSampling2D((2, 2))(inputs)
         conv = keras.layers.Conv2D(filters, (2, 2), activation='relu', padding='same', kernel_initializer='he_normal')(upsampling)
         bn = keras.layers.BatchNormalization()(conv)
+        # layer = keras.layers.Lambda(lambda x: x, name=name)(bn)
         return bn
     
-    def standard_unit(self, inputs, filters):
+    def standard_unit(self, inputs, filters, name = 'standard_unit'):
         conv1 = keras.layers.Conv2D(filters, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(inputs)
         bn1 = keras.layers.BatchNormalization()(conv1)
         conv2 = keras.layers.Conv2D(filters, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(bn1)
         bn2 = keras.layers.BatchNormalization()(conv2)
+        # 區域名稱
+        # layer = keras.layers.Lambda(lambda x: x, name='standard_unit')(bn2)
         return bn2
 
     def residual_block(self,inputs,filters):
@@ -147,6 +150,7 @@ class UNet(Model):
     def build_model(self, filters):
         inputs = keras.layers.Input(self.input_size)
         # downsampling
+        # 取名name
         conv1 = self.standard_unit(inputs, filters[0])
         pooling1 = keras.layers.MaxPooling2D((2, 2), strides=(2, 2))(conv1)
         conv2 = self.standard_unit(pooling1, filters[1])

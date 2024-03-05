@@ -56,6 +56,24 @@ def jaccard_index(y_true, y_pred):
     union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) - intersection
     return (intersection + smooth) / (union + smooth)
 
+def mean_pixel_accuracy(y_true, y_pred):
+    # Count the number of matching pixels
+    count_same = tf.reduce_sum(tf.cast(tf.equal(y_true, y_pred), tf.float32))
+    size = y_true.shape[0] * y_true.shape[1]
+    return count_same / size
+    
+    
+    
+    
+
+def set_seed(seed):
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+    tf.random.set_seed(seed)
+    
+# 產生模型
+
+
 #產生訓練資料 以及測試資料
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, ids, path, batch_size=8, image_size=304):
@@ -191,14 +209,27 @@ class train():
         print("load model")
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "w", newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["image_name", "predict_jaccard_index", "predict_dice_coefficient","postprocess_jaccard_index", "postprocess_dice_coefficient","postprocess_crf_jaccard_index", "postprocess_crf_dice_coefficient"])
+            writer.writerow(["image_name",
+                             "predict_jaccard_index", 
+                             "predict_dice_coefficient",
+                             "predict_mPA",
+                             "postprocess_jaccard_index", 
+                             "postprocess_dice_coefficient",
+                             "postprocess_mPA",
+                             "postprocess_crf_jaccard_index",
+                             "postprocess_crf_dice_coefficient",
+                             "postprocess_crf_mPA"
+                             ])
         # evaluate
         iou = []
         dice = []
+        mPA = []
         post_iou = []
         post_dice = []
+        post_mPA = []
         post_crf_iou = []
         post_crf_dice = []
+        post_crf_mPA = []
         
         best_id = 0
         worst_id = 0
@@ -229,6 +260,8 @@ class train():
             # Tensor("Mean_1:0", shape=(), dtype=float32)
             iou.append(jc)
             dice.append(di)
+            mpa = mean_pixel_accuracy(mask, img)
+            mPA.append(mpa)
 
             if jc > best_iou :
                 best_iou = jc
@@ -241,8 +274,10 @@ class train():
             cv2.imwrite(os.path.join(mask_path, test_ids[i]), cv2.imread(os.path.join(test_path, "masks", test_ids[i])))
             jc_post = 0
             di_post = 0
+            mpa_post = 0
             jc_postcrf = 0
             di_postcrf = 0
+            mpa_postcrf = 0
 
             if postprocess_signal:
                 image = cv2.imread(os.path.join(predict_path, test_ids[i]), 0)
@@ -255,8 +290,10 @@ class train():
                 jc_post = jaccard_score(mask.ravel(), output_post.ravel())
                 di_post = dice_coef(mask, output_post)
                 di_post = di_post.numpy()
+                mpa_post = mean_pixel_accuracy(mask, output_post)
                 post_iou.append(jc_post)
                 post_dice.append(di_post)
+                post_mPA.append(mpa_post)
                 crf_input = item[:, :, 0].copy()
                 crf_input = np.array(crf_input, dtype=np.uint8)
                 crf_input = cv2.resize(crf_input, (self.image_size, self.image_size))
@@ -269,19 +306,25 @@ class train():
                 jc_postcrf = jaccard_score(mask.ravel(), postcrf.ravel())
                 di_postcrf = dice_coef(mask, postcrf)
                 di_postcrf = di_postcrf.numpy()
+                mpa_postcrf = mean_pixel_accuracy(mask, postcrf)
                 post_crf_iou.append(jc_postcrf)
                 post_crf_dice.append(di_postcrf)
+                post_crf_mPA.append(mpa_postcrf)
             # record image name, jaccard index, dice coefficient
 
             record_data = [
                 test_ids[i],
                 jc,
                 di,
+                mpa,
                 jc_post,
                 di_post,
+                mpa_post,
                 jc_postcrf,
-                di_postcrf
+                di_postcrf,
+                mpa_postcrf
             ]
+            
 
             with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
                 writer = csv.writer(f)
@@ -290,29 +333,61 @@ class train():
         # record average jaccard index, dice coefficient  std of jaccard index, dice coefficient
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["mean", np.mean(iou), np.mean(dice), np.mean(post_iou), np.mean(post_dice), np.mean(post_crf_iou), np.mean(post_crf_dice)])
-            writer.writerow(["std", np.std(iou, ddof=1), np.std(dice, ddof=1), np.std(post_iou, ddof=1), np.std(post_dice, ddof=1), np.std(post_crf_iou, ddof=1), np.std(post_crf_dice, ddof=1)])
+            writer.writerow(["mean", np.mean(iou), np.mean(dice), np.mean(mPA), np.mean(post_iou), np.mean(post_dice), np.mean(post_mPA), np.mean(post_crf_iou), np.mean(post_crf_dice), np.mean(post_crf_mPA)])
+            writer.writerow(["std", np.std(iou, ddof=1), np.std(dice, ddof=1), np.std(mPA, ddof=1), np.std(post_iou, ddof=1), np.std(post_dice, ddof=1), np.std(post_mPA, ddof=1), np.std(post_crf_iou, ddof=1), np.std(post_crf_dice, ddof=1), np.std(post_crf_mPA, ddof=1)])
         # record best image name ,jaccard index, dice coefficient worst image name ,jaccard index, dice coefficient
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["best", test_ids[best_id], best_iou, dice[best_id]])
-            writer.writerow(["worst", test_ids[worst_id], worst_iou, dice[worst_id]])
+            writer.writerow(["best", test_ids[best_id], best_iou, dice[best_id],mPA[best_id]])
+            writer.writerow(["worst", test_ids[worst_id], worst_iou, dice[worst_id], mPA[worst_id]])
         # record postprocess best image name ,jaccard index, dice coefficient worst image name ,jaccard index, dice coefficient
         if postprocess_signal:
             print(os.path.join("record","CRF",dataset_name+'.csv'))
             print(os.path.join("record","Morphology",dataset_name+'.csv'))
+            postprocess_crf = [
+                model_name,
+                np.mean(iou),
+                np.std(iou, ddof=1),
+                np.mean(dice),
+                np.std(dice, ddof=1),
+                np.mean(mPA),
+                np.std(mPA, ddof=1),
+                np.mean(post_crf_iou),
+                np.std(post_crf_iou, ddof=1),
+                np.mean(post_crf_dice),
+                np.std(post_crf_dice, ddof=1),
+                np.mean(post_crf_mPA),
+                np.std(post_crf_mPA, ddof=1)
+                
+            ]
+            postprocess_Morphology = [
+                model_name,
+                np.mean(iou),
+                np.std(iou, ddof=1),
+                np.mean(dice),
+                np.std(dice, ddof=1),
+                np.mean(mPA),
+                np.std(mPA, ddof=1),
+                np.mean(post_iou),
+                np.std(post_iou, ddof=1),
+                np.mean(post_dice),
+                np.std(post_dice, ddof=1),
+                np.mean(post_mPA),
+                np.std(post_mPA, ddof=1)
+            ]
+            
             with open(os.path.join("record","CRF",dataset_name+'.csv'), 'a', newline='') as f:
                 writer = csv.writer(f)
                 # 'model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','ji_score','ji_var','dice_score','dice_var'
-                writer.writerow([model_name,np.mean(iou), np.std(iou, ddof=1),np.mean(dice),np.std(dice, ddof=1),np.mean(post_crf_iou), np.mean(post_crf_dice),np.std(post_crf_dice, ddof=1),np.std(post_crf_iou, ddof=1)])
+                writer.writerow(postprocess_crf)
                 
                 
             with open(os.path.join("record","Morphology",dataset_name+'.csv'),  'a', newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow([model_name,np.mean(iou), np.std(iou, ddof=1),np.mean(dice),np.std(dice, ddof=1),np.mean(post_iou), np.mean(post_dice),np.std(post_dice, ddof=1),np.std(post_iou, ddof=1)])
+                writer.writerow(postprocess_Morphology)
 
 
-        return np.mean(iou), np.std(iou, ddof=1), np.mean(dice), np.std(dice, ddof=1)
+        return np.mean(iou), np.std(iou, ddof=1), np.mean(dice), np.std(dice, ddof=1), np.mean(mPA), np.std(mPA, ddof=1)
 
     def fitModel(self,model,dataset,data,  train_dataset, valid_dataset, epoch, lrn, model_path, model_name, feature):
         print("fitModel",dataset,data)
@@ -343,13 +418,13 @@ class train():
                 writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate", "predict_threshold", "time", "loss", "dice_coef", "val_loss", "val_dice_coef"])
 
 				
-    def best_model_record(self, best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var):
+    def best_model_record(self, best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_mPA, best_mPA_var):
         print(best_model)
         [model_name , epoch, batch, lrn] = best_model.split('_')
         if not os.path.isfile(os.path.join("record", "best_model.csv")):
             with open(os.path.join("record", "best_model.csv"), "w", newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate", "predict_threshold", "time", "best_iou", "best_iou_var", "best_dice", "best_dice_var"])
+                writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate", "predict_threshold", "time", "best_iou", "best_iou_var", "best_dice", "best_dice_var", "best_mPA", "best_mPA_var"])
 
         with open(os.path.join("record", "best_model.csv"), "a", newline='') as f:
             writer = csv.writer(f)
@@ -365,19 +440,24 @@ class train():
                 best_iou, # best iou
                 best_iou_var, # best iou var
                 best_dice, # best dice
-                best_dice_var # best dice var
+                best_dice_var, # best dice var
+                best_mPA, # best mPA
+                best_mPA_var, # best mPA var
             ])
         f = open(self.data_class + '_' + self.data_date + '_summary_2.txt', 'a')
         lines = ['----------Summary:' + best_model + '----------\n',
                 'Time: '+ str(best_model_time) + '\n',
                 'Jaccard index: '+ str(best_iou) + ' +- ' + str(best_iou_var) + '\n',
                 'Dice Coefficient: '+ str(best_dice) + ' +- ' + str(best_dice_var) + '\n',
+                'mPA: '+ str(best_mPA) + ' +- ' + str(best_mPA_var) + '\n',
                 '----------------------------------------\n\n']
         f.writelines(lines)
         f.close()
 
     # 訓練模型
     def run(self, PATH_DATASET, train_signal = True, postprocess_signal = False):
+        set_seed(42)
+        
         if train_signal:
             self.record_model()
 
@@ -399,11 +479,11 @@ class train():
                 # 預測資料
                     with open(os.path.join("record","CRF",dataset_name+'.csv'), 'w') as f:
                         writer = csv.writer(f)
-                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','ji_score','ji_var','dice_score','dice_var'])
+                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_mPA_score','original_mPA_var','ji_score','ji_var','dice_score','dice_var','mPA_score','mPA_var'])
                 if not os.path.isfile(os.path.join("record","Morphology",dataset_name+'.csv')):
                     with open(os.path.join("record","Morphology",dataset_name+'.csv'), 'w') as f:
                         writer = csv.writer(f)
-                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','ji_score','ji_var','dice_score','dice_var'])
+                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_mPA_score','original_mPA_var','ji_score','ji_var','dice_score','dice_var','mPA_score','mPA_var'])
             for data in self.datas: #讀取資料集的訓練資料
                 for  model_name in self.models:  # 讀取模型
                     best_model = ''
@@ -411,6 +491,8 @@ class train():
                     best_dice_var = -1
                     best_iou = -1
                     best_iou_var = -1
+                    best_mPA = -1
+                    best_mPA_var = -1
                     best_model_time = 0
                     for epoch in self.epochs: #每個模型訓練幾個epoch
                         for batch in self.batchs: #每個模型訓練幾個batch
@@ -463,8 +545,15 @@ class train():
                                     self.record(history, time,model_path,save_model_name,count.__str__())
 
                                 print("evaluate")
-                                ji_score, ji_var , dice_score, dice_var = self.evaluateModel(dataset_name,model, dataset, result_path,model_path,save_model_name,count.__str__(),self.predict_threshold,postprocess_signal)
+                                ji_score, ji_var , dice_score, dice_var , mPA_score, mPA_var = self.evaluateModel(dataset_name, model, test_path, result_path,model_path, save_model_name, count.__str__(),self.predict_threshold,postprocess_signal)
                                 print("finish evaluate")
+                                ji_score = ji_score * 100
+                                ji_var = ji_var * 100
+                                dice_score = dice_score * 100
+                                dice_var = dice_var * 100
+                                mPA_score = mPA_score * 100
+                                mPA_var = mPA_var * 100
+                                
                                 if train_signal:
                                     f = open(self.data_class + '_' + self.data_date + '_summary.txt', 'a') # + save_model_name + '----------\n',
                                     lines = ['----------Summary:' + dataset_name + '----------\n',
@@ -472,6 +561,7 @@ class train():
                                             'Time: '+ str(time) + '\n',
                                             'Jaccard index: '+ str(ji_score) + ' +- ' + str(ji_var) + '\n',
                                             'Dice Coefficient: '+ str(dice_score) + ' +- ' + str(dice_var) + '\n',
+                                            'mPA: '+ str(mPA_score) + ' +- ' + str(mPA_var) + '\n',
                                             '----------------------------------------\n\n']
                                     f.writelines(lines)
                                     f.close()
@@ -481,12 +571,14 @@ class train():
                                         best_iou_var = ji_var
                                         best_dice = dice_score
                                         best_dice_var = dice_var
+                                        best_mPA = mPA_score
+                                        best_mPA_var = mPA_var
                                         best_model = save_model_name
                                         best_model_time = time
                     
                     if train_signal:  
                         print("best_model:", best_model)        
-                        self.best_model_record(best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var)
+                        self.best_model_record(best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_mPA, best_mPA_var)
 
 
 

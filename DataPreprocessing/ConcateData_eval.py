@@ -13,7 +13,11 @@ class Concatenation() :
         self.image_path = image_path
         self.layers = layers   
     def getConcate(self,layer,concateLayer ,mask_file, output_file):
-        input_path=[os.path.join(self.image_path, path,'images') for path in concateLayer]
+        if 'ALL' in concateLayer[1]:
+            input_path=[os.path.join(self.image_path, path) for path in concateLayer]
+            input_path[0] = os.path.join(input_path[0],'images')
+        else:
+            input_path=[os.path.join(self.image_path, path,'images') for path in concateLayer]
         print('input_path',input_path)
         tools.makefolder(os.path.join(self.image_path,output_file,'images'))
         tools.makefolder(os.path.join(self.image_path,output_file,'masks'))
@@ -39,14 +43,14 @@ class Concatenation() :
                     # blur = cv2.GaussianBlur(image,(5,5),0)
                     otsu_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
                     merged_image = np.dstack([merged_image, otsu_image[1]])
-                    cv2.imshow('otsu_image',otsu_image[1])
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
+                    # cv2.imshow('otsu_image',otsu_image[1])
+                    # cv2.waitKey(0)
+                    # cv2.destroyAllWindows()
                 else:
                     merged_image = np.dstack([image])
-                    cv2.imshow('image',image)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
+                    # cv2.imshow('image',image)
+                    # cv2.waitKey(0)
+                    # cv2.destroyAllWindows()
                    
             print('merged_image',merged_image.shape)   
             output_path = os.path.join(self.image_path,output_file,'images',image_name)
@@ -69,16 +73,16 @@ class Concatenation() :
 
 if __name__ == "__main__":
     import cv2
-    date = '0205'
+    date = '0304'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
     image_path = PATH + FILE
-    data_groups = ["OR", "CC"]
-    filters = "_bil510_clahe7"
-    dict_concate = {'OR': [FILE  + filters+"_OR", FILE  + "_CC",FILE + "_OR"] , 'CC': [FILE  + filters+"_CC", FILE +"_OR" ,FILE + "_CC"]}
+    data_groups = [ "CC"]
+    filters = "_connectedComponent_bil510_clahe7"
+    dict_concate = {'OR': [FILE  + filters+"_OR", FILE  + "_CC",FILE + "_OR"] , 'CC': [FILE  + filters+"_CC", "ALL/3/" ,"ALL/4_OCT/"]}
     
     for data_group in data_groups:
         path = FILE + '/'+ data_group
         label= Concatenation(path,image_path)
-        label.getConcate(data_group,dict_concate[data_group] ,FILE  +filters,FILE  +filters + '_concate_' + data_group)
+        label.getConcate(data_group,dict_concate[data_group] ,FILE  +filters,FILE  +filters + '_concateOCT_' + data_group)

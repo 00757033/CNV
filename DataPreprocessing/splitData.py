@@ -6,7 +6,7 @@ import cv2
 import shutil
 
 class splitData():
-    def __init__(self, path,layers = {"3":"OR","4":"CC"}):
+    def __init__(self, path,layers = {"4":"CC"}):
         self.train_test = ["train","test","valid"]
         self.path = path
         self.df = None
@@ -67,7 +67,7 @@ class splitData():
 
 if __name__ == "__main__":
     path = "../../Data"
-    date = '0205'
+    date = '0304'
     disease = 'PCV'
     NAME = disease + "_" + date
     path_base =  path + "/" + disease + "_"+ date
@@ -75,4 +75,4 @@ if __name__ == "__main__":
     output_path = path_base 
 
     split = splitData(path_base)
-    split.splitData(NAME + '_bil510_clahe7_concate' ,NAME + '_bil510_clahe7_concate_42')
+    split.splitData(NAME + '_connectedComponent_bil510_clahe7_concateOCT' ,NAME + '_connectedComponent_bil510_clahe7_concateOCT_42')

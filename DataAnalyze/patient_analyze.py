@@ -87,6 +87,7 @@ class Analyze():
         self.inject_df = pd.read_excel(file, sheet_name="20230830",na_filter = False, engine='openpyxl')
         self.inject_df['病歷號'] = self.inject_df['病歷號'].apply(lambda x: '{:08d}'.format(x))
         # turn to json
+        list_date = {'打針前門診日期': 'pre-injection', '三針後門診': '1st-injection', '六針後門診': '2nd-injection', '九針後門診': '3rd-injection', '十二針後門診': '4th-injection'}
         inject_dict = dict()
         for index, row in self.inject_df.iterrows():
             patient_id = row['病歷號']
@@ -97,7 +98,7 @@ class Analyze():
                 if eye not in inject_dict[patient_id].keys():
                     inject_dict[patient_id][eye] = dict()
                 # if date is Nat then set '' else turn to yearmonthday
-                list_date = {'打針前門診日期': 'pre-injection', '三針後門診': '1st-injection', '六針後門診': '2nd-injection', '九針後門診': '3rd-injection', '十二針後門診': '4th-injection'}
+                
                 for date , date_name in list_date.items():
                     if pd.isnull(row[date]) or len(str(row[date])) < 8:
                         row[date] = ''
@@ -107,7 +108,8 @@ class Analyze():
         count = 0
         for patient_id, eyes in inject_dict.items():
             for eye in eyes:
-                count += 1
+                if list_date['打針前門診日期'] in inject_dict[patient_id][eye] and  list_date['三針後門診'] in inject_dict[patient_id][eye] :
+                    count += 1
 
         print('inject case',count)
         
@@ -132,13 +134,14 @@ class Analyze():
                     missing_records[patient_id] = set()
                 missing_records[patient_id] = eyes
         tools.pop_empty_dict(missing_records)
-        print('missing_records')
-        print(missing_records)
+        
+        # count missing_records patient+eye
+        count = 0
+        for patient_id, eyes in missing_records.items():
+            count += len(eyes)
+        print('missing records',count)
         return missing_records
-    
-                
-                
-    
+      
 
     def check_date(self, patient_in_list,patient_in_folder): # patient_in_list 病患資料表中的病患  patient_in_folder 病歷表中的病患
         # 病歷表中的病患 
@@ -172,11 +175,7 @@ class Analyze():
                                 
         tools.pop_empty_dict(need_collect)
         return need_collect
-                                    
-                            
-                            
-                            
-                    
+                                                    
                 
     # Uncollected patients
     def Uncollected_patients(self,patient_in_excell_list,patient_in_folder,inject_dict):
@@ -231,6 +230,13 @@ class Analyze():
                                 
                 
         tools.pop_empty_dict(uncollect_patient)
+        
+        # count uncollect_patient patient+date+eye
+        count = 0
+        for patient_id, dates in uncollect_patient.items():
+            for date, eyes in dates.items():
+                count += len(eyes)
+        print('uncollect patient',count)
         return uncollect_patient,collect_patient
 
     
@@ -296,7 +302,6 @@ class Analyze():
                                 check = False
                         if check:
                             count += 1
-                            print(patientID,date,OD_OS)
                             del unlabel[patientID][date][OD_OS]
                     else:
                         unlabel[patientID][date][OD_OS] = label_layer
@@ -309,7 +314,7 @@ class Analyze():
         return islabeled,unlabel
 
     # copy need label data to unlabel folder  
-    def need_label(self,need_label_dict,label_name,disease_name = 'PCV',unlabel_path = '../../Data/need_label',label_layer = ['3','4']):
+    def need_label(self,need_label_dict,label_name,disease_name = 'PCV',unlabel_path = '../../Data/need_label2',label_layer = ['3','4']):
         for layer in label_layer:
             if not os.path.exists(unlabel_path + '/' + label_name + '/' +layer):
                 os.makedirs(unlabel_path + '/' + label_name + '/' +layer)
@@ -352,6 +357,7 @@ if __name__ == '__main__':
     analyze = Analyze()
     # 收集病患資料
     analyze.disease()
+    tools.makefolder('./record')
     # save
     analyze.save_disease()
     need_collect = analyze.read_file()
@@ -362,10 +368,11 @@ if __name__ == '__main__':
     print('other',len(other))
     print('patient',len(patient))
     
+    
+    
     # 病患資料表中的PCV病患
     tools.remove_exist_file('./record/PCV.txt')
     tools.txt_to_file(PCV,'record','PCV')
-
 
     inject = analyze.inject('../../Data/打針資料.xlsx')
     tools.remove_exist_file('./record/inject.json')
@@ -388,6 +395,7 @@ if __name__ == '__main__':
     
     # 未收集病患資料&日期
     not_collect,collect_patient = analyze.Uncollected_patients(PCV,patient_collected,inject)
+    
     tools.remove_exist_file('./record/uncollect_PCV.txt')
     with open('./record/uncollect_PCV.txt', 'w') as f:
         for key, value in not_collect.items():
@@ -398,7 +406,7 @@ if __name__ == '__main__':
     tools.write_to_json_file('./record/collect_patient.json',collect_patient)
     
     # need label
-    islabeled,unlabel = analyze.label(collect_patient)
+    islabeled,unlabel = analyze.label(collect_patient,'../../Data/labeled','label_',['4'])
     
     tools.remove_exist_file('./record/islabeled.json')
     tools.write_to_json_file('./record/islabeled.json',islabeled)
@@ -406,8 +414,8 @@ if __name__ == '__main__':
     tools.remove_exist_file('./record/unlabel.json')
     tools.write_to_json_file('./record/unlabel.json',unlabel)
     
-    # need label
-    need_label = analyze.need_label(unlabel,'PCV')
+    # # need label
+    # need_label = analyze.need_label(unlabel,'PCV')
     
     
 

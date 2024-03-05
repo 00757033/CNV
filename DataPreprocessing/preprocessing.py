@@ -18,7 +18,7 @@ from skimage.filters import unsharp_mask
 # normalize
 
 class PreprocessData():
-    def __init__(self,path,layers = {"3":"OR","4":"CC"}):
+    def __init__(self,path,layers = {"4":"CC"}):
         self.path = path
         self.layers = layers
         self.train_test = ["train","test","valid"]
@@ -510,7 +510,7 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '0205'
+    date = '0304'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
@@ -520,4 +520,4 @@ if __name__ == "__main__":
     # preprocess.filter_preprocess(FILE + '_otsu',FILE + '_otsu_bil')
     # preprocess.clahe_preprocess(FILE + '_otsu_bil',FILE + '_otsu_bil_clahe')
     # preprocess.preprocess('' ,FILE + '_bil510_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/')
-    preprocess.preprocess(FILE +'' ,FILE + '_fastNlMeansDenoising7_Unsharp_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=True,bilateralFilter =False ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/')
+    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil510_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=False,bilateralFilter =True ,Unsharp = False,clahe =True,   save_img =True,new_parameter = False,path = './record/')

@@ -16,14 +16,14 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="tensorflow")
 # Disable NumPy deprecation warnings for TensorFlow
 os.environ['TF_NUMPY_BANNER'] = 'off'
 #Get label data
-train_signal = False
+train_signal = True
 train_data = True
-postprocess_signal = False
-result= False
+postprocess_signal = True
+result= True
 #data_class為病徵的名稱，如:PED, CNV
 def main(data_class):
     #Date time
-    data_date = "0205"
+    data_date = "0304"
     #Path definition
     PATH_BASE = "../../Data/"
     PATH_LABEL = PATH_BASE + "Label"
@@ -44,10 +44,10 @@ def main(data_class):
 
     #HyperParameter
     image_size   = 304
-    models       = ['AttUNet'] # 'UNet','UNetPlusPlus', #,'R2UNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet'
-    epochs       = [150] #50、100、200、400
+    models       = ['UNet','UNetPlusPlus','AttUNet','R2UNet','ResUNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet'] #  #
+    epochs       = [200] #50、100、200、400
     datas        = ['train']
-    batchs       = [8]
+    batchs       = [2,4,8]
     lrns         = [0.001]
     filters      = [16,32, 64, 128, 256]
 

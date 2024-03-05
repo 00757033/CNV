@@ -6,7 +6,7 @@ import shutil
 import os
 from matplotlib import pyplot as plt
 class Augment():
-    def __init__(self,path,layers = {"3":"OR","4":"CC"}):
+    def __init__(self,path,layers = {"4":"CC"}):
         self.path = path
         self.layers = layers
         self.train_test = ["train","test","valid"]
@@ -37,17 +37,17 @@ class Augment():
         augmented = transform(image=image, mask=mask)
         aug_image = augmented['image']
         aug_mask = augmented['mask']
-        # show the augmented image
-        fig, ax = plt.subplots(2, 2, figsize=(10, 10))
-        ax[0, 0].imshow(image)
-        ax[0, 0].axis('off')
-        ax[0, 1].imshow(mask)
-        ax[0, 1].axis('off')
-        ax[1, 0].imshow(aug_image)
-        ax[1, 0].axis('off')
-        ax[1, 1].imshow(aug_mask)
-        ax[1, 1].axis('off')
-        plt.show()
+        # # show the augmented image
+        # fig, ax = plt.subplots(2, 2, figsize=(10, 10))
+        # ax[0, 0].imshow(image)
+        # ax[0, 0].axis('off')
+        # ax[0, 1].imshow(mask)
+        # ax[0, 1].axis('off')
+        # ax[1, 0].imshow(aug_image)
+        # ax[1, 0].axis('off')
+        # ax[1, 1].imshow(aug_mask)
+        # ax[1, 1].axis('off')
+        # plt.show()
         
             
             
@@ -98,13 +98,13 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '0205'
+    date = '0304'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date
     PATH_LABEL = PATH + "/" + "new_label"
     PATH_IMAGE = PATH + "/" + "OCTA"
     preprocess = Augment(PATH_BASE + '/' + 'trainset')
-    augment_time = [10]
+    augment_time = [2]
     for time in augment_time:
-        preprocess.augumentation(disease + "_"+ date +  '_42','aug' + str(time),time)    
+        preprocess.augumentation(disease + "_"+ date +  '_connectedComponent_bil510_clahe7_concate_42','aug' + str(time),time)    

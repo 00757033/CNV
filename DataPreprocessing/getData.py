@@ -11,7 +11,7 @@ import json
 
 import tools.tools as tools
 class getData():
-    def __init__(self,path,image_path,label_path,label_title,all_layers = ["1_OCT", "2_OCT", "3_OCT", "4_OCT", "1", "2", "3", "4"],layers = {"3":"OR","4":"CC"}):
+    def __init__(self,path,image_path,label_path,label_title,all_layers = ["1_OCT", "2_OCT", "3_OCT", "4_OCT", "1", "2", "3", "4"],layers = {"4":"CC"}):
         self.path = path
         self.label_path = label_path
         self.image_path = image_path
@@ -143,7 +143,6 @@ class getData():
                                                 cv2.imwrite(output_path + '/'+self.layers[image.stem]+'/images/'+ new_image_name+'.png' ,save_image)
                                     if copy_label and type == 'disease':
                                         for label in label_dict[patientID][date][eyes]:
-                                            print('label',label)
                                             origin_label_path = os.path.join(self.label_path,patientID,date,eyes,self.label_title + '_' + label+'.png')
                                             output_label_path = os.path.join(output_path,self.layers[label],'masks', new_image_name+'.png')
 
@@ -189,7 +188,7 @@ class getData():
             
                 
 if __name__ == '__main__':
-    date = '0205'
+    date = '0305'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date
@@ -202,6 +201,6 @@ if __name__ == '__main__':
     health = data.health('../DataAnalyze/PCV_disease.json')
     # data.writeLabelJson('./record/label_dict.json')
     types = ['disease','health']
-    data.getData(disease,PATH_BASE,'disease',toinpaint = True,copy_image = True,copy_label = True)
+    data.getData(disease,PATH_BASE,'disease',toinpaint = False,copy_image = True,copy_label = True)
 
 

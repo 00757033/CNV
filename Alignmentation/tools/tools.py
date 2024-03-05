@@ -1,13 +1,14 @@
 import os
 import json
 import cv2
+import numpy as np
 def remove_exist_file(file_name):
     if os.path.exists(file_name):
         os.remove(file_name)
 
 def write_to_json_file(file_name, data):
     with open(file_name, 'w') as fp:
-        json.dump(data, fp, indent=4, sort_keys=True, ensure_ascii=False)
+        json.dump(data, fp, indent=4, sort_keys=True, ensure_ascii=True)
 
 # write patient to txt
 def txt_to_file(set_patient,file_path = './',file_name = 'patient',title = False,line = False):
@@ -79,6 +80,16 @@ def overlay_images(image1, image2, alpha=0.5):
 def makefolder(output_dir):
     os.makedirs(output_dir, exist_ok=True)
 
+# Convert float32 to float recursively
+def convert_float32_to_float(obj):
+    if isinstance(obj, np.float32):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {key: convert_float32_to_float(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_float32_to_float(item) for item in obj]
+    else:
+        return obj
  
 def format_json(str):
     resultStr = json.dumps(json.loads(str), indent=4, ensure_ascii=False)

@@ -11,8 +11,8 @@ import csv
 import tools.tools as tools
 from skimage.feature import corner_harris
 from skimage.metrics import mean_squared_error
-from skimage.metrics import structural_similarity
-from skimage.metrics import peak_signal_noise_ratio
+from skimage.metrics import peak_signal_noise_ratio as psnr
+from skimage.metrics import structural_similarity as ssim
 import pathlib as pl
 def setFolder(path):
     os.makedirs(path, exist_ok=True)
@@ -20,35 +20,73 @@ def setFolder(path):
 def mean_squared_error_ignore_zeros(img1, img2,img3):
     # 對於兩張影像 計算每個pixel 的差異
     # 找出兩影像中相應像素都為零的位置
-    both_zeros_mask  = (img1 == 0) & (img2 == 0) & (img3 == 0)
+    msk1 = img1 == 0
+    msk2 = img2 == 0
+    msk3 = img3 == 0
+    both_zeros_mask = np.logical_and(np.logical_and(msk1, msk2), msk3)
+    # 提取非零区域
+    # img1_non_zero = img1.copy()
+    # img1_non_zero[both_zeros_mask] = 0
+    # img2_non_zero = img2.copy()
+    # img2_non_zero[both_zeros_mask] = 0
+    # img3_non_zero = img3.copy()
+    # img3_non_zero[both_zeros_mask] = 0
+    
+    size = 304 * 304 - np.sum(both_zeros_mask)
+    
+    # diff = img1_non_zero - img2_non_zero
+    # mse = np.sum(diff ** 2) / size
+    # print('mse',mse)
+    
+    diff = abs(img1[~both_zeros_mask] - img2[~both_zeros_mask])
+    mse =  np.sum(diff ** 2) / size
+    # print('mse',mse)
+    return mse
+
+def psnr_ignore_zeros(img1, img2,img3):
+    msk1 = img1 == 0
+    msk2 = img2 == 0
+    msk3 = img3 == 0
+    
+    both_zeros_mask = np.logical_and(np.logical_and(msk1, msk2), msk3)
+    
+    img1_non_zero = img1.copy()
+    img1_non_zero[both_zeros_mask] = 0
+    img2_non_zero = img2.copy()
+    img2_non_zero[both_zeros_mask] = 0
+    img3_non_zero = img3.copy()
+    img3_non_zero[both_zeros_mask] = 0
+    
 
     
-    diff = img1[~both_zeros_mask] - img2[~both_zeros_mask]
-    mse = np.mean(diff ** 2)
-    return mse
-def psnr_ignore_zeros(img1, img2,img3):
+    # # 計算 PSNR
+    mse = mean_squared_error_ignore_zeros(img1, img2,img3)
+    psnr_value = 10 * np.log10(255 ** 2 / mse)
+    # print('psnr',psnr_value)
     
-    both_zeros_mask  = (img1 == 0) & (img2 == 0) & (img3 == 0)
-    diff = img1[~both_zeros_mask] - img2[~both_zeros_mask] 
-    mse = np.mean(diff**2)
-    # 如果 MSE 為 0，則 PSNR 為無窮大
-    if mse == 0:
-        return float('inf')
-    max_pixel_value = 255.0
-    # 計算 PSNR
-    psnr = 20 * np.log10(max_pixel_value / np.sqrt(mse))
-    return psnr
+    return psnr_value
+
 
 def ssim_ignore_zeros(img1, img2,img3):
-    both_zeros_mask  = (img1 == 0) & (img2 == 0) & (img3 == 0)
+    
+    # 找出兩影像中相應像素都為零的位置
+    msk1 = img1 == 0
+    msk2 = img2 == 0
+    msk3 = img3 == 0
+    both_zeros_mask = np.logical_and(np.logical_and(msk1, msk2), msk3)
     # 提取非零区域
-    img1_non_zero = img1[~both_zeros_mask]
-    img2_non_zero = img2[~both_zeros_mask]
+    img1_non_zero = img1.copy()
+    img1_non_zero[both_zeros_mask] = 0
+    img2_non_zero = img2.copy()
+    img2_non_zero[both_zeros_mask] = 0
     
-    
-    # SSIM
-    ssim_index, _ = structural_similarity(img1_non_zero, img2_non_zero, full=True)
-    return ssim_index
+
+    ssim_value, _ = ssim(img1_non_zero, img2_non_zero, data_range=254, full=True, gaussian_weights=True, use_sample_covariance=False)
+    # print('ssim_value',ssim_value)
+    # # SSIM
+    # ssim_index, _ = ssim(img1_non_zero, img2_non_zero,full=True)
+    # print('ssim_index',ssim_index)
+    return ssim_value
     
     
             
@@ -64,17 +102,15 @@ class finding():
         self.output_label_path = output_label_path
         self.image_size= (304, 304)
         self.data_list = ['1','2', '3', '4', '1_OCT', '2_OCT', '3_OCT', '4_OCT']
-        self.label_list = ['CC', 'OR']
+        self.label_list = ['CC']
+        self.methods_template = [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED, cv2.TM_CCORR , cv2.TM_CCORR_NORMED, cv2.TM_CCOEFF, cv2.TM_CCOEFF_NORMED]
+        self.method_template_name = ['TM_SQDIFF', 'TM_SQDIFF_NORMED', 'TM_CCORR' , 'TM_CCORR_NORMED', 'TM_CCOEFF', 'TM_CCOEFF_NORMED']
 
 
     def evaluates(self, pre_treatment_img, post_treatment_img,matching_img):
         cmp_pre_treatment_img = cv2.imread(pre_treatment_img , cv2.IMREAD_GRAYSCALE)
         cmp_post_treatment_img = cv2.imread(post_treatment_img, cv2.IMREAD_GRAYSCALE)
         cmp_matching_img = cv2.imread(matching_img, cv2.IMREAD_GRAYSCALE)
-        
-        # 僅保留 cmp_matching_img 不為0的部分 進行比較
-        cmp_pre_treatment_img[cmp_matching_img == 0] = 0
-        cmp_post_treatment_img[cmp_matching_img == 0] = 0
         
                           
         
@@ -85,10 +121,26 @@ class finding():
             return -1 , -1 , -1,-1 , -1 , -1
         
         
-        mse = mean_squared_error_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
-        psnr = psnr_ignore_zeros( cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
-        ssim = ssim_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
+        # mse = mean_squared_error_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
+        # psnr = psnr_ignore_zeros( cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
+        # ssim = ssim_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
+        # ssim = ssim * 100
+        
+        
+        
+        # mse = mean_squared_error(cmp_pre_treatment_img, cmp_post_treatment_img) 
+        # psnr = peak_signal_noise_ratio(cmp_pre_treatment_img, cmp_post_treatment_img)
+        # ssim = structural_similarity(cmp_pre_treatment_img, cmp_post_treatment_img)
+        # ssim = ssim * 100
+        # img_one all 255
+        img_white = np.ones(cmp_pre_treatment_img.shape) * 255
+        mse = mean_squared_error_ignore_zeros(cmp_pre_treatment_img ,cmp_post_treatment_img,img_white)
+        psnr = psnr_ignore_zeros( cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
+        ssim = ssim_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
         ssim = ssim * 100
+        
+        cmp_pre_treatment_img[cmp_matching_img == 0] = 0
+        cmp_post_treatment_img[cmp_matching_img == 0] = 0
         matching_mse = mean_squared_error_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
         matching_psnr = psnr_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
         matching_ssim = ssim_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
@@ -153,7 +205,10 @@ class finding():
         image2 = image.copy()
         image2 = self.preprocess(image2)
         
-        rst,image2 = cv2.threshold(image2, 0, 255,  cv2.THRESH_BINARY  + cv2.THRESH_OTSU)
+        # rst,image2 = cv2.threshold(image2, 0, 255,  cv2.THRESH_BINARY  + cv2.THRESH_OTSU)
+        
+        # 二值化 32 255
+        rst,image2 = cv2.threshold(image2, 64, 255,  cv2.THRESH_BINARY)
         
         image2 = cv2.bitwise_not(image2)
         # 找到影像中 最白的最大面積的圓
@@ -190,19 +245,9 @@ class finding():
 
         # 無條件進位
         max_radius = int(math.ceil(max_radius))
-
-
-        # 畫出黃斑中心
-        # draw the circle
-        cv2.rectangle(draw_image, (int(center[0] - max_radius), int(center[1] - max_radius)), (int(center[0] + max_radius), int(center[1] + max_radius)), (255, 0, 255), 3)
-        cv2.circle(draw_image, center, 5, (0, 255, 255), -1)
-        t = 40
-        cv2.rectangle(draw_image, (int(center[0] - max_radius-t), int(center[1] - max_radius-t)), (int(center[0] + max_radius+ t), int(center[1] + max_radius+ t)), (255, 255, 0), 3)
-
-        # cv2.imshow('img',draw_image)
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-
+        
+        
+        t = 50
         if int(center[0] - max_radius) < t :
             t = int(center[0] - max_radius)
         if int(center[1] - max_radius) < t :
@@ -211,11 +256,27 @@ class finding():
             t = len(image[0]) - int(center[0] + max_radius)
         if int(center[1] + max_radius) > len(image) - t :
             t = len(image) - int(center[1] + max_radius)
+            
+        # 畫出黃斑中心
+        # draw the circle
+        cv2.rectangle(draw_image, (int(center[0] - max_radius), int(center[1] - max_radius)), (int(center[0] + max_radius), int(center[1] + max_radius)), (255, 0, 255), 3)
+        cv2.circle(draw_image, center, 5, (0, 255, 255), -1)
+        
+        cv2.rectangle(draw_image, (int(center[0] - max_radius-t), int(center[1] - max_radius-t)), (int(center[0] + max_radius+ t), int(center[1] + max_radius+ t)), (255, 255, 0), 3)
+
+        # # show the image wait 3 seconds and destroy
+        # fig , ax = plt.subplots(1,2,figsize=(10,10))
+        # ax[0].imshow(draw_image)
+
+        # ax[0].set_title('center')
+        # ax[1].imshow(image)
+
+        # ax[1].set_title('image')
+        # plt.show()
+        
 
         crop_img = image[int(center[1] - max_radius)-t:int(center[1] + max_radius)+t, int(center[0] - max_radius)-t:int(center[0] + max_radius)+t]
         # show the image wait 3 seconds and destroy
-
-
         return  crop_img , center , max_radius + t
 
     def LK(self,img1, img2,center,radius,  distance=0.9, method='KAZE',matcher='BF'):
@@ -260,8 +321,8 @@ class finding():
             kp2, des2 = sift.compute(img2, kp2)
 
 
-        img1_draw = cv2.drawKeypoints(img1, kp1, img1, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-        img2_draw = cv2.drawKeypoints(img2, kp2, img2, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        # img1_draw = cv2.drawKeypoints(img1, kp1, img1, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        # img2_draw = cv2.drawKeypoints(img2, kp2, img2, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         # Convert to numpy arrays
         if des1 is None or des2 is None:
             H = np.array(np.eye(3))
@@ -438,8 +499,82 @@ class finding():
 
         return matched_image
         
-    
+    def check_H_range(self,H):
+        if H is not None:
+            translation = (H[0, 2], H[1, 2])
+            rotation_rad = math.atan2(H[1, 0], H[0, 0])
+            rotation_angle= np.arctan2(H[1, 0], H[0, 0]) * 180 / np.pi
+            scale_x =  np.linalg.norm(H[:, 0])
+            scale_y = np.linalg.norm(H[:, 1])
+            # print('translation',translation)
+            # print('rotation_rad',rotation_rad)
+            # print('rotation_angle',rotation_angle)
+            # print('scale x',scale_x)
+            # print('scale y',scale_y)
+            
+            
+            if translation[0] > 304 // 2 or translation[0] < -304 // 2 or translation[1] > 304 // 2 or translation[1] < -304 // 2:
+                print('translation out of range')
+                return False
+            if rotation_angle > 30 or rotation_angle < -30:
+                print('rotation out of range')
+                return False
+            if scale_x > 1.5 or scale_x < 0.5 or scale_y > 1.5 or scale_y < 0.5:
+                print('scale out of range')
+                return False
+            return True
+        else:
+            return False
 
+    def getPoints(self,img, template, method=cv2.TM_CCOEFF_NORMED):
+        result = cv2.matchTemplate(img, template, method) # 回傳的是相關係數矩陣
+        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result) # 找到最大值和最小值的位置 也就是左上角的位置 以及右下角的位置
+        if self.method_template_name[method] in ['TM_SQDIFF', 'TM_SQDIFF_NORMED']:
+            top_left = min_loc # 要移動的位置
+            r = min_val # r=最低的相關係數
+        else:
+            top_left = max_loc
+            r = max_val # r=最高的相關係數
+        return top_left, r #top_left:回傳對位左上角的位置, r=最高的相關係數
+        
+            
+    def get_element(self,image, template, offset_x=0, offset_y=0, method=cv2.TM_CCOEFF_NORMED):
+        elements, r = self.getPoints(image, template, method)
+        elements = (elements[0] - offset_x, elements[1] - offset_y)
+        return elements, r
+
+    def pointMatch(self,pre_img,crop_img,center,radius, method = cv2.TM_CCOEFF_NORMED):
+        elements_c, r_c = self.get_element(pre_img, crop_img, center[0] - radius, center[1] - radius, method)
+        # 選擇最高的相關係數的位置
+        e = [elements_c]
+        r = [r_c]
+        Relation = 0
+        relation_min = 1000000000000000000000000000
+        shift_x = None
+        shift_y = None
+        for i in range(0, len(r)):
+
+            if self.method_template_name[method] in ['TM_SQDIFF', 'TM_SQDIFF_NORMED']:
+
+                if r[i] < relation_min:
+                    relation_min = r[i]
+                    shift_x = e[i][0] 
+                    shift_y = e[i][1]
+            elif  self.method_template_name[method] in ['TM_CCORR']:  
+                if r[i] > Relation:
+                    Relation = r[i]
+                    shift_x = e[i][0]
+                    shift_y = e[i][1]
+            else:
+                if r[i] > Relation:
+                    Relation = r[i]
+                    shift_x = e[i][0]
+                    shift_y = e[i][1]                
+        if shift_x != None : 
+            return shift_x, shift_y
+        else:
+            print('No Match')
+            return 0,0        
     
     def feature(self, feature, matcher, distance):
         patient_dict = {}
@@ -478,36 +613,28 @@ class finding():
                     if pre_treatment_file != '' and post_treatment_file != '':
                         pre_image = cv2.imread(self.output_image_path + '1/' + patient_id + '_' + eye + '_' + str(pre_treatment) + '.png')
                         post_image = cv2.imread(self.output_image_path + '1/' + patient_id + '_' + eye + '_' + str(post_treatment) + '.png')
+                        
 
+                        
                         pre_image = cv2.resize(pre_image, (304, 304))
                         post_image = cv2.resize(post_image, (304, 304))
 
                         pre_image = cv2.normalize(pre_image, None, 0, 255, cv2.NORM_MINMAX)
                         post_image = cv2.normalize(post_image, None, 0, 255, cv2.NORM_MINMAX)
-
-
-
+                        
+                        pre_image_original = pre_image.copy()
+                        post_image_original = post_image.copy()
                         # show histogram
-
-                        # fig , ax =  plt.subplots(3,2,figsize=(10,10))
-                        # ax[0][0].hist(pre_image2.ravel(), 256, [0, 256])
-                        # ax[0][0].set_title('pre_image2')
-                        # ax[0][1].hist(post_image2.ravel(), 256, [0, 256])
-                        # ax[0][1].set_title('post_image2')
-                        # ax[1][0].imshow(pre_image2)
-                        # ax[1][1].imshow(post_image2)
-                        # ax[2][0].hist(pre_image.ravel(), 256, [0, 256])
-                        # ax[2][0].set_title('pre_image')
-                        # ax[2][1].hist(post_image.ravel(), 256, [0, 256])
-                        # ax[2][1].set_title('post_image')
-
-                        # plt.show()
+                        
                         crop_img ,center,radius = self.find_center(post_image)
+                        
+                        
+                        # pre_image_gray = cv2.cvtColor(pre_image, cv2.COLOR_BGR2GRAY)
+                        # post_image_gray = cv2.cvtColor(post_image, cv2.COLOR_BGR2GRAY)
+                        # crop_img_gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
+                        
                         # print(center,radius)
                         # print(center[1] - radius,center[1] + radius,center[0] - radius,center[0] + radius)
-
-                        pre_image2 = cv2.cvtColor(pre_image, cv2.COLOR_BGR2GRAY)
-                        crop_img = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
 
                         # pre_image2 = cv2.bilateralFilter(pre_image2, 5, 75, 75)
                         # crop_img = cv2.bilateralFilter(crop_img, 5, 75, 75)
@@ -515,55 +642,57 @@ class finding():
 
                         # pre_image2 = cv2.equalizeHist(pre_image2)
                         # crop_img = cv2.equalizeHist(crop_img)
-                
+                        
 
-                        H = self.LK(pre_image2,crop_img,center=(center[0],center[1]), radius = int(radius), distance=distance, method=feature, matcher=matcher)
+                        H = self.LK(pre_image,crop_img,center=(center[0],center[1]), radius = int(radius), distance=distance, method=feature, matcher=matcher)
                         
 
                         if H is not None:
-                            translation = (H[0, 2], H[1, 2])
-                            rotation_rad = math.atan2(H[1, 0], H[0, 0])
-                            rotation_angle = math.degrees(rotation_rad)
-                            scale = (np.sqrt(H[0, 0] ** 2 + H[1, 0] ** 2), center)
-                            # print('translation',translation)
-                            # print('rotation_rad',rotation_rad)
-                            # print('scale',scale)
-                            # print('center',center)
-
-                            # plt 
-                            post_image = cv2.warpPerspective(post_image, H, (post_image.shape[1], post_image.shape[0]))
-                            # fig , ax =  plt.subplots(1,3,figsize=(10,10))
-                            # ax[0].imshow(pre_image2)
-                            # ax[1].imshow(crop_img)
-                            # ax[2].imshow(post_image)
-                            # plt.show()
-
-                            # print(translation,center,radius,H)
-
+                            # 平移
                             H[0,2] -= (center[0] - int(radius))
                             H[1,2]-=(center[1] - int(radius))
-
-                            # 平移
                             translation = (H[0, 2], H[1, 2])
-                      
-                            # 旋轉
-                            rotation_rad = math.atan2(H[1, 0], H[0, 0])
-                            # 旋轉角度
-                            rotation_angle = math.degrees(rotation_rad)
-                            # 縮放
-                            scale = np.sqrt(H[0, 0] ** 2 + H[1, 0] ** 2)
+                            
+                        if H is  None or not self.check_H_range(H):
+                            shift_x, shift_y = self.pointMatch(pre_image,crop_img,center,radius, method = cv2.TM_CCOEFF_NORMED)
+                            if shift_x > 304 // 2 or shift_x < -304 // 2 or shift_y > 304 // 2 or shift_y < -304 // 2:
+                                H = None
+                            else:
+                                # H 3x3
+                                H = np.array([[1.0, 0.0, shift_x], [0, 1.0, shift_y], [0.0, 0.0, 1.0]]).astype(np.float32)
+                            
+                        if H is  None or not self.check_H_range(H):   
+                            H = np.array(np.eye(3))
+                    
+                        # post_image = cv2.warpPerspective(post_image, H, (post_image.shape[1], post_image.shape[0]))
+                        # post_image2= post_image.copy()
+                        # post_image2[: : , : , 0] = 0
+                        # post_image2[: : , : , 2] = 0
+                        # visimg1= cv2.addWeighted(pre_image, 0.5, post_image2, 0.5, 0)
+                        # visimg2 = cv2.addWeighted(post_image_original, 0.5, post_image2, 0.5, 0)
+                    
 
-                            # print('translation_matrix',translation_matrix)
-
-                            # print('translation2: {}'.format(translation))
-                            # print('rotation2: {}'.format(rotation_rad))
-                            # print('rotation_angle2: {}'.format(rotation_angle))
-                            # print('scale2: {}'.format(scale))  
-                            # fig , ax =  plt.subplots(1,3,figsize=(10,10))
-                            # ax[0].imshow(pre_image2)
-                            # ax[1].imshow(crop_img)
-                            # ax[2].imshow(post_image)
-                            # plt.show()
+                        # fig , ax =  plt.subplots(1,6,figsize=(20,20))
+                        # ax[0].imshow(pre_image)
+                        # ax[0].set_title('pre_image')
+                        # ax[1].imshow(post_image_original)
+                        # ax[1].set_title('post_image_original')
+                        # ax[2].imshow(crop_img)
+                        # ax[2].set_title('crop_img')
+                        # ax[3].imshow(post_image)
+                        # ax[3].set_title('post_image')
+                        # ax[4].imshow(visimg1)
+                        # ax[4].set_title('visimg1')
+                        # ax[5].imshow(visimg2)
+                        # ax[5].set_title('visimg2')
+                        # plt.show()
+                        translation = (H[0, 2], H[1, 2])
+                        rotation_rad = math.atan2(H[1, 0], H[0, 0])
+                        rotation_angle= np.arctan2(H[1, 0], H[0, 0]) * 180 / np.pi
+                        scale_x =  np.linalg.norm(H[:, 0])
+                        scale_y = np.linalg.norm(H[:, 1])
+                        scale_x = np.float64(scale_x)
+                        scale_y = np.float64(scale_y)
 
                         for data in self.data_list:
 
@@ -583,56 +712,26 @@ class finding():
                                     # print(self.output_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png')
                                     cv2.imwrite(self.output_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png', post_image)
 
-                                    if H is None:
-                                        result = post_image
-                                        translation = (0,0)
-                                        rotation_rad = 0 
-                                        rotation_angle = 0
-                                        scale = 1
-                                    elif scale > 2 or scale < 0.5:
-                                        result = post_image
-                                        translation = (0,0)
-                                        rotation_rad = 0 
-                                        rotation_angle = 0
-                                        scale = 1
-
-                                    elif translation[0] > 304 // 2 or translation[0] < -304 // 2:
-                                        result = post_image
-                                        translation = (0,0)
-                                        rotation_rad = 0 
-                                        rotation_angle = 0
-                                        scale = 1
-
-                                    elif translation[1] > 304 // 2 or translation[1] < -304 // 2:
-                                        result = post_image
-                                        translation = (0,0)
-                                        rotation_rad = 0 
-                                        rotation_angle = 0
-                                        scale = 1
-
-                                    elif rotation_angle > 60 or rotation_angle < -60:
-                                        result = post_image
-                                        translation = (0,0)
-                                        rotation_rad = 0 
-                                        rotation_angle = 0
-                                        scale = 1
-
-                                    elif np.isnan(H).any():
-                                        result = post_image
-                                        translation = (0,0)
-                                        rotation_rad = 0 
-                                        rotation_angle = 0
-                                        scale = 1
-
-                                    else:
-                                        # apply the homography to the second image
+                                    if H is not None:
                                         result = cv2.warpPerspective(post_image, H, (pre_image.shape[1], pre_image.shape[0]))
                                         
-                                    patient_dict[patient_id + '_' + eye][post_treatment]['translation'] = translation
+                                    else:
+                                        result = post_image.copy()
+                                        H = np.array(np.eye(3))
+                                        
+                                        # translation = (H[0, 2], H[1, 2])
+                                        # rotation_rad = math.atan2(H[1, 0], H[0, 0])
+                                        # rotation_angle= np.arctan2(H[1, 0], H[0, 0]) * 180 / np.pi
+                                        # scale_x =  np.linalg.norm(H[:, 0]).astype(np.float32)
+                                        # scale_y = np.linalg.norm(H[:, 1]).astype(np.float32)
+                                        
+                                        
+                                        
+                                    patient_dict[patient_id + '_' + eye][post_treatment]['translation'] = [translation[0], translation[1]]
                                     patient_dict[patient_id + '_' + eye][post_treatment]['rotation_rad'] = rotation_rad
                                     patient_dict[patient_id + '_' + eye][post_treatment]['rotation_angle'] = rotation_angle
-                                    patient_dict[patient_id + '_' + eye][post_treatment]['scale'] = scale
-                                    patient_dict[patient_id + '_' + eye][post_treatment]['center'] = center
+                                    patient_dict[patient_id + '_' + eye][post_treatment]['scale'] = [scale_x, scale_y]
+                                    patient_dict[patient_id + '_' + eye][post_treatment]['center'] = [center[0], center[1]]
                                     patient_dict[patient_id + '_' + eye][post_treatment]['radius'] = radius
 
 
@@ -664,9 +763,9 @@ class finding():
                                 os.makedirs(self.output_label_path + '/' + match_par + '/' + label +'_move/')
                                 
                             mask_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(self.image_path))),label,'masks')
-                            print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                            # print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
                             if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
-                                print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                                # print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.resize(pre_label, self.image_size)
                                 pre_label = cv2.normalize(pre_label, None, 0, 255, cv2.NORM_MINMAX)
@@ -685,7 +784,7 @@ class finding():
                                         # print(H)
                                         translation = (H[0, 2], H[1, 2])
                                         rotation = math.atan2(H[1, 0], H[0, 0])
-                                        rotation_angle = rotation * 180 / np.pi  # angle in degrees []
+                                        rotation_angle= np.arctan2(H[1, 0], H[0, 0]) * 180 / np.pi
                                         scale = H[0, 0] / np.cos(rotation_angle)
 
 
@@ -723,7 +822,7 @@ class finding():
                             post_treatment_img = self.output_image_path + '1/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
                             matching_img = self.output_path  + '/1_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png'                              
                             mse,psnr,ssim, matching_mse,matching_psnr,matching_ssim = self.evaluates(pre_treatment_img,post_treatment_img,matching_img)
-
+                        
                             if psnr == float('inf') :
                                 continue
                             if ssim == float('inf') : 
@@ -734,14 +833,18 @@ class finding():
                                 continue
                             if ssim  < 0 or psnr < 0 or mse <0 or matching_ssim  < 0 or  matching_psnr < 0 or matching_mse <0 :
                                 continue
-                            
-                            patient_dict[patient_id + '_' + eye][post_treatment]['original'] = [mse,psnr,ssim]
-                            patient_dict[patient_id + '_' + eye][post_treatment]['matching'] = [matching_mse,matching_psnr,matching_ssim]                                 
-         # delete empty patient
-        for key in list(patient_dict):
-            if not patient_dict[key]:
+                                
+                                # patient_dict[patient_id + '_' + eye][post_treatment]['original'] = [mse,psnr,ssim]
+                                # patient_dict[patient_id + '_' + eye][post_treatment]['matching'] = [matching_mse,matching_psnr,matching_ssim]                                 
+        # delete empty patient
+        for key in list(patient_dict.keys()):
+            if len(patient_dict[key]) == 0:
                 del patient_dict[key]
                 
+                        
+                
+        print('------------------')
+        print(len(patient_dict))       
         return patient_dict
 
     def all_evaluate(self,match_path):
@@ -915,6 +1018,16 @@ class finding():
 
 
 
+# Convert float32 to float recursively
+def convert_float32_to_float(obj):
+    if isinstance(obj, np.float32):
+        return float(obj)
+    elif isinstance(obj, dict):
+        return {key: convert_float32_to_float(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [convert_float32_to_float(item) for item in obj]
+    else:
+        return obj
 
             
 
@@ -936,7 +1049,7 @@ if __name__ == '__main__':
     pre_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
     post_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
     
-    date = '0205'
+    date = '0305'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
@@ -946,9 +1059,9 @@ if __name__ == '__main__':
     output_image_path = PATH_BASE + 'inpaint/'
     image_path = PATH_BASE + 'inpaint/MATCH/' 
     output_label_path = output_image_path + 'MATCH_LABEL/' 
-    distances = [0.8]
-    features = ['SIFT','KAZE','AKAZE','ORB','BRISK']
-    matchers = ['BF','FLANN']
+    distances = [0.9]
+    features = ['FREAK']#,'SIFT','KAZE','AKAZE','ORB','BRISK' 
+    matchers = ['BF']# ,'FLANN'
     patient_list = get_data_from_txt_file('PCV.txt')
     setFolder('./record/'+ disease + '_' + date + '/') 
     for distance in distances:
@@ -957,16 +1070,19 @@ if __name__ == '__main__':
                 # print(image_path + 'crop' + '_' +  feature + '_' + matcher + '_' + str(distance))
 
                 find = finding(label_path,image_path,output_label_path,output_image_path,features,matchers,distance)
+                
                 find_dict = find.feature(feature,matcher,distance)
+                find_dict = convert_float32_to_float(find_dict)
                 json_file = './record/'+ disease + '_' + date + '/'+ 'crop_'+feature + '_' + matcher + '_' + str(distance) + '_align.json'
                 tools.write_to_json_file(json_file, find_dict)
+                
                 # eval = find.all_evaluate(image_path + 'crop' + '_' +  feature + '_' + matcher + '_' + str(distance))
                 # json_file2 = './record/'+ disease + '_' + date + '/'+ 'crop_'+feature + '_' + matcher + '_' + str(distance) + '_evals.json'
                 # tools.write_to_json_file(json_file2, eval)
                 eval = find.all_evaluate(image_path + 'crop' + '_' +  feature + '_' + matcher + '_' + str(distance))
                 csv_file = './record/'+ disease + '_' + date + '/'+ feature + '_' + matcher + '_' + str(distance) + '_evals.csv'
                 cases = 0
-                with open(csv_file, 'w') as f:
+                with open(csv_file, 'w' , newline='') as f:
                     csv_writer = csv.writer(f)
                     csv_writer.writerow(['patient', 'eye','post_treatment', 'pre_treatment', 'mse', 'psnr', 'ssim', 'matching_mse', 'matching_psnr', 'matching_ssim'])
                     for patient_eye in eval:
@@ -987,16 +1103,20 @@ if __name__ == '__main__':
                                                                 eval[patient_eye][treatment]['matching'][0],
                                                                 eval[patient_eye][treatment]['matching'][1],
                                                                 eval[patient_eye][treatment]['matching'][2]])
+                    
+                    csv_writer.writerow(['avg', '', '', '', eval["avg"]['original']['mse'], eval["avg"]['original']['psnr'], eval["avg"]['original']['ssim'], eval["avg"]['matching']['mse'], eval["avg"]['matching']['psnr'], eval["avg"]['matching']['ssim']])
+                    csv_writer.writerow(['std', '', '', '', eval["std"]['original']['mse'], eval["std"]['original']['psnr'], eval["std"]['original']['ssim'], eval["std"]['matching']['mse'], eval["std"]['matching']['psnr'], eval["std"]['matching']['ssim']])
                         
                 aligment_file = './record/'+ disease + '_' + date + '/' + 'evaluations.csv'
                 if not os.path.exists(aligment_file):
-                    with open(aligment_file, 'w') as f:
+                    with open(aligment_file, 'w', newline='') as f:
                         csv_writer = csv.writer(f)  
-                        csv_writer.writerow(['feature', 'matcher', 'distance', 'cases','avg_mse', 'avg_psnr', 'avg_ssim','std_mse', 'std_psnr', 'std_ssim','avg_matching_mse', 'avg_matching_psnr', 'avg_matching_ssim','std_matching_mse', 'std_matching_psnr', 'std_matching_ssim'])
+                        csv_writer.writerow(['feature', 'cases','avg_mse', 'avg_psnr', 'avg_ssim','std_mse', 'std_psnr', 'std_ssim','avg_matching_mse', 'avg_matching_psnr', 'avg_matching_ssim','std_matching_mse', 'std_matching_psnr', 'std_matching_ssim'])
 
-                with open(aligment_file, 'a') as f:
+                with open(aligment_file, 'a', newline='') as f:
                     csv_writer = csv.writer(f)
-                    csv_writer.writerow([feature, matcher, distance, cases ,
+                    csv_writer.writerow([feature + '_' + matcher + '_' + str(distance),
+                                            cases ,
                                             eval["avg"]['original']['mse'],
                                             eval["avg"]['original']['psnr'],
                                             eval["avg"]['original']['ssim'],

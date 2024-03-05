@@ -5,15 +5,15 @@ from pathlib import Path
 import tools.tools as tools
 from matplotlib import pyplot as plt
 class reLabel():
-    def __init__(self,path,layers = {"3":"OR","4":"CC"}):
+    def __init__(self,path,layers = {"4":"CC"}):
         self.path = path
         self.layers = layers
 
-    def relabel(self,output_name,mathod = 'threshold',min_area = 7): # OTSU and then ROI
+    def relabel(self,output_name,mathod = 'threshold',min_area = 50): # OTSU and then ROI
         data_dir = ['images','masks']
 
         
-        for layer in {"4":"CC","3":"OR"}:
+        for layer in self.layers:
             # save figure
             # tools.makefolder(os.path.join('..\\..\\PPT用',self.layers[layer]))
 
@@ -57,7 +57,7 @@ class reLabel():
                     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label)
 
                     # 不同的連通域賦予不同的顏色
-
+                
                     areas = stats[:, cv2.CC_STAT_AREA]
                     without_background = label.copy()
                     
@@ -129,7 +129,7 @@ class reLabel():
 
 
 if __name__ == "__main__":
-    date = '0205'
+    date = '0304'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date

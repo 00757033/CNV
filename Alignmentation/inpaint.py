@@ -9,9 +9,10 @@ import shutil
 import pandas as pd
 
 class inpaint():
-    def __init__(self,path,layers = {"3":"OR","4":"CC"}):
+    def __init__(self,path,output_path,layers = ["1","2","3","4"]):
         self.path = path
         self.points = []
+        self.output_path = output_path
         self.layers = layers
         self.data_list = ['1','2', '3', '4']
 
@@ -125,7 +126,7 @@ class inpaint():
             mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
             dst = cv2.inpaint(remove_img, mask, 5, cv2.INPAINT_TELEA)
             window_size = 30
-            dst = self.texture_synthesis(dst, self.y, self.x, self.height, self.width, 100, window_size)
+            dst = self.texture_synthesis(dst, self.y, self.x, self.height, self.width, 500, window_size)
             return dst
         else:
             print("Failed to load the image.")
@@ -160,13 +161,13 @@ class inpaint():
 
     def all_inpaint(self):
         for data in self.data_list:
-            tools.makefolder(self.path + '/inpaint/' + data)
+            tools.makefolder(self.output_path  + data)
             for file in Path(self.path + '/' + data).iterdir():
                 if file.suffix == '.png':
-                    print(file)
+                    # print(file)
                     dst = self.extraneous_information(str(file))
-                    print(self.path + '/inpaint/' + data +'/'+ file.name)
-                    cv2.imwrite(self.path + '/inpaint/' + data +'/'+ file.name, dst)
+                    # print(self.path + '/inpaint/' + data +'/'+ file.name)
+                    cv2.imwrite(self.output_path + data +'/'+ file.name, dst)
                     # print("Save the file: ", file)
                     # print("--------------------------------------------------")
                     # cv2.imshow('dst', dst)
@@ -208,15 +209,17 @@ class inpaint():
                 
         
 if __name__ == "__main__":
-    date = '0205'
+    date = '0305'
     disease = 'PCV'
     PATH = "../../Data/"
     
     disease_folder = PATH + "/" + disease + "_"+ date
+    IMAGE_PATH = disease_folder + "/" + "ALL"
     PATH_BASE =  disease_folder + '/inpaint/'
-    preprocess = inpaint(PATH_BASE)
+    preprocess = inpaint(IMAGE_PATH,PATH_BASE)
+    preprocess.all_inpaint()
     # file1 = "..\\..\\Data\\OCTA\\00294362\\20210511\\L\\4.png"
     # file2 = "..\\..\\Data\\OCTA\\00294362\\20221222\\L\\3.png"
     # dst = preprocess.extraneous_information(file2)
     # preprocess.print_points()
-    preprocess.OCTA_inpaint(PATH,disease_folder)
+    # preprocess.OCTA_inpaint(PATH,disease_folder)

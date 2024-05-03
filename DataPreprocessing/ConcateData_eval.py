@@ -52,7 +52,7 @@ class Concatenation() :
                     # cv2.waitKey(0)
                     # cv2.destroyAllWindows()
                    
-            print('merged_image',merged_image.shape)   
+            # print('merged_image',merged_image.shape)   
             output_path = os.path.join(self.image_path,output_file,'images',image_name)
             if check:
                 cv2.imwrite(output_path,merged_image)
@@ -73,7 +73,7 @@ class Concatenation() :
 
 if __name__ == "__main__":
     import cv2
-    date = '0304'
+    date = '0306'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date

@@ -279,7 +279,7 @@ class Analyze():
         return  exist,not_exist
 
     # check patient data is exist or not
-    def label(self,patient_disease,label_path = '../../Data/labeled',label_name = 'label_',label_layer = ['3','4']):
+    def label(self,patient_disease,label_path = '../../Data/20240311_label',label_name = 'label_',label_layer = ['3','4']):
         islabeled = dict()
         unlabel = dict()
         count = 0
@@ -314,7 +314,7 @@ class Analyze():
         return islabeled,unlabel
 
     # copy need label data to unlabel folder  
-    def need_label(self,need_label_dict,label_name,disease_name = 'PCV',unlabel_path = '../../Data/need_label2',label_layer = ['3','4']):
+    def need_label(self,need_label_dict,label_name,disease_name = 'PCV',unlabel_path = '../../Data/need_label3',label_layer = ['4']):
         for layer in label_layer:
             if not os.path.exists(unlabel_path + '/' + label_name + '/' +layer):
                 os.makedirs(unlabel_path + '/' + label_name + '/' +layer)
@@ -406,7 +406,7 @@ if __name__ == '__main__':
     tools.write_to_json_file('./record/collect_patient.json',collect_patient)
     
     # need label
-    islabeled,unlabel = analyze.label(collect_patient,'../../Data/labeled','label_',['4'])
+    islabeled,unlabel = analyze.label(collect_patient,'../../Data/20240311_label','label_',['4'])
     
     tools.remove_exist_file('./record/islabeled.json')
     tools.write_to_json_file('./record/islabeled.json',islabeled)
@@ -415,7 +415,11 @@ if __name__ == '__main__':
     tools.write_to_json_file('./record/unlabel.json',unlabel)
     
     # # need label
-    # need_label = analyze.need_label(unlabel,'PCV')
+    need_label = analyze.need_label(unlabel,'PCV')
+    
+    tools.remove_exist_file('./record/need_label.json')
+    tools.write_to_json_file('./record/need_label.json',need_label)
+    
     
     
 

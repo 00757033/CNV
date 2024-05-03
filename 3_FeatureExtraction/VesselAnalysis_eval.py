@@ -23,38 +23,50 @@ import SimpleITK as sitk
 import six
 from skimage import io, color, measure
 import math
-
+from datetime import datetime
 from radiomics import featureextractor
 from radiomics import firstorder, getTestCase, glcm, glrlm, glszm, imageoperations, shape2D, ngtdm, gldm 
+from dateutil import parser
 # python -m pip install pyradiomics
 
 class VesselAnalysis():
-    def __init__( self, PATH_BASE,disease,compare_path, layers = ['CC', 'OR']):
+    def __init__( self, PATH_BASE,disease,compare_path, layers = ['CC']):
         self.PATH_BASE = PATH_BASE
         self.compare_path = compare_path
         self.layers = layers
         self.disease = disease
+        self.inject()
+    def inject(self,file = '../../Data/打針資料.xlsx',label = ["診斷","病歷號","眼睛","打針前門診日期","三針後門診","六針後門診","九針後門診","十二針後門診"]):
+        self.inject_df = pd.read_excel(file, sheet_name="20230830",na_filter = False, engine='openpyxl')
         
 
-    def feature_extract(self):
+        self.inject_df['病歷號'] = self.inject_df['病歷號'].apply(lambda x: '{:08d}'.format(x))
+        self.inject_df = self.inject_df.sort_values(by=["病歷號","眼睛"])       
+
+    def feature_extract(self,save_file_name = 'VesselFeature.json'):
         patient_feature = dict()
         cout = 0
+        eye_dict = {'L':'OS','R':'OD'}
         for patient in pl.Path(os.path.join(self.compare_path) ).iterdir():
             patient_feature[patient.name] = dict()
             date = dict()
             for image in pl.Path(os.path.join(patient, 'images') ).iterdir():
+                patientid, eye = patient.name.split('_')
                 if image.name.endswith(".png"):
+                    if self.inject_df[self.inject_df['病歷號'] == patientid].empty:
+                        continue
+                    patient_record = self.inject_df[self.inject_df['病歷號'] == patientid ]
+                    patient_record = patient_record[patient_record['眼睛'] == eye_dict[eye]]
                     # date_ layer all  exist
                     if os.path.exists(os.path.join(patient, 'masks', image.name)) and os.path.exists(os.path.join(patient, 'images', image.name)):
                         image_date = image.name.split('_')[0]
                         if image_date not in date:
                             date[image_date] = 0
-                        date[image_date] += 1
+                        date[image_date] = 1
             # date 刪除 value < len(self.layers)
             for key in list(date.keys()):
                 if date[key] < len(self.layers):
-                    del date[key]
-                    
+                    del date[key]     
             if len(date) < 2:
                 del patient_feature[patient.name]
             else :
@@ -62,30 +74,42 @@ class VesselAnalysis():
                 date = dict(sorted(date.items(), key=lambda item: item[1], reverse=True)) 
                 feature = dict()   
                 # 將msk 做聯集
-                msk_CC = np.zeros((304,304), dtype=np.uint8)
-                msk_OR = np.zeros((304,304), dtype=np.uint8)
+                if 'CC' in self.layers :
+                    msk_CC = np.zeros((304,304), dtype=np.uint8)
+                if 'OR' in self.layers :
+                    msk_OR = np.zeros((304,304), dtype=np.uint8)
                 for item in range(1):# len(date)
-                    print('item',item)
-                    CC_post = cv2.imread(os.path.join(patient, 'masks', list(date.keys())[item] + '_CC.png'), cv2.IMREAD_GRAYSCALE)
-                    OR_post = cv2.imread(os.path.join(patient, 'masks', list(date.keys())[item] + '_OR.png'), cv2.IMREAD_GRAYSCALE)
-                    msk_CC = np.where((msk_CC > 0) | (CC_post > 0), 255, 0)
-                    msk_OR = np.where((msk_OR > 0) | (OR_post > 0), 255, 0)
-                
-                msk_CC[msk_CC > 0] = 255
-                msk_CC = msk_CC.astype(np.uint8)
-                msk_OR[msk_OR > 0] = 255
-                msk_OR = msk_OR.astype(np.uint8)
+                    if 'CC' in self.layers :
+                        CC_post = cv2.imread(os.path.join(patient, 'masks', list(date.keys())[item] + '_CC.png'), cv2.IMREAD_GRAYSCALE)
+                        msk_CC = np.where((msk_CC > 0) | (CC_post > 0), 255, 0)
+                        
+                    if 'OR' in self.layers :
+                        OR_post = cv2.imread(os.path.join(patient, 'masks', list(date.keys())[item] + '_OR.png'), cv2.IMREAD_GRAYSCALE)
+                        msk_OR = np.where((msk_OR > 0) | (OR_post > 0), 255, 0)
                 
                 tools.makefolder(os.path.join(patient, 'concat_masks'))
-                cv2.imwrite(os.path.join(patient, 'concat_masks', 'CC.png'), msk_CC)
-                cv2.imwrite(os.path.join(patient, 'concat_masks', 'OR.png'), msk_OR)
                 
-                msk_CC_rm_small = remove_small_area(msk_CC, min_area = 50)
-                msk_OR_rm_small = remove_small_area(msk_OR, min_area = 50)
                 # save all_msk 
                 tools.makefolder(os.path.join(patient, 'concat_masks_rm_small'))
-                cv2.imwrite(os.path.join(patient, 'concat_masks_rm_small', 'CC.png'), msk_CC_rm_small)
-                cv2.imwrite(os.path.join(patient, 'concat_masks_rm_small', 'OR.png'), msk_OR_rm_small)
+                
+                if 'CC' in self.layers :
+                    msk_CC[msk_CC > 0] = 255
+                    msk_CC = msk_CC.astype(np.uint8)
+                    cv2.imwrite(os.path.join(patient, 'concat_masks', 'CC.png'), msk_CC)
+                    msk_CC_rm_small = remove_small_area(msk_CC, min_area = 50)
+                    cv2.imwrite(os.path.join(patient, 'concat_masks_rm_small', 'CC.png'), msk_CC_rm_small)
+                    # Dilation 
+                    msk_CC_rm_small = cv2.dilate(msk_CC_rm_small, np.ones((4,4), np.uint8), iterations=1)
+                     
+                    
+                if 'OR' in self.layers :
+                    msk_OR[msk_OR > 0] = 255
+                    msk_OR = msk_OR.astype(np.uint8)
+                    cv2.imwrite(os.path.join(patient, 'concat_masks', 'OR.png'), msk_OR)
+                    msk_OR_rm_small = remove_small_area(msk_OR, min_area = 50)
+                    cv2.imwrite(os.path.join(patient, 'concat_masks_rm_small', 'OR.png'), msk_OR_rm_small)
+                    # Dilation
+                    msk_OR_rm_small = cv2.dilate(msk_OR_rm_small, np.ones((4,4), np.uint8), iterations=1)
                 
                 # # Dilation 
                 # msk_CC_rm_small = cv2.dilate(msk_CC_rm_small, np.ones((4,4), np.uint8), iterations=1)
@@ -96,12 +120,14 @@ class VesselAnalysis():
                 # cv2.imwrite(os.path.join(patient, 'all_msk', 'CC.png'), msk_CC_rm_small)
                 # cv2.imwrite(os.path.join(patient, 'all_msk', 'OR.png'), msk_OR_rm_small)
                 
-                
-                for item in range(len(date)):
-                    cout += 1
-                    name = list(date.keys())[item] 
-                    feature[item] = dict()
-                    for layer in self.layers:
+                for layer in self.layers:
+                    cout = 0
+                    feature = dict()
+                    
+                    
+                    for item in range(len(date)):
+                        cout += 1
+                        data_time = list(date.keys())[item]
                         img_name = list(date.keys())[item] + '_' + layer + '.png'
                         img = cv2.imread(os.path.join(patient, 'images', img_name), cv2.IMREAD_GRAYSCALE)
                         msk = cv2.imread(os.path.join(patient, 'masks', img_name), cv2.IMREAD_GRAYSCALE)
@@ -121,33 +147,53 @@ class VesselAnalysis():
                         if layer == 'CC':
                             msk_rm_small = msk_CC_rm_small
                         else :
-                            msk_rm_small = msk_OR_rm_small                           
-                        area, center,VD ,VLD ,VAPR,VLA,VDI= process_image(img = img, msk = msk,all_msk = msk_rm_small,img_name = img_name,patient = patient)
-                        feature[item]['VD_' + layer] = VD
-                        feature[item]['VLD_' + layer] = VLD
-                        feature[item]['VAPR_' + layer] = VAPR
-                        # feature[item]['VLA_' + layer] = VLA
-                        feature[item]['VDI_' + layer] = VDI
-                        # feature[item]['center_' + layer] = center
-                        # feature[item]['Date'] = list(date.keys())[item]
-                        print('Texture feature')
+                            msk_rm_small = msk_OR_rm_small    
+                        data_time = datetime.strptime(data_time, '%Y%m%d').date()
+                        pretreatment_date = str(patient_record['打針前門診日期'].values[0])
+                        if pretreatment_date == 'nan':
+                            continue
+                        pretreatment_date = parser.parse(pretreatment_date).date()
+                        posttreatment_date = str(patient_record['三針後門診'].values[0])
+                        if posttreatment_date == 'nan':
+                            continue
+                        posttreatment_date = parser.parse(posttreatment_date).date()
+                        if pretreatment_date == data_time:
+                            print('Pre-treatment',patient.name,data_time)
+                            feature['Pre-treatment'] = dict()
+                            area, center,VD ,VLD ,VAPR,VLA,VDI= process_image(img = img, msk = msk,all_msk = msk_rm_small,img_name = img_name,patient = patient)
+                            feature ['Pre-treatment']['VD_' + layer] = VD
+                            feature ['Pre-treatment']['VLD_' + layer] = VLD
+                            feature ['Pre-treatment']['VDI_' + layer] = VDI
+                            feature ['Pre-treatment']['Date'] = list(date.keys())[item]
+                            print('Texture feature')
+                            
+                            texture_features = Texture_features(img, msk_rm_small,layer)
+                            feature['Pre-treatment'] = {**feature['Pre-treatment'], **texture_features}
                         
 
-                            
-                        # texture_features = Texture_features(img, msk_rm_small,layer)    
-                        
-                        # feature[item] = {**feature[item], **texture_features}
-                        len_feature = len(feature[item])
-                            
+                        elif posttreatment_date == data_time:
+                            print('Post-treatment',patient.name,data_time)
+                            feature['Post-treatment'] = dict()
+                            area, center,VD ,VLD ,VAPR,VLA,VDI= process_image(img = img, msk = msk,all_msk = msk_rm_small,img_name = img_name,patient = patient)
+                            feature ['Post-treatment'] = dict()
+                            feature ['Post-treatment']['VD_' + layer] = VD
+                            feature ['Post-treatment']['VLD_' + layer] = VLD
+                            feature ['Post-treatment']['VDI_' + layer] = VDI
+                            feature ['Post-treatment']['Date'] = list(date.keys())[item]
+                            print('Texture feature')
+                            texture_features = Texture_features(img, msk_rm_small,layer)
+                            feature['Post-treatment'] = {**feature['Post-treatment'], **texture_features}
+                         
+
                                 
                 # print('feature',feature)            
                 patient_feature[patient.name] = feature
         print('patient_feature',len(patient_feature))
         print('cout',cout)
-        print('len_feature',len_feature)
         tools.makefolder(os.path.join( 'record', self.disease))
-        file = './record/' + self.disease + '/' + 'VesselFeature_Morphology.json'
+        file = './record/' + self.disease + '/' + save_file_name
         tools.write_to_json_file(file, patient_feature)
+           
         return patient_feature
             
     def get_feature_extract(self):
@@ -219,7 +265,35 @@ class VesselAnalysis():
         tools.write_to_json_file(file, patient_feature)
         return patient_feature
 
-def  HOG(img, msk , bin = 8):
+    def relative_feature_extract(self,input_file_name = 'VesselFeature.json',save_file_name = 'RelativeVesselFeature.json'):
+        treatment = ['Pre-treatment','Post-treatment']
+        json_file = './record/' + self.disease + '/' + input_file_name
+        relative_feature = dict()
+        if os.path.exists(json_file):
+            patient_feature = json.load(open(json_file))
+        else :
+            patient_feature = self.feature_extract()
+        
+        for patient in patient_feature :
+            if len(patient_feature[patient]) < 2:
+                continue
+            relative_feature[patient] = dict()
+            for feature in  patient_feature[patient][treatment[0]]:
+                if feature in patient_feature[patient][treatment[1]]:
+                    if feature == 'Date':
+                        continue
+                    pre_feature = patient_feature[patient][treatment[0]][feature]
+                    post_feature = patient_feature[patient][treatment[1]][feature]
+                    relative_feature[patient][feature] = round((post_feature - pre_feature) *100 / (pre_feature + 1e-7),4)
+        file = './record/' + self.disease + '/' + save_file_name
+        tools.write_to_json_file(file, relative_feature)
+        return relative_feature
+                    
+                
+            
+            
+
+def  HOG(img, msk ,layer = 'CC',bin = 8):
     orientations = bin 
     img_roi = img.copy()
     img_roi[msk == 0] = 0
@@ -259,25 +333,34 @@ def  HOG(img, msk , bin = 8):
     hist = hist.astype("float")
     hist /= (hist.sum() + 1e-7)
     
+    # 從HOG特徵中提取紋理特徵
+    features = dict()
+    mean_value  = np.mean(fd)
+    std_value = np.std(fd)
+    Skewness = stats.skew(fd)
+    Kurtosis = stats.kurtosis(fd)
+    features['HOG_Mean_' + layer] = mean_value
+    features['HOG_Std_' + layer] = std_value
+    features['HOG_Skewness_' + layer] = Skewness
+    features['HOG_Kurtosis_' + layer] = Kurtosis
     
-    # print('hist',hist.shape, hist)
+    # print('features',features)
     
+    return features
 
-    # 回傳特徵
-    return hist
 
-def TAS(img, msk,layer = 'CC'):
+def TAS(img, msk,layer = 'CC'): # 閾值鄰接矩陣（TAS）
     img_roi = img.copy()
     img_roi[msk == 0] = 0
     feature = dict()
     # Threshold Adjacency Matrix
     features, labels = pyfeats.tas_features(img_roi)
     for i in range(len(features)):
-        feature['TAM_' + str(i) + '_' + layer] = features[i]
+        feature['Threshold Adjacency Matrix ' + str(i) + '_' + layer] = features[i]
         
     return feature
     
-def GLDS(img, msk,layer = 'CC'):
+def GLDS(img, msk,layer = 'CC'): # 灰階差統計（GLDS）
     img_roi = img.copy()
     img_roi[msk == 0] = 0
     feature = dict()
@@ -291,7 +374,7 @@ def GLDS(img, msk,layer = 'CC'):
     return feature    
 
 # 用局部二值模式（Local Binary Pattern，LBP）提取紋理特徵
-def LBP(img, msk,bin =  8):
+def LBP(img, msk,layers = 'CC',bin = 8):
     from skimage.feature import local_binary_pattern
     # settings for LBP
     radius = 1  # LBP算法中範圍半徑的取值
@@ -327,120 +410,131 @@ def LBP(img, msk,bin =  8):
     hist = hist.astype("float")
     hist /= (hist.sum() + 1e-7)
     
+    feature = dict()
+    feature['LBP mean' + '_'+ layers] = np.mean(lbp)
+    feature['LBP std' + '_'+ layers] = np.std(lbp)
+    feature['LBP skewness' + '_'+ layers] = stats.skew(hist)
+    feature['LBP kurtosis' + '_'+ layers] = stats.kurtosis(hist)
+    
     # print('hist',hist.shape, hist)
     
-    return hist
+    
+    return feature
  
 
-    
-    
-    
-    
-    
-    
-
 # Local Gaussian Difference Extrema Pattern
-# def LGDEP(img, msk, bin = 64):
-#     # Gaussian Difference Extrema Pattern
-#     img_roi = img.copy()
-#     img_roi[msk == 0] = 0
+def LGDEP(img, msk,layers = 'CC',bin = 8):
     
-#      # Apply Gaussian blur to the image
-#     blurred = cv2.GaussianBlur(img_roi, (5, 5), 0)
-#     # Apply LGDEP
-#     lgp = cv2.Laplacian(blurred, cv2.CV_64F)
+    # Gaussian Difference Extrema Pattern
+    img_roi = img.copy()
+    img_roi[msk == 0] = 0
     
-#     # 視覺化
+     # Apply Gaussian blur to the image
+    blurred = cv2.GaussianBlur(img_roi, (5, 5), 0)
+    # Apply LGDEP
+    lgp = cv2.Laplacian(blurred, cv2.CV_64F)
+    
+    # # 視覺化
+    # plt.figure(figsize=(12, 4))
+    # plt.subplot(1, 2, 1)
+    # plt.imshow(img, cmap='gray')
+    # plt.title('Original Image')
+    
+    # plt.subplot(1, 2, 2)
+    # plt.imshow(lgp, cmap='gray')
+    # plt.title('LGDEP Image')
+    
+    # plt.show()
+    
+    # 計算LGDEP紋理圖像的直方圖
+    hist, _ = np.histogram(lgp.ravel(), density=True, bins=bin)
+    
+    # Normalize the features to have a consistent length
+    hist = hist.astype("float")
+    hist /= (hist.sum() + 1e-7)
+    
+    # fe
+    feature = dict()
+    feature['LGDEP mean '+'_'+ layers] = np.mean(lgp)
+    feature['LGDEP std' +'_'+ layers] = np.std(lgp)
+    feature['LGDEP skewness' +'_'+ layers] = stats.skew(hist)
+    feature['LGDEP kurtosis' +'_'+ layers] = stats.kurtosis(hist)
+    
+    
+    return feature
+
+
+    
+# def Wavelets(patient, img_pre_name, img_post_name, layer, treatment_count):
+#     img_pre = cv2.imread(os.path.join(patient, 'images', img_pre_name), cv2.IMREAD_GRAYSCALE)
+#     img_post = cv2.imread(os.path.join(patient, 'images', img_post_name), cv2.IMREAD_GRAYSCALE)
+#     msk_pre = cv2.imread(os.path.join(patient, 'masks', img_pre_name), cv2.IMREAD_GRAYSCALE)
+#     msk_post = cv2.imread(os.path.join(patient, 'masks', img_post_name), cv2.IMREAD_GRAYSCALE)
+    
+#     if img_pre is None or img_post is None or msk_pre is None or msk_post is None:
+#         print('No image')
+#         return 0, 0, 0, 0, 0
+    
+#     HOGL, hog_image = HOG(img_pre)
+    
+#     msk = msk_pre + msk_post
+#     msk[msk > 0] = 255
+#     msk = msk.astype(np.uint8)
+#     msk_rm_small = remove_small_area(msk, min_area = 50)
+    
+#     img = img_pre.copy()
+#     img[msk_rm_small == 0] = 0
+    
+    
+#     # 使用 Daubechies 小波變換
+#     coeffs = pywt.dwt2(img, 'db1')
+    
+#    # Step 4: Threshold the detail coefficients to remove noise
+#     threshold = 0.1  # Adjust this threshold value based on your requirements
+#     coeffs = tuple(map(lambda x: pywt.threshold(x, threshold, mode='soft'), coeffs))
+
+#     # Step 5: Reconstruct the denoised image
+#     denoised_img = pywt.idwt2(coeffs, 'db1')
+
+#     # 可视化
 #     plt.figure(figsize=(12, 4))
+
 #     plt.subplot(1, 2, 1)
 #     plt.imshow(img, cmap='gray')
 #     plt.title('Original Image')
-    
+
 #     plt.subplot(1, 2, 2)
-#     plt.imshow(lgp, cmap='gray')
-#     plt.title('LGDEP Image')
-    
+#     plt.imshow(denoised_img, cmap='gray')
+#     plt.title('Denoised Image')
+
+#     plt.show()
+
+#     # # coeffs 包含了逼近系数（LL子图）和细节系数（LH、HL、HH子图）
+#     LL, (LH, HL, HH) = coeffs
+
+#     # 可视化
+#     plt.figure(figsize=(12, 4))
+
+#     plt.subplot(2, 2, 1)
+#     plt.imshow(LL, cmap='gray')
+#     plt.title('Approximation (LL)')
+
+#     plt.subplot(2, 2, 2)
+#     plt.imshow(LH, cmap='gray')
+#     plt.title('Horizontal Detail (LH)')
+
+#     plt.subplot(2, 2, 3)
+#     plt.imshow(HL, cmap='gray')
+#     plt.title('Vertical Detail (HL)')
+
+#     plt.subplot(2, 2, 4)
+#     plt.imshow(HH, cmap='gray')
+#     plt.title('Diagonal Detail (HH)')
+
 #     plt.show()
     
-#     # 計算LGDEP紋理圖像的直方圖
-#     hist, _ = np.histogram(lgp.ravel(), density=True, bins=bin)
-    
-#     # Normalize the features to have a consistent length
-#     hist = hist.astype("float")
-#     hist /= (hist.sum() + 1e-7)
-    
-#     # print('hist',hist.shape, hist)
-    
-#     return hist
-
-    
-def Wavelets(patient, img_pre_name, img_post_name, layer, treatment_count):
-    img_pre = cv2.imread(os.path.join(patient, 'images', img_pre_name), cv2.IMREAD_GRAYSCALE)
-    img_post = cv2.imread(os.path.join(patient, 'images', img_post_name), cv2.IMREAD_GRAYSCALE)
-    msk_pre = cv2.imread(os.path.join(patient, 'masks', img_pre_name), cv2.IMREAD_GRAYSCALE)
-    msk_post = cv2.imread(os.path.join(patient, 'masks', img_post_name), cv2.IMREAD_GRAYSCALE)
-    
-    if img_pre is None or img_post is None or msk_pre is None or msk_post is None:
-        print('No image')
-        return 0, 0, 0, 0, 0
-    
-    HOGL, hog_image = HOG(img_pre)
-    
-    msk = msk_pre + msk_post
-    msk[msk > 0] = 255
-    msk = msk.astype(np.uint8)
-    msk_rm_small = remove_small_area(msk, min_area = 50)
-    
-    img = img_pre.copy()
-    img[msk_rm_small == 0] = 0
-    
-    
-    # 使用 Daubechies 小波變換
-    coeffs = pywt.dwt2(img, 'db1')
-    
-   # Step 4: Threshold the detail coefficients to remove noise
-    threshold = 0.1  # Adjust this threshold value based on your requirements
-    coeffs = tuple(map(lambda x: pywt.threshold(x, threshold, mode='soft'), coeffs))
-
-    # Step 5: Reconstruct the denoised image
-    denoised_img = pywt.idwt2(coeffs, 'db1')
-
-    # 可视化
-    plt.figure(figsize=(12, 4))
-
-    plt.subplot(1, 2, 1)
-    plt.imshow(img, cmap='gray')
-    plt.title('Original Image')
-
-    plt.subplot(1, 2, 2)
-    plt.imshow(denoised_img, cmap='gray')
-    plt.title('Denoised Image')
-
-    plt.show()
-
-    # # coeffs 包含了逼近系数（LL子图）和细节系数（LH、HL、HH子图）
-    LL, (LH, HL, HH) = coeffs
-
-    # 可视化
-    plt.figure(figsize=(12, 4))
-
-    plt.subplot(2, 2, 1)
-    plt.imshow(LL, cmap='gray')
-    plt.title('Approximation (LL)')
-
-    plt.subplot(2, 2, 2)
-    plt.imshow(LH, cmap='gray')
-    plt.title('Horizontal Detail (LH)')
-
-    plt.subplot(2, 2, 3)
-    plt.imshow(HL, cmap='gray')
-    plt.title('Vertical Detail (HL)')
-
-    plt.subplot(2, 2, 4)
-    plt.imshow(HH, cmap='gray')
-    plt.title('Diagonal Detail (HH)')
-
-    plt.show()
+#     feature = dict()
+#     return feature
 
 # 紋理分析 治療變化
 
@@ -508,7 +602,7 @@ def Texture_features(img, msk,layer = 'CC'):
     
     # # # # print('Statistical Feature Matrix')
     # #  SFM 特徵如下：1) 粗糙度，2) 對比度，3) 週期性，4) 粗糙度。
-    SFM_feature = SFM(img , msk)
+    SFM_feature = SFM(img , msk,layer)
     feature = {**feature, **SFM_feature}
     
     # # FDTA
@@ -518,20 +612,20 @@ def Texture_features(img, msk,layer = 'CC'):
     
     # # HOG
     # print('HOG')
-    fd  = HOG(img, msk )
-    feature['HOG' + '_' + layer] = fd
+    fd  = HOG(img, msk,layer )
+    feature= {**feature, **fd}
     
     
     GLDS_feature = GLDS(img , msk,layer) # 'GLDS_Homogeneity', 'GLDS_Contrast', 'GLDS_ASM', 'GLDS_Entopy', 'GLDS_Mean'
     feature = {**feature, **GLDS_feature} 
     
     #     # # print('LBP')
-    # lbp= LBP(img, msk )
-    # feature['LBP' + '_' + layer] = lbp
+    lbp= LBP(img, msk,layer)
+    feature = {**feature, **lbp}
     
 
     
-    # # # print('FirstOrder')
+    # # # # print('FirstOrder')
     # firstOrder_feature = firstOrder(img , msk,layer)
     # feature = {**feature, **firstOrder_feature}
 
@@ -544,8 +638,17 @@ def Texture_features(img, msk,layer = 'CC'):
     
     
     
-    # # print('LGDEP')
+    # print('LGDEP')
+    lgdep = LGDEP(img, msk,layer)
+    feature= {**feature, **lgdep}
     
+    # # print('LTEM')
+    # ltem = LTEM(img, msk)
+    # feature['LTEM' + '_' + layer] = ltem
+    
+    # print('HuMoments')
+    hu = HuMoments(img, msk)
+    feature = {**feature, **hu}
     
         
     return feature
@@ -622,22 +725,12 @@ def HuMoments(img, msk,layer = 'CC'):
     feature = dict()
     # Hu Moments
     features, labels = pyfeats.hu_moments(img_roi)
-    for i in range(len(features)):
-        print('Hu_' + str(i) + '_' + layer,features[i])
-        feature['Hu_' + str(i) + '_' + layer] = features[i]
+    for key, value in zip(labels, features):
+        feature[key + '_' + layer] = value
         
     return feature
 
-def Zernikes(img, msk,layer = 'CC'):
-    img_roi = img.copy()
-    img_roi[msk == 0] = 0
-    feature = dict()
-    # Zernikes
-    features, labels = pyfeats.zernikes(img_roi)
-    for i in range(len(features)):
-        feature['Zernikes_' + str(i) + '_' + layer] = features[i]
-        
-    return feature
+
 
 
 def FDTA(img, msk,layer = 'CC'):
@@ -646,8 +739,8 @@ def FDTA(img, msk,layer = 'CC'):
     feature = dict()
     # FDTA
     features, labels = pyfeats.fdta(img_roi,msk)
-    for i in range(len(features)):
-        feature['FDTA_' + str(i) + '_' + layer] = features[i]
+    for key, value in zip(labels, features):
+        feature[ key + '_' + layer] = value
         
     return feature
 
@@ -693,8 +786,10 @@ def DWT(img,msk, layer = 'CC'):
    
     
     # std Dh1 , Dh2,Dv2
-    std_LH = np.std(non_zero_abs_LH)
-    std_HL = np.std(non_zero_abs_HL)
+    std_LH = np.std(non_zero_abs_LH, ddof=1)
+    std_HL = np.std(non_zero_abs_HL, ddof=1)
+    
+    
     
     
     feature['avg_LH_' + layer] = avg_LH
@@ -786,6 +881,7 @@ def AMFM(img, msk, layer = 'CC'):
     # 使用 Gabor Transform 小波變換 僅 對msk內的影像進行小波變換
     features, labels = pyfeats.amfm_features(img_roi, bins = 32)
     for i in range(len(features)):
+        print(labels[i],features[i])
         feature[labels[i] + '_' + layer] = features[i]
     # LH 水平細節
 
@@ -1057,8 +1153,8 @@ def process_image(img, msk,all_msk,img_name , patient , min_area = 50):
     
     binary_img_area = sum(sum(binary_img)) 
     skeleton_area = sum(sum(skeleton))
-    print('binary_img_area',binary_img_area)
-    print('skeleton_area',skeleton_area)
+    # print('binary_img_area',binary_img_area)
+    # print('skeleton_area',skeleton_area)
     # VDI : 血管半徑指數
     VDI = binary_img_area / skeleton_area
     
@@ -1133,12 +1229,12 @@ def getMeanStd(feature):
 def main():
     PATH_BASE = '../../Data/'
     data_class = 'PCV'
-    data_date = '0205'
+    data_date = '20240320'
     PATH_BASE  =  PATH_BASE + data_class + '_' + data_date + '/'
     path = PATH_BASE +  '/compare/'
     vessel_analysis = VesselAnalysis(PATH_BASE,data_class + '_' + data_date,path)
-    vessel_analysis.feature_extract()
-    # 計算 P-value
+    patient_feature = vessel_analysis.feature_extract('VesselFeature.json')
+    relative_feature = vessel_analysis.relative_feature_extract('VesselFeature.json','VesselFeature_relative.json')
 
     
 if __name__ == '__main__':

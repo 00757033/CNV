@@ -98,7 +98,7 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '0304'
+    date = '0305'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date

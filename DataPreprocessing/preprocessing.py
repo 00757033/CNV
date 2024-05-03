@@ -185,7 +185,7 @@ class PreprocessData():
             output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
     
             label_path = tools.get_label_path(input_path,self.layers[layer])
-            print('input_path',self.path+ '/' +label_path + '/'+ 'images')
+            print('input_path',label_path,self.path+ '/' +label_path + '/'+ 'images')
             d,sigmaColor,sigmaSpace,clip,kernel = parm[layer]
             
             # not return none
@@ -223,7 +223,15 @@ class PreprocessData():
 
                 
                         if bilateralFilter : 
+                            print('self.path',self.path)
+                            preprocessing_image_1 = cv2.imread(os.path.join(self.path,  'ALL','1',image_name), cv2.IMREAD_GRAYSCALE)
+                            preprocessing_image_2 = cv2.imread(os.path.join(self.path,  'ALL','2',image_name), cv2.IMREAD_GRAYSCALE)
+                            preprocessing_image_and = preprocessing_image_1&preprocessing_image_2& gray_image
+                            # preprocessing_image = cv2.addWeighted(gray_image, 0.5, preprocessing_image_and, 0.5, 0)
+                            
                             preprocessing_image = cv2.bilateralFilter(preprocessing_image, d, sigmaColor,sigmaSpace )
+                            preprocessing_image = cv2.addWeighted(preprocessing_image, 0.7, preprocessing_image_and, 0.3, 0)
+                            preprocessing_image = cv2.normalize(preprocessing_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
                             
                         if Unsharp :
                             preprocessing_image = cv2.GaussianBlur(preprocessing_image,(5,5),0)
@@ -510,7 +518,7 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '0304'
+    date = '20240325'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
@@ -520,4 +528,4 @@ if __name__ == "__main__":
     # preprocess.filter_preprocess(FILE + '_otsu',FILE + '_otsu_bil')
     # preprocess.clahe_preprocess(FILE + '_otsu_bil',FILE + '_otsu_bil_clahe')
     # preprocess.preprocess('' ,FILE + '_bil510_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/')
-    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil510_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=False,bilateralFilter =True ,Unsharp = False,clahe =True,   save_img =True,new_parameter = False,path = './record/')
+    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil71010_clahe0712',parm = {"4":[7,10,10,0.7,12]},fastNlMeansDenoising=False,bilateralFilter =True ,Unsharp = False,clahe =True,   save_img =True,new_parameter = False,path = './record/')

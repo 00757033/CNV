@@ -205,7 +205,7 @@ if __name__ == '__main__':
             X_train, Y_train = data_shuffle(X_train, Y_train)
             pca = Dimension_reduction(X_train, Y_train, X_test, Y_test)
             accuracy, sensitivity, specificity, precision, f1 = pca.principal_component_analysis(pc_begin, pc_end)
-            randomforest
+            randomforest(X_train,Y_train,X_test,Y_test)
             ############### 所有c10取2的list ###################
             accuracy_list.append(accuracy)
             sensitivity_list.append(sensitivity)

@@ -9,7 +9,7 @@ class reLabel():
         self.path = path
         self.layers = layers
 
-    def relabel(self,output_name,mathod = 'threshold',min_area = 50): # OTSU and then ROI
+    def relabel(self,output_name,mathod = 'threshold',min_area = 4): # OTSU and then ROI
         data_dir = ['images','masks']
 
         
@@ -54,7 +54,7 @@ class reLabel():
 
                     # 刪除小面積
                     # 連通域的數目 連通域的圖像 連通域的信息 矩形框的左上角坐標 矩形框的寬高 面積
-                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label)
+                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label, connectivity=8)
 
                     # 不同的連通域賦予不同的顏色
                 
@@ -69,6 +69,34 @@ class reLabel():
                             without_background[labels == i] = 0
                     
                     cv2.imwrite(os.path.join(output_dir, 'masks', img_path.split('\\')[-1]), without_background)
+
+                if mathod == 'connectedComponent2':
+                    # image2 = image.copy()
+                    # image2[image_label == 0] = 0
+                    ret, binary_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                    # mask
+
+                    label = image_label.copy()
+                    label[binary_image == 0] = 0
+
+                    # 刪除小面積
+                    # 連通域的數目 連通域的圖像 連通域的信息 矩形框的左上角坐標 矩形框的寬高 面積
+                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label, connectivity=8)
+
+                    # 不同的連通域賦予不同的顏色
+                
+                    areas = stats[:, cv2.CC_STAT_AREA]
+                    without_background = label.copy()
+                    
+                    output = np.zeros((labels.shape[0], labels.shape[1], 3), dtype=np.uint8)
+                    for i in range(1, num_labels):
+                        color = [np.random.randint(0, 255) for _ in range(3)]
+                        output[labels == i] = color
+                        if areas[i] < min_area:
+                            without_background[labels == i] = 0
+                    
+                    cv2.imwrite(os.path.join(output_dir, 'masks', img_path.split('\\')[-1]), without_background)                
+
                 cv2.imwrite(output_image + '/'+image_name,image)
 
 
@@ -79,7 +107,7 @@ class reLabel():
         return label_image
 
 
-    def detect_blood_vessels(self,image,min_area = 4):
+    def detect_blood_vessels(self,image,min_area = 10):
 
         # otsu threshold
         # ret, binary_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -129,7 +157,7 @@ class reLabel():
 
 
 if __name__ == "__main__":
-    date = '0304'
+    date = '20240325'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date

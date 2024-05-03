@@ -19,11 +19,12 @@ os.environ['TF_NUMPY_BANNER'] = 'off'
 train_signal = True
 train_data = True
 postprocess_signal = True
-result= True
+result= False
+gradcam_signal = False
 #data_class為病徵的名稱，如:PED, CNV
 def main(data_class):
     #Date time
-    data_date = "0304"
+    data_date = "20240325"
     #Path definition
     PATH_BASE = "../../Data/"
     PATH_LABEL = PATH_BASE + "Label"
@@ -44,12 +45,12 @@ def main(data_class):
 
     #HyperParameter
     image_size   = 304
-    models       = ['UNet','UNetPlusPlus','AttUNet','R2UNet','ResUNet','DenseUNet','MultiResUNet','DCUNet','FRUNet','BCDUNet'] #  #
-    epochs       = [200] #50、100、200、400
+    models       = ['UNet'] # 'UNet','UNetPlusPlus','AttUNet','R2UNet','MultiResUNet','DCUNet','BCDUNet' ,'ResUNet','DenseUNet','FRUNet'
+    epochs       = [150] #50、100、200、400
     datas        = ['train']
     batchs       = [2,4,8]
-    lrns         = [0.001]
-    filters      = [16,32, 64, 128, 256]
+    lrns         = [0.01,0.005,0.001,0.0005,0.0001]
+    filters      = [[16,32,64,128,256],[32,64,128,256,512],[64,128,256,512,1024]] # [16,32,64,128,256],
 
     #Evaluate prediction threshold
     predict_threshold = 0.5
@@ -60,7 +61,7 @@ def main(data_class):
         tools.makefolder(PATH_DATASET)
         
         Train = train(data_class, data_date, PATH_MODEL, PATH_RESULT, image_size, models, batchs, epochs, datas, lrns, filters, predict_threshold)
-        Train.run(PATH_DATASET, train_signal,postprocess_signal = True)
+        Train.run(PATH_DATASET, train_signal,postprocess_signal = True, gradcam_signal = gradcam_signal)
 
     #Result--------------------------------------------------------------------------------------------------------
     if result :

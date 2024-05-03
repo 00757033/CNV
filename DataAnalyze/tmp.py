@@ -4,7 +4,7 @@ import cv2
 import shutil
 import tools.tools as tools
 path = "../../Data/Label"
-labeled = path + '/' + 'labeled'
+labeled = path + '/' + 'labeled3'
 os.makedirs(labeled, exist_ok=True)
 
 for image_path in pathlib.Path(path).iterdir():

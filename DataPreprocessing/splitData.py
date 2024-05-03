@@ -15,7 +15,7 @@ class splitData():
         self.valid_df= None
         self.layers = layers
 
-    def splitData(self,name,output_name,random = 42):
+    def splitData(self,name,output_name,random = 35):
         tools.makefolder(os.path.join(self.path, "trainset"))
         print("start split data")
         random_state = str(random)
@@ -25,8 +25,8 @@ class splitData():
                 tools.makefolder(os.path.join(self.path, "trainset",output_name  + '_'+ self.layers[layer], i, "images"))
                 tools.makefolder(os.path.join(self.path, "trainset",output_name  + '_'+ self.layers[layer], i, "masks"))
 
-        train_ratio = 0.7  # 訓練集比例
-        test_ratio = 0.2  # 測試集比例
+        train_ratio = 0.6  # 訓練集比例
+        test_ratio = 0.3 # 測試集比例
         val_ratio = 0.1   # 驗證集比例
 
         # 確保比例總和不大於1.0
@@ -42,7 +42,8 @@ class splitData():
             all_files = os.listdir(os.path.join(path_input, "images"))
 
             # 切分資料集
-
+            print("split data")
+            print("all_files",os.path.join(path_input, "images"),len(all_files))
             
             # 切分資料集
             train_test_data, val_data = train_test_split(all_files, test_size=val_ratio, random_state=random)
@@ -67,7 +68,7 @@ class splitData():
 
 if __name__ == "__main__":
     path = "../../Data"
-    date = '0304'
+    date = '20240325'
     disease = 'PCV'
     NAME = disease + "_" + date
     path_base =  path + "/" + disease + "_"+ date
@@ -75,4 +76,6 @@ if __name__ == "__main__":
     output_path = path_base 
 
     split = splitData(path_base)
-    split.splitData(NAME + '_connectedComponent_bil510_clahe7_concateOCT' ,NAME + '_connectedComponent_bil510_clahe7_concateOCT_42')
+    # split.splitData(NAME + '_connectedComponent_bil510_clahe7_concateOCT' ,NAME + '_connectedComponent_bil510_clahe7_concateOCT_2')
+    # split.splitData(NAME + '_connectedComponent_bil525_clahe1515' ,NAME + '_connectedComponent_bil525_clahe1515_30')
+    split.splitData(NAME + '_connectedComponent' ,NAME + '_connectedComponent_35')

@@ -7,6 +7,7 @@ import os
 from inpaint import inpaint
 from destripe import destripe_octa_image
 import json
+import matplotlib.pyplot as plt
 
 
 import tools.tools as tools
@@ -89,7 +90,7 @@ class getData():
 
 
     # copy the image and label to the output path        
-    def getData(self,label_dict,output_path,type,toinpaint = True,copy_image = True, copy_label = True):
+    def getData(self,label_dict,output_path,type,toinpaint = True,copy_image = True, copy_label = True,erase = True):
         if toinpaint:
             preprocess = inpaint(self.path)
         if not  label_dict:
@@ -113,7 +114,8 @@ class getData():
                 for eyes in label_dict[patientID][date]:
                     print("-------------")
                     new_image_name = patientID + '_' + eyes + '_' + date
-                    if not self.errorimage('CC_'+new_image_name) and not self.errorimage('OR_'+new_image_name): # 刪除錯誤圖片
+                    
+                    if not self.errorimage('CC_'+new_image_name,erase ) : #and  not self.errorimage('OR_'+new_image_name) 刪除錯誤圖片
                         for lay in self.all_layers:
                             for image in pl.Path(os.path.join(self.image_path,patientID,date,eyes)).iterdir():
                                 if image.stem == lay and image.suffix == '.png':
@@ -128,17 +130,44 @@ class getData():
                                     if save_image is None:
                                         continue
                                     save_image = cv2.resize(save_image,(304,304))
+                                    # save_image= cv2.normalize(save_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
                                     cv2.imwrite(output_path + '/ALL/' + lay + '/' + new_image_name+'.png' ,save_image)
+                                    
                                     if copy_image:
                                         if type == 'health':
                                             if image.stem =='3':
                                                 cv2.imwrite(output_path + '/OR/images/'+ 'OR_' + new_image_name+'.png' ,save_image)
                                             elif image.stem =='4':
-                                    
+                                                # img_ref = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,'1'+'.png'))
+                                                # cut=  save_image - img_ref 
+                                                # cut[cut < 0] = 0
+                                                # tools.makefolder(output_path + '/CC_cut/images/')
+                                                # cv2.imwrite(output_path + '/CC_cut/images/'+ 'CC_' + new_image_name+'.png' ,cut)
                                                 cv2.imwrite(output_path + '/CC/images/'+ 'CC_' + new_image_name+'.png' ,save_image)
                                         elif type == 'disease':
                                             # label_dict[patientID][date][eyes] data split('_')[1] == image.stem 
-                                            
+                                            # 4-1
+                                            if image.stem =='4':
+                                                img_ref = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,'1'+'.png'),0)
+                                                img_ref2 = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,'2'+'.png'),0)
+                                                img_ref = cv2.resize(img_ref,(304,304))
+                                                img_ref2 = cv2.resize(img_ref2,(304,304))
+                                                # img_ref = img_ref > 0 and img_ref2 > 0
+                                                img_ref_and = img_ref & img_ref2
+                                                # ret , img_ref = cv2.threshold(img_ref,0,255,cv2.THRESH_OTSU)
+                                                save_image2 = cv2.cvtColor(save_image, cv2.COLOR_BGR2GRAY)
+                                                cut= save_image2 - img_ref_and&save_image2
+                                                cut[cut < 0] = 0
+                                                # fig , ax = plt.subplots(1,5)
+                                                # ax[0].imshow(save_image2,cmap = 'gray')
+                                                # ax[1].imshow(img_ref,cmap = 'gray')
+                                                # ax[2].imshow(img_ref2,cmap = 'gray')
+                                                # ax[3].imshow(img_ref_and,cmap = 'gray')
+                                                # ax[4].imshow(cut,cmap = 'gray')
+                                                # plt.show()
+                                                
+                                                tools.makefolder(output_path + '/CC_cut/images/')
+                                                cv2.imwrite(output_path + '/CC_cut/images/'+ new_image_name+'.png' ,cut)
                                             if image.stem in label_dict[patientID][date][eyes]:
                                                 cv2.imwrite(output_path + '/'+self.layers[image.stem]+'/images/'+ new_image_name+'.png' ,save_image)
                                     if copy_label and type == 'disease':
@@ -175,8 +204,10 @@ class getData():
                             #             if copy_label :
                             #                 shutil.copy(origin_label_path,output_label_path)
 
-    def errorimage(self,image_name): # 判斷是否為錯誤圖片
+    def errorimage(self,image_name,erase = True): # 判斷是否為錯誤圖片
         file = '..//..//Data//刪除.xlsx'
+        if not erase:
+            return False
         data = pd.read_excel(file, engine='openpyxl')
         data = data.values.tolist()
         for i in data:
@@ -188,11 +219,11 @@ class getData():
             
                 
 if __name__ == '__main__':
-    date = '0305'
+    date = '20240325'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date
-    PATH_LABEL = PATH + "/" + "labeled"
+    PATH_LABEL = PATH + "/" + "20240325_labeled"
     PATH_IMAGE = PATH + "/" + "OCTA"
     tools.makefolder(PATH_BASE)
     data = getData(PATH_BASE,PATH_IMAGE,PATH_LABEL,"label")
@@ -201,6 +232,6 @@ if __name__ == '__main__':
     health = data.health('../DataAnalyze/PCV_disease.json')
     # data.writeLabelJson('./record/label_dict.json')
     types = ['disease','health']
-    data.getData(disease,PATH_BASE,'disease',toinpaint = False,copy_image = True,copy_label = True)
+    data.getData(disease,PATH_BASE,'disease',toinpaint = False,copy_image = True,copy_label = True,erase = True)
 
 

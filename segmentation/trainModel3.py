@@ -1,6 +1,6 @@
 
 import timeit
-from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score
+from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score , confusion_matrix
 import glob
 import cv2
 import csv
@@ -22,6 +22,8 @@ import datetime
 from UNetModel2 import *
 from postprocessing3 import *
 import tensorflow as tf
+import cv2
+from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score
 model_classes = {
     'UNet': UNet,
     'FRUNet': FRUNet,
@@ -31,10 +33,12 @@ model_classes = {
     'RecurrentUNet': RecurrentUNet,
     'ResUNet': ResUNet,
     'R2UNet': R2UNet,
-    'R2AttentionUNet': R2AttentionUNet,
+    # 'R2AttentionUNet': R2AttentionUNet,
     'DenseUNet': DenseUNet,
     'MultiResUNet': MultiResUNet,
     'DCUNet': DCUNet,
+    'SDUNet': SDUNet,
+    'CARUNet' : CARUNet,
 }
 
 # 評估指標
@@ -55,6 +59,32 @@ def jaccard_index(y_true, y_pred):
     intersection = tf.reduce_sum(y_true * y_pred)
     union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) - intersection
     return (intersection + smooth) / (union + smooth)
+
+def jaccard_loss(y_true, y_pred):
+    return 1.0 - jaccard_index(y_true, y_pred)
+
+def Tversky_similarity_index(y_true, y_pred, alpha=0.7):
+    smooth = 1e-5
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    true_pos = tf.reduce_sum(y_true * y_pred)
+    false_neg = tf.reduce_sum(y_true * (1 - y_pred))
+    false_pos = tf.reduce_sum((1 - y_true) * y_pred)
+    return (true_pos + smooth) / (true_pos + alpha * false_neg + (1 - alpha) * false_pos + smooth)
+
+def Tversky_loss(y_true, y_pred, alpha=0.5):
+    return 1.0 - Tversky_similarity_index(y_true, y_pred, alpha)
+ 
+def focal_loss(y_true, y_pred, alpha=0.25, gamma=2.0):
+    y_true = tf.cast(y_true, tf.float32)
+    y_pred = tf.cast(y_pred, tf.float32)
+    bce = tf.keras.losses.binary_crossentropy(y_true, y_pred)
+    BCE_EXP = tf.exp(-bce)
+    focal_loss =  tf.reduce_mean(alpha * tf.pow((1-BCE_EXP), gamma) * bce)
+    return focal_loss
+
+def Tv_focal_loss(y_true, y_pred, alpha=0.5, beta=0.5, gamma=2.0):
+    return Tversky_loss(y_true, y_pred, alpha) + focal_loss(y_true, y_pred, beta, gamma)   
 
 def mean_pixel_accuracy(y_true, y_pred):
     # Count the number of matching pixels
@@ -142,7 +172,7 @@ class train():
 
     def record(self, history, time, model_path, model_name, feature):
         # save_model_name = model_name + '_' + dataset_name + '_' + epoch.__str__() + '_' + batch.__str__() + '_' + lrn.__str__()
-        [model_name , epoch, batch, lrn] = model_name.split('_')
+        [model_name , epoch, batch, lrn, filter] = model_name.split('_')
         model_path = model_path.split('\\')[-2]
         # 紀錄訓練結果 現在日期 時間 模型 資料集  批次大小 訓練次數 學習率  預測閥值 訓練時間 訓練loss 訓練acc 驗證loss 驗證acc 
         print("record :",model_path)
@@ -153,6 +183,7 @@ class train():
             batch, # 批次大小
             epoch, # 訓練次數
             lrn, # 學習率
+            filter, # 濾波器大小
             self.predict_threshold, # 預測閥值
             time, # 訓練時間
             history.history['loss'][-1], # 訓練loss
@@ -178,7 +209,7 @@ class train():
         dilation2 = cv2.dilate(erosion2, kernel, iterations = 1)
         return dilation2
 
-    def evaluateModel(self,dataset_name, model, test_dataset, result_path,model_path, model_name, feature,predict_threshold = 0.5,postprocess_signal = False):
+    def evaluateModel(self,dataset_name, model, test_dataset, result_path,model_path, model_name, feature,predict_threshold = 0.5,postprocess_signal = False,gradcam_signal = False):
         print("evaluateModel" , model_name)
         test_dataset2 = test_dataset
         # make folder
@@ -203,8 +234,8 @@ class train():
 
         # load model
         model.load_weights(os.path.join(model_path, model_name+'_' + feature + '.h5'))
-
-        self.gradcam(model, test_dataset2, result_path,model_name+'_' + feature)
+        if gradcam_signal:
+            self.gradcam(model, test_dataset2, result_path,model_name+'_' + feature)
         
         print("load model")
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "w", newline='') as f:
@@ -212,24 +243,24 @@ class train():
             writer.writerow(["image_name",
                              "predict_jaccard_index", 
                              "predict_dice_coefficient",
-                             "predict_mPA",
+                             "predict_Sensitivity",
                              "postprocess_jaccard_index", 
                              "postprocess_dice_coefficient",
-                             "postprocess_mPA",
+                             "postprocess_Sensitivity",
                              "postprocess_crf_jaccard_index",
                              "postprocess_crf_dice_coefficient",
-                             "postprocess_crf_mPA"
+                             "postprocess_crf_Sensitivity"
                              ])
         # evaluate
         iou = []
         dice = []
-        mPA = []
+        Sensitivitys = []
         post_iou = []
         post_dice = []
-        post_mPA = []
+        post_Sensitivity = []
         post_crf_iou = []
         post_crf_dice = []
-        post_crf_mPA = []
+        post_crf_Sensitivity = []
         
         best_id = 0
         worst_id = 0
@@ -260,8 +291,8 @@ class train():
             # Tensor("Mean_1:0", shape=(), dtype=float32)
             iou.append(jc)
             dice.append(di)
-            mpa = mean_pixel_accuracy(mask, img)
-            mPA.append(mpa)
+            Sensitivity = recall_score(mask.flatten(), img.flatten(), average='micro')
+            Sensitivitys.append(Sensitivity)
 
             if jc > best_iou :
                 best_iou = jc
@@ -274,10 +305,10 @@ class train():
             cv2.imwrite(os.path.join(mask_path, test_ids[i]), cv2.imread(os.path.join(test_path, "masks", test_ids[i])))
             jc_post = 0
             di_post = 0
-            mpa_post = 0
+            Sensitivity_post = 0
             jc_postcrf = 0
             di_postcrf = 0
-            mpa_postcrf = 0
+            Sensitivity_postcrf = 0
 
             if postprocess_signal:
                 image = cv2.imread(os.path.join(predict_path, test_ids[i]), 0)
@@ -290,10 +321,10 @@ class train():
                 jc_post = jaccard_score(mask.ravel(), output_post.ravel())
                 di_post = dice_coef(mask, output_post)
                 di_post = di_post.numpy()
-                mpa_post = mean_pixel_accuracy(mask, output_post)
+                Sensitivity_post = mean_pixel_accuracy(mask, output_post)
                 post_iou.append(jc_post)
                 post_dice.append(di_post)
-                post_mPA.append(mpa_post)
+                post_Sensitivity.append(Sensitivity_post)
                 crf_input = item[:, :, 0].copy()
                 crf_input = np.array(crf_input, dtype=np.uint8)
                 crf_input = cv2.resize(crf_input, (self.image_size, self.image_size))
@@ -306,23 +337,23 @@ class train():
                 jc_postcrf = jaccard_score(mask.ravel(), postcrf.ravel())
                 di_postcrf = dice_coef(mask, postcrf)
                 di_postcrf = di_postcrf.numpy()
-                mpa_postcrf = mean_pixel_accuracy(mask, postcrf)
+                Sensitivity_postcrf = mean_pixel_accuracy(mask, postcrf)
                 post_crf_iou.append(jc_postcrf)
                 post_crf_dice.append(di_postcrf)
-                post_crf_mPA.append(mpa_postcrf)
+                post_crf_Sensitivity.append(Sensitivity_postcrf)
             # record image name, jaccard index, dice coefficient
 
             record_data = [
                 test_ids[i],
                 jc,
                 di,
-                mpa,
+                Sensitivity,
                 jc_post,
                 di_post,
-                mpa_post,
+                Sensitivity_post,
                 jc_postcrf,
                 di_postcrf,
-                mpa_postcrf
+                Sensitivity_postcrf
             ]
             
 
@@ -333,13 +364,13 @@ class train():
         # record average jaccard index, dice coefficient  std of jaccard index, dice coefficient
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["mean", np.mean(iou), np.mean(dice), np.mean(mPA), np.mean(post_iou), np.mean(post_dice), np.mean(post_mPA), np.mean(post_crf_iou), np.mean(post_crf_dice), np.mean(post_crf_mPA)])
-            writer.writerow(["std", np.std(iou, ddof=1), np.std(dice, ddof=1), np.std(mPA, ddof=1), np.std(post_iou, ddof=1), np.std(post_dice, ddof=1), np.std(post_mPA, ddof=1), np.std(post_crf_iou, ddof=1), np.std(post_crf_dice, ddof=1), np.std(post_crf_mPA, ddof=1)])
+            writer.writerow(["mean", np.mean(iou), np.mean(dice), np.mean(Sensitivitys), np.mean(post_iou), np.mean(post_dice), np.mean(post_Sensitivity), np.mean(post_crf_iou), np.mean(post_crf_dice), np.mean(post_crf_Sensitivity)])
+            writer.writerow(["std", np.std(iou, ddof=1), np.std(dice, ddof=1), np.std(Sensitivitys, ddof=1), np.std(post_iou, ddof=1), np.std(post_dice, ddof=1), np.std(post_Sensitivity, ddof=1), np.std(post_crf_iou, ddof=1), np.std(post_crf_dice, ddof=1), np.std(post_crf_Sensitivity, ddof=1)])
         # record best image name ,jaccard index, dice coefficient worst image name ,jaccard index, dice coefficient
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["best", test_ids[best_id], best_iou, dice[best_id],mPA[best_id]])
-            writer.writerow(["worst", test_ids[worst_id], worst_iou, dice[worst_id], mPA[worst_id]])
+            writer.writerow(["best", test_ids[best_id], best_iou, dice[best_id],Sensitivitys[best_id]])
+            writer.writerow(["worst", test_ids[worst_id], worst_iou, dice[worst_id], Sensitivitys[worst_id]])
         # record postprocess best image name ,jaccard index, dice coefficient worst image name ,jaccard index, dice coefficient
         if postprocess_signal:
             print(os.path.join("record","CRF",dataset_name+'.csv'))
@@ -350,14 +381,14 @@ class train():
                 np.std(iou, ddof=1),
                 np.mean(dice),
                 np.std(dice, ddof=1),
-                np.mean(mPA),
-                np.std(mPA, ddof=1),
+                np.mean(Sensitivitys),
+                np.std(Sensitivitys, ddof=1),
                 np.mean(post_crf_iou),
                 np.std(post_crf_iou, ddof=1),
                 np.mean(post_crf_dice),
                 np.std(post_crf_dice, ddof=1),
-                np.mean(post_crf_mPA),
-                np.std(post_crf_mPA, ddof=1)
+                np.mean(post_crf_Sensitivity),
+                np.std(post_crf_Sensitivity, ddof=1)
                 
             ]
             postprocess_Morphology = [
@@ -366,14 +397,14 @@ class train():
                 np.std(iou, ddof=1),
                 np.mean(dice),
                 np.std(dice, ddof=1),
-                np.mean(mPA),
-                np.std(mPA, ddof=1),
+                np.mean(Sensitivitys),
+                np.std(Sensitivitys, ddof=1),
                 np.mean(post_iou),
                 np.std(post_iou, ddof=1),
                 np.mean(post_dice),
                 np.std(post_dice, ddof=1),
-                np.mean(post_mPA),
-                np.std(post_mPA, ddof=1)
+                np.mean(post_Sensitivity),
+                np.std(post_Sensitivity, ddof=1)
             ]
             
             with open(os.path.join("record","CRF",dataset_name+'.csv'), 'a', newline='') as f:
@@ -387,16 +418,16 @@ class train():
                 writer.writerow(postprocess_Morphology)
 
 
-        return np.mean(iou), np.std(iou, ddof=1), np.mean(dice), np.std(dice, ddof=1), np.mean(mPA), np.std(mPA, ddof=1)
+        return np.mean(iou), np.std(iou, ddof=1), np.mean(dice), np.std(dice, ddof=1), np.mean(Sensitivitys), np.std(Sensitivitys, ddof=1)
 
     def fitModel(self,model,dataset,data,  train_dataset, valid_dataset, epoch, lrn, model_path, model_name, feature):
         print("fitModel",dataset,data)
         # checkpoint
         checkpoint = ModelCheckpoint(os.path.join(model_path, model_name+'_' + feature + '.h5'), monitor='val_dice_coef', mode='max', save_best_only=True, save_weights_only=True)
         # earlystopping
-        # earlystopping = EarlyStopping(monitor='val_dice_coef', patience=20, verbose=1, mode='max')
+        # earlystopping = EarlyStopping(monitor='val_dice_coef', patience=30, verbose=1, mode='max')
         # reduce learning rate
-        reduce_lr = ReduceLROnPlateau(monitor='val_dice_coef', factor=0.5, patience=10, verbose=1, mode='max')
+        reduce_lr = ReduceLROnPlateau(monitor='val_dice_coef', factor=0.5, patience=15, verbose=1, mode='max')
         # board
         log = os.path.join('logs',dataset,data, model_name+'_'+feature)
         tensorboard = TensorBoard(log_dir=log, histogram_freq=0, write_graph=True, write_images=True)
@@ -415,16 +446,16 @@ class train():
         if not os.path.isfile(os.path.join("record", "training.csv")):
             with open(os.path.join("record", "training.csv"), "w", newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate", "predict_threshold", "time", "loss", "dice_coef", "val_loss", "val_dice_coef"])
+                writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate","filter", "predict_threshold", "time", "loss", "dice_coef", "val_loss", "val_dice_coef"])
 
 				
-    def best_model_record(self, best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_mPA, best_mPA_var):
+    def best_model_record(self, best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_Sensitivity, best_Sensitivity_var):
         print(best_model)
-        [model_name , epoch, batch, lrn] = best_model.split('_')
+        [model_name , epoch, batch, lrn, filter] = best_model.split('_')
         if not os.path.isfile(os.path.join("record", "best_model.csv")):
             with open(os.path.join("record", "best_model.csv"), "w", newline='') as f:
                 writer = csv.writer(f)
-                writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate", "predict_threshold", "time", "best_iou", "best_iou_var", "best_dice", "best_dice_var", "best_mPA", "best_mPA_var"])
+                writer.writerow(["date", "model", "dataset", "batch", "epoch", "learning_rate", "filter","predict_threshold", "time", "best_iou", "best_iou_var", "best_dice", "best_dice_var", "best_Sensitivity", "best_Sensitivity_var"])
 
         with open(os.path.join("record", "best_model.csv"), "a", newline='') as f:
             writer = csv.writer(f)
@@ -435,28 +466,29 @@ class train():
                 batch, # batch size
                 epoch, # epoch
                 lrn, # learning rate
+                filter,
                 self.predict_threshold, # predict threshold
                 best_model_time, # 訓練時間
                 best_iou, # best iou
                 best_iou_var, # best iou var
                 best_dice, # best dice
                 best_dice_var, # best dice var
-                best_mPA, # best mPA
-                best_mPA_var, # best mPA var
+                best_Sensitivity, # best Sensitivity
+                best_Sensitivity_var, # best Sensitivity var
             ])
         f = open(self.data_class + '_' + self.data_date + '_summary_2.txt', 'a')
         lines = ['----------Summary:' + best_model + '----------\n',
                 'Time: '+ str(best_model_time) + '\n',
                 'Jaccard index: '+ str(best_iou) + ' +- ' + str(best_iou_var) + '\n',
                 'Dice Coefficient: '+ str(best_dice) + ' +- ' + str(best_dice_var) + '\n',
-                'mPA: '+ str(best_mPA) + ' +- ' + str(best_mPA_var) + '\n',
+                'Sensitivity: '+ str(best_Sensitivity) + ' +- ' + str(best_Sensitivity_var) + '\n',
                 '----------------------------------------\n\n']
         f.writelines(lines)
         f.close()
 
     # 訓練模型
-    def run(self, PATH_DATASET, train_signal = True, postprocess_signal = False):
-        set_seed(42)
+    def run(self, PATH_DATASET, train_signal = True, postprocess_signal = False, gradcam_signal = False):
+        set_seed(20)
         
         if train_signal:
             self.record_model()
@@ -479,11 +511,11 @@ class train():
                 # 預測資料
                     with open(os.path.join("record","CRF",dataset_name+'.csv'), 'w') as f:
                         writer = csv.writer(f)
-                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_mPA_score','original_mPA_var','ji_score','ji_var','dice_score','dice_var','mPA_score','mPA_var'])
+                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_Sensitivity_score','original_Sensitivity_var','ji_score','ji_var','dice_score','dice_var','Sensitivity_score','Sensitivity_var'])
                 if not os.path.isfile(os.path.join("record","Morphology",dataset_name+'.csv')):
                     with open(os.path.join("record","Morphology",dataset_name+'.csv'), 'w') as f:
                         writer = csv.writer(f)
-                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_mPA_score','original_mPA_var','ji_score','ji_var','dice_score','dice_var','mPA_score','mPA_var'])
+                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_Sensitivity_score','original_Sensitivity_var','ji_score','ji_var','dice_score','dice_var','Sensitivity_score','Sensitivity_var'])
             for data in self.datas: #讀取資料集的訓練資料
                 for  model_name in self.models:  # 讀取模型
                     best_model = ''
@@ -491,94 +523,95 @@ class train():
                     best_dice_var = -1
                     best_iou = -1
                     best_iou_var = -1
-                    best_mPA = -1
-                    best_mPA_var = -1
+                    best_Sensitivity = -1
+                    best_Sensitivity_var = -1
                     best_model_time = 0
                     for epoch in self.epochs: #每個模型訓練幾個epoch
                         for batch in self.batchs: #每個模型訓練幾個batch
                             for lrn in self.lrns: #每個模型訓練幾個learning rate
-                                # 建立模型跟預測結果的資料夾
-                                floder_path = self.data_class + '_' + self.data_date
-                                model_path = os.path.join(self.model_path,floder_path,dataset_name,data)
-                                result_path = os.path.join(self.result_path,floder_path,dataset_name,data)
-                                if not os.path.isdir(model_path):
-                                    os.makedirs(model_path)
-                                if not os.path.isdir(result_path):
-                                    os.makedirs(result_path)
-                                # 訓練資料集
-                                train_path = os.path.join(dataset, "train")
-                                valid_path = os.path.join(dataset, "valid")
-                                test_path = os.path.join(dataset, "test")
-                                train_ids = os.listdir(os.path.join(train_path, "images"))
-                                valid_ids = os.listdir(os.path.join(valid_path, "images"))
-                                test_ids = os.listdir(os.path.join(test_path, "images"))
-                                # 訓練資料
-                                train_dataset = DataGenerator(train_ids, train_path, batch_size=batch, image_size=self.image_size)
-                                valid_dataset = DataGenerator(valid_ids, valid_path, batch_size=batch, image_size=self.image_size)
+                                for filter in self.filters:
+                                    # 建立模型跟預測結果的資料夾
+                                    floder_path = self.data_class + '_' + self.data_date
+                                    model_path = os.path.join(self.model_path,floder_path,dataset_name,data)
+                                    result_path = os.path.join(self.result_path,floder_path,dataset_name,data)
+                                    if not os.path.isdir(model_path):
+                                        os.makedirs(model_path)
+                                    if not os.path.isdir(result_path):
+                                        os.makedirs(result_path)
+                                    # 訓練資料集
+                                    train_path = os.path.join(dataset, "train")
+                                    valid_path = os.path.join(dataset, "valid")
+                                    test_path = os.path.join(dataset, "test")
+                                    train_ids = os.listdir(os.path.join(train_path, "images"))
+                                    valid_ids = os.listdir(os.path.join(valid_path, "images"))
+                                    test_ids = os.listdir(os.path.join(test_path, "images"))
+                                    # 訓練資料
+                                    train_dataset = DataGenerator(train_ids, train_path, batch_size=batch, image_size=self.image_size)
+                                    valid_dataset = DataGenerator(valid_ids, valid_path, batch_size=batch, image_size=self.image_size)
 
 
-                                #設定模型
-                                if model_name in model_classes:
-                                    getModels = model_classes[model_name](self.image_size ,lrn)
-                                else:
-                                    raise ValueError(f"Model '{model_name}' is not supported.")
-                                model = getModels.build_model(self.filters)
-                                # print(model.summary())
-                                # # 編譯模型optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate), loss=self.dice_coef_loss
-                                model.compile(optimizer=Adam(learning_rate=lrn), loss=dice_coef_loss, metrics=[dice_coef, jaccard_index])
-                                # 訓練模型 
-                                save_model_name = model_name + '_' + epoch.__str__() + '_' + batch.__str__() + '_' + lrn.__str__()
-                                # 取得字串 用來判斷是否有重複訓練過 去掉最後的_1.h5
+                                    #設定模型
+                                    if model_name in model_classes:
+                                        getModels = model_classes[model_name](self.image_size ,lrn)
+                                    else:
+                                        raise ValueError(f"Model '{model_name}' is not supported.")
+                                    model = getModels.build_model(filter)
+                                    print("train model",model_name)
+                                    print(model.summary())
+                                    # # 編譯模型optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate), loss=self.dice_coef_loss
+                                    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lrn), loss=Tversky_loss, metrics=[dice_coef, jaccard_index])
+                                    # 訓練模型 
+                                    save_model_name = model_name + '_' + epoch.__str__() + '_' + batch.__str__() + '_' + lrn.__str__() + '_' + str(filter[0])
+                                    # 取得字串 用來判斷是否有重複訓練過 去掉最後的_1.h5
 
-                                lists = os.listdir(model_path) #列出資料夾下所有的目錄與檔案
-                                count = 0
-                                for i in range(0,len(lists)):
-                                    # 找名稱完全相同
-                                    if lists[i].startswith(save_model_name) and lists[i].endswith('.h5'):
-                                        count = count +1
-                                
-                                if train_signal:
-                                    count = count +1 # 紀錄模型訓練次數
-                                    history, time = self.fitModel(model,dataset_name,data ,train_dataset, valid_dataset,epoch, lrn ,model_path,save_model_name,count.__str__())
+                                    lists = os.listdir(model_path) #列出資料夾下所有的目錄與檔案
+                                    count = 0
+                                    for i in range(0,len(lists)):
+                                        # 找名稱完全相同
+                                        if lists[i].startswith(save_model_name) and lists[i].endswith('.h5'):
+                                            count = count +1
+                                    
+                                    if train_signal:
+                                        count = count +1 # 紀錄模型訓練次數
+                                        history, time = self.fitModel(model,dataset_name,data ,train_dataset, valid_dataset,epoch, lrn ,model_path,save_model_name,count.__str__())
 
-                                    # 紀錄訓練結果
-                                    self.record(history, time,model_path,save_model_name,count.__str__())
+                                        # 紀錄訓練結果
+                                        self.record(history, time,model_path,save_model_name,count.__str__())
 
-                                print("evaluate")
-                                ji_score, ji_var , dice_score, dice_var , mPA_score, mPA_var = self.evaluateModel(dataset_name, model, test_path, result_path,model_path, save_model_name, count.__str__(),self.predict_threshold,postprocess_signal)
-                                print("finish evaluate")
-                                ji_score = ji_score * 100
-                                ji_var = ji_var * 100
-                                dice_score = dice_score * 100
-                                dice_var = dice_var * 100
-                                mPA_score = mPA_score * 100
-                                mPA_var = mPA_var * 100
-                                
-                                if train_signal:
-                                    f = open(self.data_class + '_' + self.data_date + '_summary.txt', 'a') # + save_model_name + '----------\n',
-                                    lines = ['----------Summary:' + dataset_name + '----------\n',
-                                            'Model: '+ save_model_name + '\n',
-                                            'Time: '+ str(time) + '\n',
-                                            'Jaccard index: '+ str(ji_score) + ' +- ' + str(ji_var) + '\n',
-                                            'Dice Coefficient: '+ str(dice_score) + ' +- ' + str(dice_var) + '\n',
-                                            'mPA: '+ str(mPA_score) + ' +- ' + str(mPA_var) + '\n',
-                                            '----------------------------------------\n\n']
-                                    f.writelines(lines)
-                                    f.close()
-                                
-                                    if ji_score > best_iou :
-                                        best_iou = ji_score
-                                        best_iou_var = ji_var
-                                        best_dice = dice_score
-                                        best_dice_var = dice_var
-                                        best_mPA = mPA_score
-                                        best_mPA_var = mPA_var
-                                        best_model = save_model_name
-                                        best_model_time = time
+                                    print("evaluate")
+                                    ji_score, ji_var , dice_score, dice_var , Sensitivity_score, Sensitivity_var = self.evaluateModel(dataset_name,model, dataset, result_path,model_path,save_model_name,count.__str__(),self.predict_threshold,postprocess_signal,gradcam_signal)
+                                    
+                                    ji_score = ji_score * 100
+                                    ji_var = ji_var * 100
+                                    dice_score = dice_score * 100
+                                    dice_var = dice_var * 100
+                                    Sensitivity_score = Sensitivity_score * 100
+                                    Sensitivity_var = Sensitivity_var * 100
+                                    
+                                    if train_signal:
+                                        f = open(self.data_class + '_' + self.data_date + '_summary.txt', 'a') # + save_model_name + '----------\n',
+                                        lines = ['----------Summary:' + dataset_name + '----------\n',
+                                                'Model: '+ save_model_name + '\n',
+                                                'Time: '+ str(time) + '\n',
+                                                'Jaccard index: '+ str(ji_score) + ' +- ' + str(ji_var) + '\n',
+                                                'Dice Coefficient: '+ str(dice_score) + ' +- ' + str(dice_var) + '\n',
+                                                'Sensitivity: '+ str(Sensitivity_score) + ' +- ' + str(Sensitivity_var) + '\n',
+                                                '----------------------------------------\n\n']
+                                        f.writelines(lines)
+                                        f.close()
+                                    
+                                        if ji_score > best_iou :
+                                            best_iou = ji_score
+                                            best_iou_var = ji_var
+                                            best_dice = dice_score
+                                            best_dice_var = dice_var
+                                            best_Sensitivity = Sensitivity_score
+                                            best_Sensitivity_var = Sensitivity_var
+                                            best_model = save_model_name
+                                            best_model_time = time
                     
-                    if train_signal:  
-                        print("best_model:", best_model)        
-                        self.best_model_record(best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_mPA, best_mPA_var)
+                    if train_signal:         
+                        self.best_model_record(best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_Sensitivity, best_Sensitivity_var)
 
 
 

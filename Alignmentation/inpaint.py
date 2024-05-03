@@ -209,7 +209,7 @@ class inpaint():
                 
         
 if __name__ == "__main__":
-    date = '0305'
+    date = '20240320'
     disease = 'PCV'
     PATH = "../../Data/"
     

@@ -1,0 +1,3213 @@
+{
+    "00006202_R": {
+        "20221026": {
+            "center": [
+                156,
+                154
+            ],
+            "radius": 104,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -17.0,
+                7.0
+            ]
+        },
+        "20230712": {
+            "center": [
+                117,
+                165
+            ],
+            "radius": 94,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                54.0,
+                -6.0
+            ]
+        }
+    },
+    "00016179_R": {
+        "20180321": {
+            "center": [
+                199,
+                111
+            ],
+            "radius": 75,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                8.0,
+                31.0
+            ]
+        }
+    },
+    "00285176_L": {
+        "20161228": {
+            "center": [
+                152,
+                161
+            ],
+            "radius": 103,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -7.0,
+                1.0
+            ]
+        },
+        "20190116": {
+            "center": [
+                141,
+                163
+            ],
+            "radius": 106,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                5.0,
+                -2.0
+            ]
+        },
+        "20190522": {
+            "center": [
+                146,
+                170
+            ],
+            "radius": 106,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                -7.0
+            ]
+        }
+    },
+    "00468301_L": {
+        "20220502": {
+            "center": [
+                153,
+                158
+            ],
+            "radius": 91,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                -18.0
+            ]
+        }
+    },
+    "00563175_L": {
+        "20160711": {
+            "center": [
+                139,
+                152
+            ],
+            "radius": 84,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -3.0,
+                0.0
+            ]
+        },
+        "20160808": {
+            "center": [
+                140,
+                149
+            ],
+            "radius": 85,
+            "rotation_angle": -10.69001841236232,
+            "rotation_rad": -0.18657601839453938,
+            "scale": [
+                0.8026196747387898,
+                1.0464495266695362
+            ],
+            "translation": [
+                0.36614214395878264,
+                5.205012884678894
+            ]
+        },
+        "20161107": {
+            "center": [
+                172,
+                168
+            ],
+            "radius": 84,
+            "rotation_angle": 2.195160539855577,
+            "rotation_rad": 0.03831277903033603,
+            "scale": [
+                1.1818197874021936,
+                1.0536524839800023
+            ],
+            "translation": [
+                -43.960123862703306,
+                -17.76779201436679
+            ]
+        }
+    },
+    "00871678_L": {
+        "20170313": {
+            "center": [
+                151,
+                158
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -7.0,
+                2.0
+            ]
+        },
+        "20170828": {
+            "center": [
+                142,
+                146
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                8.0
+            ]
+        },
+        "20171030": {
+            "center": [
+                144,
+                153
+            ],
+            "radius": 90,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                5.0
+            ]
+        },
+        "20180205": {
+            "center": [
+                141,
+                149
+            ],
+            "radius": 99,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                6.0
+            ]
+        },
+        "20180917": {
+            "center": [
+                146,
+                150
+            ],
+            "radius": 87,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                6.0
+            ]
+        },
+        "20190327": {
+            "center": [
+                142,
+                151
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                3.0
+            ]
+        }
+    },
+    "01244637_L": {
+        "20220408": {
+            "center": [
+                149,
+                155
+            ],
+            "radius": 103,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -7.0,
+                -8.0
+            ]
+        },
+        "20220902": {
+            "center": [
+                154,
+                150
+            ],
+            "radius": 90,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                -1.0
+            ]
+        },
+        "20230913": {
+            "center": [
+                142,
+                147
+            ],
+            "radius": 73,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -18.0,
+                4.0
+            ]
+        }
+    },
+    "01790839_R": {
+        "20211102": {
+            "center": [
+                138,
+                131
+            ],
+            "radius": 75,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -32.0,
+                -3.0
+            ]
+        }
+    },
+    "01836108_L": {
+        "20161205": {
+            "center": [
+                155,
+                153
+            ],
+            "radius": 83,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -56.0,
+                -20.0
+            ]
+        },
+        "20170220": {
+            "center": [
+                158,
+                148
+            ],
+            "radius": 90,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -47.0,
+                -18.0
+            ]
+        },
+        "20170424": {
+            "center": [
+                149,
+                146
+            ],
+            "radius": 92,
+            "rotation_angle": 5.887368454929018,
+            "rotation_rad": 0.10275396381656275,
+            "scale": [
+                1.1447441567369714,
+                1.0231948056205555
+            ],
+            "translation": [
+                -52.53926439882811,
+                -17.15979195100485
+            ]
+        }
+    },
+    "01979334_R": {
+        "20221227": {
+            "center": [
+                161,
+                153
+            ],
+            "radius": 82,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                -6.0
+            ]
+        },
+        "20230921": {
+            "center": [
+                149,
+                132
+            ],
+            "radius": 87,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                7.0
+            ]
+        }
+    },
+    "02062686_L": {
+        "20220428": {
+            "center": [
+                154,
+                154
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                9.0
+            ]
+        }
+    },
+    "02236052_R": {
+        "20211129": {
+            "center": [
+                153,
+                118
+            ],
+            "radius": 106,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                -3.0
+            ]
+        },
+        "20220624": {
+            "center": [
+                149,
+                135
+            ],
+            "radius": 93,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -16.0,
+                -24.0
+            ]
+        }
+    },
+    "02875773_L": {
+        "20220420": {
+            "center": [
+                147,
+                145
+            ],
+            "radius": 94,
+            "rotation_angle": 2.175139997756994,
+            "rotation_rad": 0.03796335465268162,
+            "scale": [
+                1.0533650883542838,
+                0.9862195618409398
+            ],
+            "translation": [
+                -0.5078773666742649,
+                -7.594979976057395
+            ]
+        },
+        "20230323": {
+            "center": [
+                154,
+                142
+            ],
+            "radius": 92,
+            "rotation_angle": -10.926302909520802,
+            "rotation_rad": -0.19069996084137406,
+            "scale": [
+                0.804101694650347,
+                0.7992380945911352
+            ],
+            "translation": [
+                4.636212390659665,
+                10.899562334653389
+            ]
+        }
+    },
+    "03048783_L": {
+        "20230307": {
+            "center": [
+                151,
+                143
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -13.0,
+                11.0
+            ]
+        }
+    },
+    "03254241_L": {
+        "20161226": {
+            "center": [
+                150,
+                160
+            ],
+            "radius": 104,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -17.0,
+                -12.0
+            ]
+        },
+        "20170320": {
+            "center": [
+                85,
+                157
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                53.0,
+                -12.0
+            ]
+        },
+        "20170807": {
+            "center": [
+                169,
+                165
+            ],
+            "radius": 106,
+            "rotation_angle": -1.0660260609765013,
+            "rotation_rad": -0.018605664676105783,
+            "scale": [
+                0.9788124357477394,
+                0.9965379177380378
+            ],
+            "translation": [
+                -29.579236925791832,
+                -14.706742425672019
+            ]
+        },
+        "20171013": {
+            "center": [
+                168,
+                165
+            ],
+            "radius": 111,
+            "rotation_angle": 1.1361311668144103,
+            "rotation_rad": 0.019829229595436395,
+            "scale": [
+                1.0574221329638416,
+                1.0381904590675828
+            ],
+            "translation": [
+                -33.79645509988707,
+                -16.809475743276884
+            ]
+        },
+        "20171115": {
+            "center": [
+                164,
+                162
+            ],
+            "radius": 114,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -31.0,
+                -15.0
+            ]
+        },
+        "20180110": {
+            "center": [
+                157,
+                161
+            ],
+            "radius": 111,
+            "rotation_angle": 4.538395073758695,
+            "rotation_rad": 0.07920993679338012,
+            "scale": [
+                1.1129157373832674,
+                1.1153260908033114
+            ],
+            "translation": [
+                -27.03769652701269,
+                -22.15487302699041
+            ]
+        },
+        "20180207": {
+            "center": [
+                158,
+                162
+            ],
+            "radius": 108,
+            "rotation_angle": 3.497873926956913,
+            "rotation_rad": 0.061049416845061766,
+            "scale": [
+                1.0768484525876445,
+                1.094327938989704
+            ],
+            "translation": [
+                -29.523274978305885,
+                -22.858124453215055
+            ]
+        },
+        "20180314": {
+            "center": [
+                163,
+                164
+            ],
+            "radius": 108,
+            "rotation_angle": -4.581493882957471,
+            "rotation_rad": -0.07996215291758758,
+            "scale": [
+                0.9000070707960761,
+                0.9634263865135458
+            ],
+            "translation": [
+                -30.52136759348223,
+                -6.987908604916576
+            ]
+        },
+        "20180523": {
+            "center": [
+                164,
+                162
+            ],
+            "radius": 112,
+            "rotation_angle": 23.787978003948307,
+            "rotation_rad": 0.41517853856088666,
+            "scale": [
+                1.1567103714743274,
+                0.6389555970260666
+            ],
+            "translation": [
+                -4.994877378830253,
+                -41.724727328353126
+            ]
+        },
+        "20180627": {
+            "center": [
+                163,
+                161
+            ],
+            "radius": 112,
+            "rotation_angle": 0.4348409122170847,
+            "rotation_rad": 0.007589405640563763,
+            "scale": [
+                1.017200566237776,
+                1.1089930156189358
+            ],
+            "translation": [
+                -28.8991946710906,
+                -16.103277070508717
+            ]
+        },
+        "20181003": {
+            "center": [
+                164,
+                157
+            ],
+            "radius": 110,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -31.0,
+                -8.0
+            ]
+        },
+        "20190306": {
+            "center": [
+                167,
+                156
+            ],
+            "radius": 116,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -33.0,
+                -5.0
+            ]
+        },
+        "20190605": {
+            "center": [
+                136,
+                157
+            ],
+            "radius": 105,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                -9.0
+            ]
+        }
+    },
+    "03270708_R": {
+        "20230608": {
+            "center": [
+                152,
+                145
+            ],
+            "radius": 104,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                9.0,
+                15.0
+            ]
+        }
+    },
+    "03368010_R": {
+        "20230307": {
+            "center": [
+                149,
+                151
+            ],
+            "radius": 93,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -9.0,
+                -9.0
+            ]
+        }
+    },
+    "03978730_R": {
+        "20211124": {
+            "center": [
+                153,
+                145
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                0.0
+            ]
+        },
+        "20220704": {
+            "center": [
+                165,
+                137
+            ],
+            "radius": 93,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -6.0,
+                7.0
+            ]
+        }
+    },
+    "04851616_R": {
+        "20220526": {
+            "center": [
+                162,
+                154
+            ],
+            "radius": 110,
+            "rotation_angle": -29.626251790698895,
+            "rotation_rad": -0.5170756387725617,
+            "scale": [
+                0.5485240665953447,
+                0.6983969645959408
+            ],
+            "translation": [
+                18.15831633591064,
+                5.076163012077608
+            ]
+        }
+    },
+    "04978848_R": {
+        "20180801": {
+            "center": [
+                137,
+                144
+            ],
+            "radius": 79,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                2.0
+            ]
+        },
+        "20200617": {
+            "center": [
+                158,
+                134
+            ],
+            "radius": 92,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -6.0,
+                11.0
+            ]
+        }
+    },
+    "05084585_L": {
+        "20210930": {
+            "center": [
+                124,
+                134
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                6.0,
+                14.0
+            ]
+        }
+    },
+    "05120074_L": {
+        "20210721": {
+            "center": [
+                158,
+                164
+            ],
+            "radius": 81,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                -4.0
+            ]
+        },
+        "20220117": {
+            "center": [
+                155,
+                171
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                -9.0
+            ]
+        }
+    },
+    "05701544_L": {
+        "20220629": {
+            "center": [
+                185,
+                77
+            ],
+            "radius": 77,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -108.0,
+                82.0
+            ]
+        },
+        "20221228": {
+            "center": [
+                177,
+                182
+            ],
+            "radius": 92,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -77.0,
+                -36.0
+            ]
+        }
+    },
+    "06271674_L": {
+        "20211224": {
+            "center": [
+                183,
+                140
+            ],
+            "radius": 90,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -22.0,
+                -6.0
+            ]
+        },
+        "20220729": {
+            "center": [
+                158,
+                118
+            ],
+            "radius": 92,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                9.0
+            ]
+        }
+    },
+    "06387643_R": {
+        "20220307": {
+            "center": [
+                148,
+                197
+            ],
+            "radius": 107,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                15.0,
+                -20.0
+            ]
+        }
+    },
+    "07256061_L": {
+        "20230118": {
+            "center": [
+                159,
+                132
+            ],
+            "radius": 108,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                24.0
+            ]
+        }
+    },
+    "07535628_R": {
+        "20230103": {
+            "center": [
+                152,
+                141
+            ],
+            "radius": 100,
+            "rotation_angle": -0.7680950157573566,
+            "rotation_rad": -0.0134057869931236,
+            "scale": [
+                1.0099240772697349,
+                0.9809935571625703
+            ],
+            "translation": [
+                -12.33287551003032,
+                4.212741468015871
+            ]
+        }
+    },
+    "07557293_L": {
+        "20230613": {
+            "center": [
+                156,
+                156
+            ],
+            "radius": 99,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                -4.0
+            ]
+        }
+    },
+    "07622974_L": {
+        "20230615": {
+            "center": [
+                138,
+                200
+            ],
+            "radius": 104,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                20.0,
+                0.0
+            ]
+        }
+    },
+    "08005295_R": {
+        "20220608": {
+            "center": [
+                141,
+                171
+            ],
+            "radius": 78,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                26.0,
+                -3.0
+            ]
+        }
+    },
+    "08532554_R": {
+        "20170830": {
+            "center": [
+                147,
+                146
+            ],
+            "radius": 106,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -28.0,
+                50.0
+            ]
+        },
+        "20180103": {
+            "center": [
+                142,
+                145
+            ],
+            "radius": 111,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -31.0,
+                40.0
+            ]
+        },
+        "20190401": {
+            "center": [
+                139,
+                165
+            ],
+            "radius": 106,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -24.0,
+                -25.0
+            ]
+        },
+        "20190717": {
+            "center": [
+                139,
+                165
+            ],
+            "radius": 108,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -18.0,
+                24.0
+            ]
+        },
+        "20200814": {
+            "center": [
+                134,
+                156
+            ],
+            "radius": 99,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -35.0,
+                5.0
+            ]
+        }
+    },
+    "08707452_L": {
+        "20170118": {
+            "center": [
+                156,
+                153
+            ],
+            "radius": 98,
+            "rotation_angle": -0.9875843273392713,
+            "rotation_rad": -0.017236598153163734,
+            "scale": [
+                0.9151045024314951,
+                0.9981845546659769
+            ],
+            "translation": [
+                46.54685349802294,
+                11.362367442947644
+            ]
+        },
+        "20170222": {
+            "center": [
+                160,
+                152
+            ],
+            "radius": 96,
+            "rotation_angle": -4.142843105414969,
+            "rotation_rad": -0.07230625258303774,
+            "scale": [
+                0.9598415167636892,
+                1.0548654770790395
+            ],
+            "translation": [
+                36.82180369465388,
+                15.900315756452528
+            ]
+        },
+        "20170329": {
+            "center": [
+                160,
+                152
+            ],
+            "radius": 95,
+            "rotation_angle": -1.280989068060297,
+            "rotation_rad": -0.022357476919705913,
+            "scale": [
+                1.0258394532465882,
+                0.9603560892031909
+            ],
+            "translation": [
+                36.55519862980674,
+                17.78763957406828
+            ]
+        },
+        "20170503": {
+            "center": [
+                165,
+                150
+            ],
+            "radius": 95,
+            "rotation_angle": -3.4081981368354253,
+            "rotation_rad": -0.0594842790481144,
+            "scale": [
+                0.9255249103122685,
+                0.9531473566884024
+            ],
+            "translation": [
+                32.455641943700684,
+                19.57756564443433
+            ]
+        }
+    },
+    "09227477_L": {
+        "20170116": {
+            "center": [
+                149,
+                176
+            ],
+            "radius": 86,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -10.0,
+                9.0
+            ]
+        },
+        "20171011": {
+            "center": [
+                140,
+                153
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -3.0,
+                30.0
+            ]
+        },
+        "20180207": {
+            "center": [
+                138,
+                151
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                32.0
+            ]
+        },
+        "20180912": {
+            "center": [
+                139,
+                153
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -7.0,
+                34.0
+            ]
+        },
+        "20190724": {
+            "center": [
+                134,
+                146
+            ],
+            "radius": 93,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                35.0
+            ]
+        }
+    },
+    "09958282_L": {
+        "20161205": {
+            "center": [
+                145,
+                148
+            ],
+            "radius": 82,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                4.0
+            ]
+        },
+        "20170109": {
+            "center": [
+                141,
+                147
+            ],
+            "radius": 87,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                7.0,
+                5.0
+            ]
+        },
+        "20170220": {
+            "center": [
+                147,
+                146
+            ],
+            "radius": 82,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                5.0
+            ]
+        },
+        "20170320": {
+            "center": [
+                149,
+                149
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                3.0
+            ]
+        },
+        "20170417": {
+            "center": [
+                152,
+                181
+            ],
+            "radius": 81,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -7.0,
+                -31.0
+            ]
+        },
+        "20170612": {
+            "center": [
+                144,
+                190
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                -39.0
+            ]
+        },
+        "20170807": {
+            "center": [
+                144,
+                198
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                5.0,
+                -47.0
+            ]
+        },
+        "20171016": {
+            "center": [
+                143,
+                201
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                6.0,
+                -50.0
+            ]
+        },
+        "20171211": {
+            "center": [
+                142,
+                142
+            ],
+            "radius": 83,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                8.0
+            ]
+        },
+        "20180129": {
+            "center": [
+                132,
+                149
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                17.0,
+                2.0
+            ]
+        },
+        "20180326": {
+            "center": [
+                135,
+                141
+            ],
+            "radius": 86,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                13.0,
+                11.0
+            ]
+        },
+        "20180521": {
+            "center": [
+                133,
+                142
+            ],
+            "radius": 81,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                17.0,
+                8.0
+            ]
+        },
+        "20180716": {
+            "center": [
+                136,
+                141
+            ],
+            "radius": 89,
+            "rotation_angle": 4.218922959807745,
+            "rotation_rad": 0.07363409653662956,
+            "scale": [
+                1.1111898994125193,
+                1.0685297915070746
+            ],
+            "translation": [
+                15.351001919096511,
+                1.9427472104941188
+            ]
+        },
+        "20180910": {
+            "center": [
+                132,
+                143
+            ],
+            "radius": 85,
+            "rotation_angle": -15.509455914163095,
+            "rotation_rad": -0.27069107089505307,
+            "scale": [
+                0.8544471591051075,
+                1.1813947513082865
+            ],
+            "translation": [
+                18.00109657744281,
+                6.162985189916242
+            ]
+        },
+        "20181212": {
+            "center": [
+                129,
+                146
+            ],
+            "radius": 86,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                19.0,
+                6.0
+            ]
+        },
+        "20190306": {
+            "center": [
+                127,
+                147
+            ],
+            "radius": 90,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                22.0,
+                4.0
+            ]
+        },
+        "20190529": {
+            "center": [
+                130,
+                146
+            ],
+            "radius": 84,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                20.0,
+                5.0
+            ]
+        },
+        "20191106": {
+            "center": [
+                128,
+                138
+            ],
+            "radius": 81,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                20.0,
+                15.0
+            ]
+        },
+        "20200422": {
+            "center": [
+                129,
+                144
+            ],
+            "radius": 81,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                20.0,
+                7.0
+            ]
+        },
+        "20200923": {
+            "center": [
+                129,
+                135
+            ],
+            "radius": 86,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                18.0,
+                16.0
+            ]
+        },
+        "20210310": {
+            "center": [
+                152,
+                140
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -5.0,
+                11.0
+            ]
+        }
+    },
+    "10284504_L": {
+        "20160504": {
+            "center": [
+                140,
+                143
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                24.0,
+                10.0
+            ]
+        },
+        "20160601": {
+            "center": [
+                150,
+                156
+            ],
+            "radius": 88,
+            "rotation_angle": 3.0835055831091447,
+            "rotation_rad": 0.05381732492888223,
+            "scale": [
+                1.0854896366649254,
+                0.9949773018138203
+            ],
+            "translation": [
+                12.810781512185187,
+                -4.287782190617953
+            ]
+        },
+        "20160622": {
+            "center": [
+                150,
+                143
+            ],
+            "radius": 87,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                17.0,
+                10.0
+            ]
+        },
+        "20160715": {
+            "center": [
+                145,
+                157
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                21.0,
+                -2.0
+            ]
+        },
+        "20160817": {
+            "center": [
+                157,
+                149
+            ],
+            "radius": 87,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                8.0,
+                7.0
+            ]
+        },
+        "20160919": {
+            "center": [
+                158,
+                136
+            ],
+            "radius": 102,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                6.0,
+                14.0
+            ]
+        },
+        "20161017": {
+            "center": [
+                163,
+                148
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                5.0,
+                4.0
+            ]
+        },
+        "20161114": {
+            "center": [
+                138,
+                164
+            ],
+            "radius": 93,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                28.0,
+                -10.0
+            ]
+        },
+        "20170405": {
+            "center": [
+                164,
+                166
+            ],
+            "radius": 91,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                -9.0
+            ]
+        },
+        "20170515": {
+            "center": [
+                162,
+                161
+            ],
+            "radius": 96,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                6.0,
+                -6.0
+            ]
+        },
+        "20170612": {
+            "center": [
+                164,
+                165
+            ],
+            "radius": 93,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                -12.0
+            ]
+        },
+        "20170710": {
+            "center": [
+                159,
+                164
+            ],
+            "radius": 97,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                -12.0
+            ]
+        },
+        "20170807": {
+            "center": [
+                165,
+                168
+            ],
+            "radius": 113,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -6.0,
+                -11.0
+            ]
+        },
+        "20171016": {
+            "center": [
+                160,
+                168
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                4.0,
+                -11.0
+            ]
+        },
+        "20171120": {
+            "center": [
+                168,
+                182
+            ],
+            "radius": 122,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                -17.0
+            ]
+        },
+        "20180108": {
+            "center": [
+                147,
+                156
+            ],
+            "radius": 146,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                1.0
+            ]
+        },
+        "20180305": {
+            "center": [
+                164,
+                161
+            ],
+            "radius": 101,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                -9.0
+            ]
+        },
+        "20180514": {
+            "center": [
+                166,
+                168
+            ],
+            "radius": 100,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                8.0,
+                -17.0
+            ]
+        },
+        "20180709": {
+            "center": [
+                160,
+                159
+            ],
+            "radius": 84,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                11.0,
+                -21.0
+            ]
+        },
+        "20181217": {
+            "center": [
+                154,
+                146
+            ],
+            "radius": 86,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                11.0,
+                3.0
+            ]
+        },
+        "20190308": {
+            "center": [
+                152,
+                163
+            ],
+            "radius": 99,
+            "rotation_angle": -0.19140667337447553,
+            "rotation_rad": -0.0033406766606739633,
+            "scale": [
+                1.0211271182606572,
+                0.9508902224372284
+            ],
+            "translation": [
+                14.623230027156296,
+                -11.632338453364532
+            ]
+        }
+    },
+    "10306095_L": {
+        "20220307": {
+            "center": [
+                144,
+                127
+            ],
+            "radius": 117,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -21.0,
+                0.0
+            ]
+        }
+    },
+    "10439969_L": {
+        "20200512": {
+            "center": [
+                154,
+                145
+            ],
+            "radius": 98,
+            "rotation_angle": 3.042844605783236,
+            "rotation_rad": 0.053107656997466356,
+            "scale": [
+                0.9409671812467539,
+                0.9328885351195797
+            ],
+            "translation": [
+                38.65351216744715,
+                -27.828746634322194
+            ]
+        }
+    },
+    "11990421_L": {
+        "20210713": {
+            "center": [
+                117,
+                149
+            ],
+            "radius": 84,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                54.0,
+                0.0
+            ]
+        },
+        "20220106": {
+            "center": [
+                109,
+                136
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                64.0,
+                14.0
+            ]
+        }
+    },
+    "12291088_L": {
+        "20220715": {
+            "center": [
+                155,
+                142
+            ],
+            "radius": 97,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                11.0
+            ]
+        }
+    },
+    "12522028_L": {
+        "20170118": {
+            "center": [
+                154,
+                143
+            ],
+            "radius": 85,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                -4.0
+            ]
+        }
+    },
+    "12586387_L": {
+        "20220518": {
+            "center": [
+                159,
+                147
+            ],
+            "radius": 97,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -8.0,
+                3.0
+            ]
+        },
+        "20221017": {
+            "center": [
+                180,
+                187
+            ],
+            "radius": 101,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -26.0,
+                -36.0
+            ]
+        }
+    },
+    "12656149_R": {
+        "20220801": {
+            "center": [
+                143,
+                143
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                1.0,
+                1.0
+            ]
+        }
+    },
+    "12682926_R": {
+        "20171225": {
+            "center": [
+                167,
+                124
+            ],
+            "radius": 75,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                2.0
+            ]
+        },
+        "20190625": {
+            "center": [
+                192,
+                141
+            ],
+            "radius": 72,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -66.0,
+                -14.0
+            ]
+        }
+    },
+    "13319575_L": {
+        "20220215": {
+            "center": [
+                160,
+                135
+            ],
+            "radius": 92,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -6.0,
+                19.0
+            ]
+        }
+    },
+    "13319575_R": {
+        "20220215": {
+            "center": [
+                164,
+                183
+            ],
+            "radius": 94,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -23.0,
+                -10.0
+            ]
+        }
+    },
+    "13382321_L": {
+        "20230419": {
+            "center": [
+                151,
+                156
+            ],
+            "radius": 130,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -1.0,
+                0.0
+            ]
+        }
+    },
+    "13790698_L": {
+        "20161214": {
+            "center": [
+                147,
+                159
+            ],
+            "radius": 88,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                2.0,
+                -2.0
+            ]
+        },
+        "20170301": {
+            "center": [
+                145,
+                153
+            ],
+            "radius": 84,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                -6.0
+            ]
+        },
+        "20170405": {
+            "center": [
+                150,
+                142
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                2.0
+            ]
+        },
+        "20170531": {
+            "center": [
+                136,
+                151
+            ],
+            "radius": 95,
+            "rotation_angle": -14.142719971284322,
+            "rotation_rad": -0.2468370286864693,
+            "scale": [
+                0.6426655953167143,
+                1.2670862767357216
+            ],
+            "translation": [
+                11.246905110500478,
+                -6.382729341930059
+            ]
+        },
+        "20170621": {
+            "center": [
+                142,
+                139
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                9.0,
+                5.0
+            ]
+        },
+        "20170726": {
+            "center": [
+                127,
+                154
+            ],
+            "radius": 99,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                12.0,
+                -3.0
+            ]
+        },
+        "20170809": {
+            "center": [
+                135,
+                150
+            ],
+            "radius": 94,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                14.0,
+                -2.0
+            ]
+        },
+        "20190709": {
+            "center": [
+                117,
+                142
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                50.0,
+                8.0
+            ]
+        },
+        "20191231": {
+            "center": [
+                115,
+                141
+            ],
+            "radius": 75,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                44.0,
+                12.0
+            ]
+        }
+    },
+    "13820694_R": {
+        "20211129": {
+            "center": [
+                139,
+                144
+            ],
+            "radius": 115,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                4.0
+            ]
+        },
+        "20220729": {
+            "center": [
+                129,
+                140
+            ],
+            "radius": 109,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                8.0,
+                13.0
+            ]
+        }
+    },
+    "14112463_R": {
+        "20201022": {
+            "center": [
+                148,
+                158
+            ],
+            "radius": 100,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                -11.0
+            ]
+        },
+        "20210408": {
+            "center": [
+                178,
+                171
+            ],
+            "radius": 96,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -31.0,
+                -21.0
+            ]
+        }
+    },
+    "14306165_L": {
+        "20211227": {
+            "center": [
+                152,
+                176
+            ],
+            "radius": 80,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                -1.0
+            ]
+        }
+    },
+    "16095800_R": {
+        "20210930": {
+            "center": [
+                154,
+                148
+            ],
+            "radius": 100,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -5.0,
+                3.0
+            ]
+        }
+    },
+    "16257646_R": {
+        "20171122": {
+            "center": [
+                138,
+                126
+            ],
+            "radius": 126,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -5.0,
+                10.0
+            ]
+        }
+    },
+    "16341383_L": {
+        "20220630": {
+            "center": [
+                154,
+                191
+            ],
+            "radius": 106,
+            "rotation_angle": -4.563960724968756,
+            "rotation_rad": -0.07965614158241217,
+            "scale": [
+                1.0783698499896648,
+                0.9008629398418482
+            ],
+            "translation": [
+                -7.950716499267017,
+                -16.832346730024412
+            ]
+        }
+    },
+    "17263001_L": {
+        "20170515": {
+            "center": [
+                165,
+                148
+            ],
+            "radius": 99,
+            "rotation_angle": 0.351178339765919,
+            "rotation_rad": 0.006129218290602619,
+            "scale": [
+                1.018571805223531,
+                1.0288949794842444
+            ],
+            "translation": [
+                -20.54147493440719,
+                6.4942398170799365
+            ]
+        },
+        "20170612": {
+            "center": [
+                158,
+                141
+            ],
+            "radius": 104,
+            "rotation_angle": 1.821995846879878,
+            "rotation_rad": 0.031799826485716325,
+            "scale": [
+                0.9845269519514972,
+                0.977134903041302
+            ],
+            "translation": [
+                -1.6492789717979193,
+                14.83175000348431
+            ]
+        },
+        "20170816": {
+            "center": [
+                154,
+                136
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -5.0,
+                3.0
+            ]
+        },
+        "20171018": {
+            "center": [
+                154,
+                136
+            ],
+            "radius": 89,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -5.0,
+                3.0
+            ]
+        },
+        "20171115": {
+            "center": [
+                157,
+                165
+            ],
+            "radius": 105,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -6.0,
+                -2.0
+            ]
+        },
+        "20171213": {
+            "center": [
+                165,
+                165
+            ],
+            "radius": 92,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -15.0,
+                -17.0
+            ]
+        },
+        "20180117": {
+            "center": [
+                157,
+                167
+            ],
+            "radius": 100,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -5.0,
+                -8.0
+            ]
+        },
+        "20180425": {
+            "center": [
+                149,
+                154
+            ],
+            "radius": 105,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                3.0,
+                2.0
+            ]
+        }
+    },
+    "17634105_R": {
+        "20170111": {
+            "center": [
+                122,
+                185
+            ],
+            "radius": 74,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -23.0,
+                -59.0
+            ]
+        },
+        "20170503": {
+            "center": [
+                148,
+                153
+            ],
+            "radius": 108,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -36.0,
+                -40.0
+            ]
+        },
+        "20170531": {
+            "center": [
+                155,
+                152
+            ],
+            "radius": 100,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -43.0,
+                -43.0
+            ]
+        },
+        "20170705": {
+            "center": [
+                137,
+                154
+            ],
+            "radius": 108,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -27.0,
+                -42.0
+            ]
+        },
+        "20170830": {
+            "center": [
+                153,
+                156
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -43.0,
+                -47.0
+            ]
+        }
+    },
+    "18289838_L": {
+        "20190725": {
+            "center": [
+                162,
+                146
+            ],
+            "radius": 102,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                6.0,
+                -9.0
+            ]
+        },
+        "20200924": {
+            "center": [
+                156,
+                151
+            ],
+            "radius": 101,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                12.0,
+                -16.0
+            ]
+        }
+    },
+    "20256047_L": {
+        "20210818": {
+            "center": [
+                156,
+                158
+            ],
+            "radius": 101,
+            "rotation_angle": -3.26973240066445,
+            "rotation_rad": -0.057067596050733076,
+            "scale": [
+                0.978562773651364,
+                1.0912799051410247
+            ],
+            "translation": [
+                -18.195349218897206,
+                -10.018542631293414
+            ]
+        }
+    },
+    "20256047_R": {
+        "20210630": {
+            "center": [
+                156,
+                155
+            ],
+            "radius": 93,
+            "rotation_angle": -0.3185451948393448,
+            "rotation_rad": -0.005559662466353416,
+            "scale": [
+                1.1329567133113674,
+                1.0627987648163368
+            ],
+            "translation": [
+                3.6952191318428333,
+                3.102054118432676
+            ]
+        },
+        "20210818": {
+            "center": [
+                157,
+                155
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                20.0,
+                -4.0
+            ]
+        }
+    },
+    "20307089_R": {
+        "20210720": {
+            "center": [
+                146,
+                143
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                -1.0
+            ]
+        }
+    },
+    "20312202_L": {
+        "20210809": {
+            "center": [
+                144,
+                153
+            ],
+            "radius": 101,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                16.0,
+                -7.0
+            ]
+        },
+        "20220214": {
+            "center": [
+                156,
+                151
+            ],
+            "radius": 108,
+            "rotation_angle": -1.1228811653659752,
+            "rotation_rad": -0.019597973444267183,
+            "scale": [
+                0.9586051200385154,
+                1.0379929738675364
+            ],
+            "translation": [
+                5.198941964950109,
+                -6.513859355194484
+            ]
+        }
+    },
+    "20342007_L": {
+        "20211123": {
+            "center": [
+                152,
+                130
+            ],
+            "radius": 103,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                2.0
+            ]
+        }
+    },
+    "20354860_R": {
+        "20210920": {
+            "center": [
+                148,
+                145
+            ],
+            "radius": 95,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                5.0,
+                -4.0
+            ]
+        },
+        "20211108": {
+            "center": [
+                155,
+                149
+            ],
+            "radius": 80,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -2.0,
+                -6.0
+            ]
+        },
+        "20220214": {
+            "center": [
+                171,
+                126
+            ],
+            "radius": 73,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -9.0,
+                1.0
+            ]
+        }
+    },
+    "20402196_L": {
+        "20211129": {
+            "center": [
+                148,
+                161
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                -25.0,
+                -27.0
+            ]
+        }
+    },
+    "20724924_R": {
+        "20211209": {
+            "center": [
+                160,
+                137
+            ],
+            "radius": 104,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                2.0,
+                -2.0
+            ]
+        }
+    },
+    "20770192_L": {
+        "20211224": {
+            "center": [
+                146,
+                139
+            ],
+            "radius": 94,
+            "rotation_angle": 3.0662194707494796,
+            "rotation_rad": 0.053515625353336385,
+            "scale": [
+                1.1358076927717742,
+                1.1600183284330425
+            ],
+            "translation": [
+                -11.364321197728998,
+                -10.178307375497191
+            ]
+        }
+    },
+    "20770192_R": {
+        "20211224": {
+            "center": [
+                151,
+                163
+            ],
+            "radius": 95,
+            "rotation_angle": 1.3605345020128994,
+            "rotation_rad": 0.023745806647106512,
+            "scale": [
+                0.9657157969587593,
+                0.9999253932848304
+            ],
+            "translation": [
+                13.617275530968627,
+                -27.104572632976634
+            ]
+        }
+    },
+    "21385315_L": {
+        "20220621": {
+            "center": [
+                147,
+                136
+            ],
+            "radius": 98,
+            "rotation_angle": 0.0,
+            "rotation_rad": 0.0,
+            "scale": [
+                1.0,
+                1.0
+            ],
+            "translation": [
+                0.0,
+                16.0
+            ]
+        }
+    }
+}

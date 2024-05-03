@@ -92,7 +92,7 @@ def ssim_ignore_zeros(img1, img2,img3):
             
 # 尋找OCTA 影像的黃斑中心
 class finding():
-    def __init__(self,label_path,image_path,output_label_path,output_image_path,methods,matchers,distance):
+    def __init__(self,label_path,image_path,label_list,output_label_path,output_image_path,methods,matchers,distance):
         self.label_path = label_path
         self.image_path = image_path
         self.distances = distance
@@ -102,7 +102,7 @@ class finding():
         self.output_label_path = output_label_path
         self.image_size= (304, 304)
         self.data_list = ['1','2', '3', '4', '1_OCT', '2_OCT', '3_OCT', '4_OCT']
-        self.label_list = ['CC']
+        self.label_list = label_list
         self.methods_template = [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED, cv2.TM_CCORR , cv2.TM_CCORR_NORMED, cv2.TM_CCOEFF, cv2.TM_CCOEFF_NORMED]
         self.method_template_name = ['TM_SQDIFF', 'TM_SQDIFF_NORMED', 'TM_CCORR' , 'TM_CCORR_NORMED', 'TM_CCOEFF', 'TM_CCOEFF_NORMED']
 
@@ -336,6 +336,9 @@ class finding():
         if method == 'SIFT'  or method == 'BRISK' or method == 'BRIEF':
             if  matcher == 'BF':
                 bf = cv2.BFMatcher( cv2.NORM_L2)
+                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+                    H = np.array(np.eye(3))
+                    return None
                 matches = bf.knnMatch(des1, des2, k=2)
 
             elif matcher == 'FLANN':
@@ -344,11 +347,17 @@ class finding():
                 search_params = dict(checks=1000)
 
                 flann = cv2.FlannBasedMatcher(index_params, search_params)
+                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+                    H = np.array(np.eye(3))
+                    return None
                 matches = flann.knnMatch(des1, des2, k=2)
 
         elif method == 'ORB':
             if  matcher == 'BF':
                 bf = cv2.BFMatcher()
+                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+                    H = np.array(np.eye(3))
+                    return None
                 matches = bf.knnMatch(des1, des2, k=2)
 
             elif matcher == 'FLANN':
@@ -362,20 +371,27 @@ class finding():
                 # Make sure descriptors are 2D arrays
                 des1 = np.array(des1).astype(np.uint8)
                 des2 = np.array(des2).astype(np.uint8)
-
-
+                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+                    H = np.array(np.eye(3))
+                    return None
                 flann = cv2.FlannBasedMatcher(index_params, search_params)
                 matches = flann.knnMatch(des1, des2, k=2)
 
         elif method == 'KAZE' or method == 'AKAZE' or method == 'SURF' or method == 'FREAK':
             if  matcher == 'BF':
                 bf = cv2.BFMatcher( cv2.NORM_L2)
+                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+                    H = np.array(np.eye(3))
+                    return None
                 matches = bf.knnMatch(des1, des2, k=2)
 
             elif matcher == 'FLANN':
                 FLANN_INDEX_KDTREE = 1
                 index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
                 search_params = dict(checks=60)
+                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+                    H = np.array(np.eye(3))
+                    return None
 
                 flann = cv2.FlannBasedMatcher(index_params, search_params)
                 matches = flann.knnMatch(des1, des2, k=2)
@@ -514,13 +530,13 @@ class finding():
             
             
             if translation[0] > 304 // 2 or translation[0] < -304 // 2 or translation[1] > 304 // 2 or translation[1] < -304 // 2:
-                print('translation out of range')
+                # print('translation out of range')
                 return False
             if rotation_angle > 30 or rotation_angle < -30:
-                print('rotation out of range')
+                # print('rotation out of range')
                 return False
             if scale_x > 1.5 or scale_x < 0.5 or scale_y > 1.5 or scale_y < 0.5:
-                print('scale out of range')
+                # print('scale out of range')
                 return False
             return True
         else:
@@ -755,28 +771,33 @@ class finding():
                                     # cv2.imwrite(self.output_path + data + '_vis/' + patient_id + '_' + eye + '_' + post_treatment + '.png', vis)
                         match_par = 'crop_'+ feature + '_' + matcher + '_' + str(distance) 
                         for label in self.label_list:
+                            if 'CC' in label:
+                                output_label = 'CC'
+                            else:
+                                output_label = 'OR'
+                                        
                                     
-                                    
-                            if not os.path.exists(self.output_label_path + '/' + match_par +  '/' + label ):
-                                os.makedirs(self.output_label_path + '/' +match_par  +  '/' + label )
-                            if not os.path.exists(self.output_label_path + '/' +match_par  +  '/' + label +'_move/'):
-                                os.makedirs(self.output_label_path + '/' + match_par + '/' + label +'_move/')
+                            if not os.path.exists(self.output_label_path + '/' + match_par +  '/' + output_label ):
+                                os.makedirs(self.output_label_path + '/' +match_par  +  '/' + output_label )
+                            if not os.path.exists(self.output_label_path + '/' +match_par  +  '/' + output_label +'_move/'):
+                                os.makedirs(self.output_label_path + '/' + match_par + '/' + output_label +'_move/')
                                 
                             mask_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(self.image_path))),label,'masks')
-                            # print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
+
+                            
                             if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
                                 # print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.resize(pre_label, self.image_size)
-                                pre_label = cv2.normalize(pre_label, None, 0, 255, cv2.NORM_MINMAX)
+                                # pre_label = cv2.normalize(pre_label, None, 0, 255, cv2.NORM_MINMAX)
                                 
                                 # print('pre_label',self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
-                                cv2.imwrite(self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png', pre_label)
+                                cv2.imwrite(self.output_label_path+ match_par+ '/' + output_label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png', pre_label)
                                 
                                 if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png'):
                                     post_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png')
                                     post_label = cv2.resize(post_label, self.image_size)
-                                    post_label = cv2.normalize(post_label, None, 0, 255, cv2.NORM_MINMAX)
+                                    # post_label = cv2.normalize(post_label, None, 0, 255, cv2.NORM_MINMAX)
                                     height, width, channels = post_label.shape
                                     if H is None :
                                         result = post_label
@@ -807,17 +828,17 @@ class finding():
                                             result = cv2.warpPerspective(post_label, H, (width, height))
 
                                     # print('post_treatment',self.output_label_path+ match_par+ '/' + label + '_move/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')     
-                                    cv2.imwrite(self.output_label_path+ match_par+ '/' + label + '_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png', result)
-                                    result[result == 255] = pre_label[result == 255]
-
+                                    cv2.imwrite(self.output_label_path+ match_par+ '/' + output_label + '_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png', result)
+                                    # result[result == 0] = pre_label[result == 0]
+                                    # print('result',result.shape)
                                     # print('post_treatment',self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')     
-                                    cv2.imwrite(self.output_label_path+ match_par+ '/' + label + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png', result)
+                                    cv2.imwrite(self.output_label_path+ match_par+ '/' + output_label + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png', result)
 
                         
                         
                         
                                     
-                        if  translation[0] !=0 or translation[1]!=0 or rotation_angle !=0 or scale != 1:
+                        if  translation[0] !=0 or translation[1]!=0 or rotation_angle !=0 or scale_x != 1 or scale_y != 1:
                             pre_treatment_img = self.output_image_path+ '1/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'
                             post_treatment_img = self.output_image_path + '1/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
                             matching_img = self.output_path  + '/1_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png'                              
@@ -1016,7 +1037,30 @@ class finding():
 
         return patient
 
+    def relabel(self,img,mask,mathod = 'connectedComponent',min_area = 50):
+        if img.shape.__len__() == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            
+        if mask.shape.__len__() == 3:
+            mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+            
 
+        label = mask.copy()  
+        # if mathod == 'threshold':
+        #     threshold_label = self.otsuthreshold(img,mask) 
+        if mathod == 'connectedComponent':
+            ret, binary_image = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        
+            
+            label[binary_image == 0] = 0   
+            # 刪除小面積
+            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label, connectivity=8)
+            for i in range(1, num_labels):
+                if stats[i, 4] < min_area:
+                    label[labels == i] = 0
+            return label 
+        
+        return label    
 
 # Convert float32 to float recursively
 def convert_float32_to_float(obj):
@@ -1049,19 +1093,20 @@ if __name__ == '__main__':
     pre_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
     post_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
     
-    date = '0305'
+    date = '20240320'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
 
-    label_path = PATH_DATA + 'labeled' + '/'
+    label_path = PATH_DATA + '20240311_label' + '/'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
     output_image_path = PATH_BASE + 'inpaint/'
     image_path = PATH_BASE + 'inpaint/MATCH/' 
+    label_path_name = [disease + '_' + date + '_connectedComponent_CC']
     output_label_path = output_image_path + 'MATCH_LABEL/' 
-    distances = [0.9]
-    features = ['FREAK']#,'SIFT','KAZE','AKAZE','ORB','BRISK' 
-    matchers = ['BF']# ,'FLANN'
+    distances = [0.8]
+    features = ['SIFT','KAZE','AKAZE','ORB','BRISK' ,'FREAK','BRIEF']#,
+    matchers = ['BF','FLANN']# ,'FLANN'
     patient_list = get_data_from_txt_file('PCV.txt')
     setFolder('./record/'+ disease + '_' + date + '/') 
     for distance in distances:
@@ -1069,7 +1114,7 @@ if __name__ == '__main__':
             for matcher in matchers:
                 # print(image_path + 'crop' + '_' +  feature + '_' + matcher + '_' + str(distance))
 
-                find = finding(label_path,image_path,output_label_path,output_image_path,features,matchers,distance)
+                find = finding(label_path,image_path,label_path_name,output_label_path,output_image_path,features,matchers,distance)
                 
                 find_dict = find.feature(feature,matcher,distance)
                 find_dict = convert_float32_to_float(find_dict)

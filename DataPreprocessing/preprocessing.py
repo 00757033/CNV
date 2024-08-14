@@ -180,7 +180,7 @@ class PreprocessData():
     #                     cv2.imwrite(output_image + '/'+image_name,cl)
     #                     cv2.imwrite(output_label + '/'+image_name,image_label)
 
-    def preprocess(self,input_path,output_name,parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=True ,bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/'):
+    def preprocess(self,input_path,output_name,parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=True ,cut = True,bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/'):
         for layer in self.layers : 
             output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
     
@@ -220,19 +220,34 @@ class PreprocessData():
                         if  fastNlMeansDenoising:
                             # Apply non-local means denoising
                             preprocessing_image = cv2.fastNlMeansDenoising(preprocessing_image, None, 7, 7,21)
-
+                        # if cut:
+                        #     result = preprocessing_image.copy()
+                        #     preprocessing_image_1 = cv2.imread(os.path.join(self.path,  'ALL','1',image_name), cv2.IMREAD_GRAYSCALE)
+                        #     preprocessing_image_2 = cv2.imread(os.path.join(self.path,  'ALL','2',image_name), cv2.IMREAD_GRAYSCALE)
+                        #     # 找到两个图像的共通部分
+                        #     for i in range(preprocessing_image.shape[0]):
+                        #         for j in range(preprocessing_image.shape[1]):
+                        #             if np.array_equal(preprocessing_image_1[i][j], preprocessing_image_2[i][j]):
+                        #                 if np.all(preprocessing_image_1[i][j] >=  preprocessing_image_2[i][j]):
+                        #                     mask = np.zeros_like(preprocessing_image_1)
+                        #                     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+                        #                     mask[i][j] = 255
+                        #                     result= cv2.inpaint( result , mask, 3, cv2.INPAINT_TELEA)
+                        #     preprocessing_image = result                
+                                
+                            
+                            # fig , ax =  plt.subplots(2,2)
+                            # ax[0][0].imshow(gray_image,cmap='gray')
+                            # ax[0][1].imshow(common_noise,cmap='gray')
+                            # ax[1][0].imshow(preprocessing_image,cmap='gray')
+                            # ax[1][1].imshow(preprocessing_image,cmap='gray')
+                            # plt.show()
+                            
                 
                         if bilateralFilter : 
-                            print('self.path',self.path)
-                            preprocessing_image_1 = cv2.imread(os.path.join(self.path,  'ALL','1',image_name), cv2.IMREAD_GRAYSCALE)
-                            preprocessing_image_2 = cv2.imread(os.path.join(self.path,  'ALL','2',image_name), cv2.IMREAD_GRAYSCALE)
-                            preprocessing_image_and = preprocessing_image_1&preprocessing_image_2& gray_image
-                            # preprocessing_image = cv2.addWeighted(gray_image, 0.5, preprocessing_image_and, 0.5, 0)
-                            
                             preprocessing_image = cv2.bilateralFilter(preprocessing_image, d, sigmaColor,sigmaSpace )
-                            preprocessing_image = cv2.addWeighted(preprocessing_image, 0.7, preprocessing_image_and, 0.3, 0)
-                            preprocessing_image = cv2.normalize(preprocessing_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
-                            
+
+
                         if Unsharp :
                             preprocessing_image = cv2.GaussianBlur(preprocessing_image,(5,5),0)
                             preprocessing_image = cv2.addWeighted(gray_image,1.5, preprocessing_image,-0.5,0)
@@ -518,7 +533,7 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '20240325'
+    date = '20240502'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
@@ -528,4 +543,5 @@ if __name__ == "__main__":
     # preprocess.filter_preprocess(FILE + '_otsu',FILE + '_otsu_bil')
     # preprocess.clahe_preprocess(FILE + '_otsu_bil',FILE + '_otsu_bil_clahe')
     # preprocess.preprocess('' ,FILE + '_bil510_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/')
-    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil71010_clahe0712',parm = {"4":[7,10,10,0.7,12]},fastNlMeansDenoising=False,bilateralFilter =True ,Unsharp = False,clahe =True,   save_img =True,new_parameter = False,path = './record/')
+    # preprocess(self,input_path,output_name,parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=True ,cut = True,bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/'):
+    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil51010_clah1016',parm = {"4":[5,10,10,1.0,16]},fastNlMeansDenoising=False,cut = False,bilateralFilter =True ,Unsharp = False,clahe =True, save_img =True,new_parameter = False,path = './record/')

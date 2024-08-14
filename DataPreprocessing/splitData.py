@@ -15,7 +15,7 @@ class splitData():
         self.valid_df= None
         self.layers = layers
 
-    def splitData(self,name,output_name,random = 35):
+    def splitData(self,name,output_name,random = 42):
         tools.makefolder(os.path.join(self.path, "trainset"))
         print("start split data")
         random_state = str(random)
@@ -24,9 +24,11 @@ class splitData():
                 tools.makefolder(os.path.join(self.path, "trainset",output_name  + '_'+ self.layers[layer], i))
                 tools.makefolder(os.path.join(self.path, "trainset",output_name  + '_'+ self.layers[layer], i, "images"))
                 tools.makefolder(os.path.join(self.path, "trainset",output_name  + '_'+ self.layers[layer], i, "masks"))
+                if 'images_original' in os.listdir(os.path.join(self.path, name  + '_'+ self.layers[layer])):
+                    tools.makefolder(os.path.join(self.path, "trainset",output_name  + '_'+ self.layers[layer], i, "images_original"))
 
-        train_ratio = 0.6  # 訓練集比例
-        test_ratio = 0.3 # 測試集比例
+        train_ratio = 0.7  # 訓練集比例
+        test_ratio = 0.2 # 測試集比例
         val_ratio = 0.1   # 驗證集比例
 
         # 確保比例總和不大於1.0
@@ -57,6 +59,16 @@ class splitData():
             self.create_dataset(path_input, path_output, train_data, "train")
             self.create_dataset(path_input, path_output, test_data, "test")
             self.create_dataset(path_input, path_output, val_data, "valid")
+            if 'images_original' in os.listdir(os.path.join(self.path, name  + '_'+ self.layers[layer])):
+                for file in train_data:
+                    shutil.copy(os.path.join(path_input, "images_original", file), os.path.join(path_output, "train", "images_original", file))
+                    
+                for file in test_data:
+                    shutil.copy(os.path.join(path_input, "images_original", file), os.path.join(path_output, "test", "images_original", file))
+                    
+                for file in val_data:
+                    shutil.copy(os.path.join(path_input, "images_original", file), os.path.join(path_output, "valid", "images_original", file))
+                    
 
     def create_dataset(self, path_input, path_output, files, dataset_type):
         for file in files:
@@ -64,11 +76,13 @@ class splitData():
             shutil.copy(os.path.join(path_input, "images", file), os.path.join(path_output, dataset_type, "images", file))
             shutil.copy(os.path.join(path_input, "masks", file), os.path.join(path_output, dataset_type, "masks", file))
             
+            
+            
 
 
 if __name__ == "__main__":
     path = "../../Data"
-    date = '20240325'
+    date = '20240502'
     disease = 'PCV'
     NAME = disease + "_" + date
     path_base =  path + "/" + disease + "_"+ date
@@ -76,6 +90,6 @@ if __name__ == "__main__":
     output_path = path_base 
 
     split = splitData(path_base)
-    # split.splitData(NAME + '_connectedComponent_bil510_clahe7_concateOCT' ,NAME + '_connectedComponent_bil510_clahe7_concateOCT_2')
+    split.splitData(NAME + '_connectedComponent' ,NAME + '_connectedComponent_42')
     # split.splitData(NAME + '_connectedComponent_bil525_clahe1515' ,NAME + '_connectedComponent_bil525_clahe1515_30')
-    split.splitData(NAME + '_connectedComponent' ,NAME + '_connectedComponent_35')
+    split.splitData(NAME + '_connectedComponent_bil51010_clah1016_concate34OCT' ,NAME + '_connectedComponent_bil51010_clah1016_concate34OCT_42')

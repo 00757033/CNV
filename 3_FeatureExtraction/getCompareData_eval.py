@@ -5,18 +5,19 @@ import numpy as np
 import pandas as pd
 from datetime import datetime
 import tools.tools as tools
+import matplotlib.pyplot as plt
 #取得治療前後對應的影像
 class getCompareData():
-    def __init__(self, PATH_BASE, types,file = '../../Data/打針資料.xlsx'):
+    def __init__(self, PATH_BASE, types,file = '../../Data/打針資料.xlsx',label_list = { 'CC': "4"}):
         self.PATH_BASE = PATH_BASE
         self.types = types
         self.inject(file)
-        self.label_list = { 'CC': "4"}
+        self.label_list = label_list
 
     def getData(self, data_class, data_group, layer, data_label): 
         print('getData',data_class, data_group, layer, data_label)
-        path = self.PATH_BASE  + 'align/'+ data_group + '/'
-        path_output = self.PATH_BASE + 'compare/' 
+        path = self.PATH_BASE  + 'align/'+ data_group + '/' # input path
+        path_output = self.PATH_BASE + 'compare/' # output path
         if not os.path.exists(path_output):
             os.makedirs(path_output)
         
@@ -26,21 +27,72 @@ class getCompareData():
         patient_eyes = set()
         for data_name in data_list:
             if data_name.endswith(".png"):
-                patient_id, eye, date = data_name.split('.png')[0].split('_')
+                patient_id, eye, date = data_name.split('.png')[0].split('_') # get patient_id, eye, date from align data layer
+                
                 mapped_eye = eyes.get(eye, eye)
                 
                 disease_eye = self.inject_df[((self.inject_df['病歷號'] == patient_id) & (self.inject_df['眼睛'] == eyes[eye]) )]
                 
                 label_post = cv2.imread(path + 'masks' + '/' + data_name)  
-                image_post = cv2.imread(path + 'images' + '/' + data_name)                  
+                image_post = cv2.imread(path + 'images' + '/' + data_name)  
+                # cut 
+
+                # img_scp = cv2.imread(os.path.join(self.PATH_BASE  , 'align', '1', data_name))
+                # img_scp = cv2.normalize(img_scp, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+                # img_dcp = cv2.imread(os.path.join(self.PATH_BASE  , 'align', '2', data_name))
+                # img_dcp = cv2.normalize(img_dcp, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+                # result = image_post.copy()
+                # if  img_scp is not None and img_dcp is not None:
+                #     img_scp = cv2.resize(img_scp, (304, 304))
+                #     img_dcp = cv2.resize(img_dcp, (304, 304))
+                #     result_and = np.zeros_like(image_post)
+                #                             # clean
+                #     mask = np.zeros_like(image_post, dtype=np.uint8)
+                #     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY) 
+                    
+                #     for i in range(image_post.shape[0]):
+                #         for j in range(image_post.shape[1]):
+                #             if np.array_equal(img_scp[i][j], img_dcp[i][j]):
+                #                mask[i][j] = 255
+                               
+                #     result= cv2.inpaint( result , mask, 3, cv2.INPAINT_TELEA)
+                #     result = cv2.normalize(result, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+                    
+                    # for i in range(image_post.shape[0]):
+                    #     for j in range(image_post.shape[1]):
+                    #         if np.array_equal(img_scp[i][j], img_dcp[i][j]):
+                    #             result_and[i][j] = img_scp[i][j]
+                    #             if np.all(result[i][j] >=  img_scp[i][j]):
+                    #                 mask = np.zeros_like(image_post)
+                    #                 mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+                    #                 mask[i][j] = 255
+                    #                 result= cv2.inpaint( result , mask, 3, cv2.INPAINT_TELEA)
+                    # result = cv2.normalize(result, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+                    # result = cv2.cvtColor(result, cv2.COLOR_BGR2GRAY)
+                    # result = cv2.bilateralFilter(result, 5, 10, 10)
+                    # result = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8,8)).apply(result)
+                    
+                    
+                    # # show the image
+                    # fig, ax = plt.subplots(1, 4, figsize=(15, 15))
+                    # ax[0].imshow(img_scp)
+                    # ax[0].set_title('SCP')
+                    # ax[1].imshow(img_dcp)
+                    # ax[1].set_title('DCP')
+                    # ax[2].imshow(result)
+                    # ax[2].set_title('SCP - DCP')
+                    
+                    # ax[3].imshow(result_and)
+                    # ax[3].set_title('SCP and DCP')
+                    # plt.show()
+         
                 # find the key
-                columns_of_interest = ["打針前門診日期","三針後門診","六針後門診","九針後門診","十二針後門診"]	
-                disease_eye = disease_eye[columns_of_interest]			
+                columns_of_interest = ["打針前門診日期","三針後門診"]	
+                disease_eye = disease_eye[columns_of_interest]		
                 for index, row in disease_eye.iterrows():
                     for col_name, col_value in row.items():
                         
                         if pd.notna(col_value) and isinstance(col_value, datetime):
-                                print(col_value)
                                 col_value = datetime.strftime(col_value, '%Y%m%d')
                                 if date == col_value:
                                     treatment_count = columns_of_interest.index(col_name)
@@ -48,35 +100,21 @@ class getCompareData():
                                         patient[patient_id + '_' + eye] = []
                                     patient[patient_id + '_' + eye] .append(treatment_count)
                                     print(patient_id, eye, date ,col_name,treatment_count)    
-                                    # if not os.path.exists(path_output + '/' + str(treatment_count) + '/' + 'masks' ):
-                                    #     setFloder(path_output + '/' + str(treatment_count) + '/' + 'masks' )
-                                    #     setFloder(path_output + '/' + str(treatment_count) + '/' + 'images' ) 
-                                    # data_post = patient_id + '_'+ eye + '_'+  str(date) + '.png'
-                                    # cv2.imwrite(path_output + '/' + str(treatment_count) + '/' + 'masks' + '/' +  data_post, label_post)  
-                                    # cv2.imwrite(path_output + '/' + str(treatment_count) + '/' + 'images' + '/' +  data_post, image_post) 
-                                    if not os.path.exists(path_output + '/' + patient_id + '_' + eye + '/' + 'masks' ):
-                                        setFloder(path_output + '/' + patient_id + '_' + eye + '/' + 'masks' )
-                                        setFloder(path_output + '/' + patient_id + '_' + eye + '/' + 'images' )      
-                                    # data_post = patient_id + '_'+ eye + '.png'     
-                                    cv2.imwrite(path_output + '/' + patient_id + '_' + eye + '/' + 'masks' + '/' +  str(date)+ '_' + data_group+ '.png', label_post)
-                                    cv2.imwrite(path_output + '/' + patient_id + '_' + eye + '/' + 'images' + '/' +  str(date) + '_' + data_group + '.png', image_post)                                         
+
+                                    if not os.path.exists(os.path.join(path_output, patient_id + '_' + eye, data_group,'masks')):
+                                        setFloder(os.path.join(path_output, patient_id + '_' + eye, data_group,'masks'))
+                                        setFloder(os.path.join(path_output, patient_id + '_' + eye, data_group,'images'))
+                                    # if not os.path.exists(os.path.join(path_output, patient_id + '_' + eye, data_group + '_cut','images')):
+                                    #     setFloder(os.path.join(path_output, patient_id + '_' + eye, data_group + '_cut','images'))
+                                    #     setFloder(os.path.join(path_output, patient_id + '_' + eye, data_group + '_cut','masks'))
+                                    # dpath_output + '/' + patient_id + '_' + eye + '/' + 'masks' + '/' +  str(date)+ '_' + data_group+ '.png', label_post
+                                    cv2.imwrite(os.path.join(path_output, patient_id + '_' + eye, data_group,'masks', str(date)+ '_' + data_group+ '.png'), label_post)
+                                    cv2.imwrite(os.path.join(path_output, patient_id + '_' + eye, data_group,'images', str(date)+ '_' + data_group+ '.png'), image_post)   
+                                    
+                                    # cv2.imwrite(os.path.join(path_output, patient_id + '_' + eye, data_group + '_cut','images', str(date)+ '_' + data_group+ '.png'), result)
+                                    # cv2.imwrite(os.path.join(path_output, patient_id + '_' + eye, data_group + '_cut','masks', str(date)+ '_' + data_group+ '.png'), label_post)                                
                                                                          
 
-                # label_post = cv2.imread(path + 'masks' + '/' + data_name)  
-                # image_post = cv2.imread(path + 'images' + '/' + data_name)   
-                # data_post = patient_id + '_'+ eye + '.png' 
-                # if patient_id + '_' + eye not in patient :
-                #     patient[patient_id + '_' + eye] = 1
-                #     treatment_count = 1 
-                # else :
-                #     patient[patient_id + '_' + eye]+=1
-                #     treatment_count = patient[patient_id + '_' + eye]
-                # if not os.path.exists(path_output + '/' + patient_id + '_' + eye+ '/' + 'masks' ):
-                #     setFloder(path_output + '/' + patient_id + '_' + eye+ '/' + 'masks' )
-                #     setFloder(path_output + '/' + patient_id + '_' + eye+ '/' + 'images' )
-                    
-                # cv2.imwrite(path_output + '/' + patient_id + '_' + eye + '/' + 'masks' + '/' + str(date) + '_' + data_group+ '.png', label_post)
-                # cv2.imwrite(path_output + '/' + patient_id + '_' + eye + '/' + 'images' + '/' + str(date) + '_' + data_group+ '.png', image_post)      
         return patient        
 
 
@@ -189,11 +227,10 @@ class getCompareData():
                 # cv2.imwrite(path_output + '/' + patient_id + '_' + eye + '/' + 'images' + '/' + str(date) + '.png', image_post)      
         return patient        
         
-    def inject(self,file = '../../Data/打針資料.xlsx',label = ["診斷","病歷號","眼睛","打針前門診日期","三針後門診","六針後門診","九針後門診","十二針後門診"]):
+    def inject(self,file = '../../Data/打針資料.xlsx',label = ["診斷","病歷號","眼睛","打針前門診日期","三針後門診"]):
         # self.inject_df = pd.DataFrame()
         print(file)
-        self.inject_df = pd.read_excel(file, sheet_name="20230830",na_filter = False, engine='openpyxl')
-        
+        self.inject_df = pd.read_excel(file, sheet_name="Focea_collect",na_filter = False, engine='openpyxl')
         # add pd.read_excel(file, sheet_name="20230831",na_filter = False, engine='openpyxl')
         # self.inject_df = self.inject_df.append(pd.read_excel(file, sheet_name="20230831",na_filter = False, engine='openpyxl'))
 
@@ -207,7 +244,7 @@ def setFloder(path):
 def run():
     
     disease   = 'PCV'
-    date    = '20240320'
+    date    = '20240418'
     PATH_BASE    = "../../Data/" + disease + '_' + date + '/'
     data_groups  = ["CC"]
     dict_origin  = {'CC': "4"}
@@ -217,7 +254,6 @@ def run():
     for data_group in data_groups:
         patient = data.getData(disease, data_group, dict_origin[data_group], data_label)
         json_file = './record/'+ disease + '_' + date + '/'+ data_group + '_Treatment.json'
-        print(patient)
         tools.write_to_json_file(json_file, patient)
 
 

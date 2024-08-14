@@ -23,6 +23,7 @@ from UNetModel2 import *
 from postprocessing3 import *
 import tensorflow as tf
 import cv2
+from Deeplab import *
 from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score
 model_classes = {
     'UNet': UNet,
@@ -39,32 +40,40 @@ model_classes = {
     'DCUNet': DCUNet,
     'SDUNet': SDUNet,
     'CARUNet' : CARUNet,
+    'DeepLabV3Plus101': DeepLabV3Plus101,
+    'DeepLabV3Plus50': DeepLabV3Plus50,
 }
 
 # 評估指標
 def dice_coef(y_true, y_pred):
-    smooth = 1e-5
+    smooth = 1e-8
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     intersection = tf.reduce_sum(y_true * y_pred)
-    return (2. * intersection + smooth) / (tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) + smooth)
+    union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred)
+    dic = (2. * intersection + smooth) /(union + smooth)
+
+    return dic
 
 def dice_coef_loss(y_true, y_pred):
     return 1.0 - dice_coef(y_true, y_pred)
 
 def jaccard_index(y_true, y_pred):
-    smooth = 1e-5
+    smooth = 1e-8
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     intersection = tf.reduce_sum(y_true * y_pred)
     union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) - intersection
-    return (intersection + smooth) / (union + smooth)
+    jac = (intersection + smooth) / (union + smooth)
+    # tf.Tensor to  int
+    
+    return jac
 
 def jaccard_loss(y_true, y_pred):
     return 1.0 - jaccard_index(y_true, y_pred)
 
-def Tversky_similarity_index(y_true, y_pred, alpha=0.7):
-    smooth = 1e-5
+def Tversky_similarity_index(y_true, y_pred, alpha=0.3 ):
+    smooth = 1e-8
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     true_pos = tf.reduce_sum(y_true * y_pred)
@@ -72,19 +81,24 @@ def Tversky_similarity_index(y_true, y_pred, alpha=0.7):
     false_pos = tf.reduce_sum((1 - y_true) * y_pred)
     return (true_pos + smooth) / (true_pos + alpha * false_neg + (1 - alpha) * false_pos + smooth)
 
-def Tversky_loss(y_true, y_pred, alpha=0.5):
+def Tversky_loss(y_true, y_pred, alpha=0.7):
     return 1.0 - Tversky_similarity_index(y_true, y_pred, alpha)
- 
-def focal_loss(y_true, y_pred, alpha=0.25, gamma=2.0):
-    y_true = tf.cast(y_true, tf.float32)
-    y_pred = tf.cast(y_pred, tf.float32)
-    bce = tf.keras.losses.binary_crossentropy(y_true, y_pred)
-    BCE_EXP = tf.exp(-bce)
-    focal_loss =  tf.reduce_mean(alpha * tf.pow((1-BCE_EXP), gamma) * bce)
-    return focal_loss
+
+
+def binary_focal_loss(y_true, y_pred,alpha=0.15, gamma=2):
+    # y_true = tf.cast(y_true, tf.float32)
+    # y_pred = tf.cast(y_pred, tf.float32)
+    y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0 - 1e-7)
+    y_true=tf.cast(y_true, tf.float32)
+    L=- y_true * alpha * ((1 - y_pred) ** gamma) * tf.math.log(y_pred + 1e-8) - (1 - y_true) * (1 - alpha) * (y_pred ** gamma) * tf.math.log(1 - y_pred + 1e-8)
+    return tf.reduce_mean(L)
+
+        
+    
+     
 
 def Tv_focal_loss(y_true, y_pred, alpha=0.5, beta=0.5, gamma=2.0):
-    return Tversky_loss(y_true, y_pred, alpha) + focal_loss(y_true, y_pred, beta, gamma)   
+    return Tversky_loss(y_true, y_pred, alpha) + binary_focal_loss(y_true, y_pred, beta, gamma) 
 
 def mean_pixel_accuracy(y_true, y_pred):
     # Count the number of matching pixels
@@ -123,7 +137,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         image = cv2.imread(image_path)
         image = cv2.resize(image, (self.image_size, self.image_size))
         if image.shape==2: # 轉成3維
-            image = np.repeat(image[:, :, np.newaxis], 3, axis=2)
+            image = np.repeat(image[:, :, np.newaxis], 4, axis=2)
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
         mask = cv2.resize(mask, (self.image_size, self.image_size))
         mask = np.expand_dims(mask, axis=-1)
@@ -427,7 +441,7 @@ class train():
         # earlystopping
         # earlystopping = EarlyStopping(monitor='val_dice_coef', patience=30, verbose=1, mode='max')
         # reduce learning rate
-        reduce_lr = ReduceLROnPlateau(monitor='val_dice_coef', factor=0.5, patience=15, verbose=1, mode='max')
+        reduce_lr = ReduceLROnPlateau(monitor='val_dice_coef', factor=0.5, patience=20, verbose=1, mode='max')
         # board
         log = os.path.join('logs',dataset,data, model_name+'_'+feature)
         tensorboard = TensorBoard(log_dir=log, histogram_freq=0, write_graph=True, write_images=True)
@@ -559,7 +573,7 @@ class train():
                                     print("train model",model_name)
                                     print(model.summary())
                                     # # 編譯模型optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate), loss=self.dice_coef_loss
-                                    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lrn), loss=Tversky_loss, metrics=[dice_coef, jaccard_index])
+                                    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lrn), loss=Tv_focal_loss, metrics=[dice_coef, jaccard_index])
                                     # 訓練模型 
                                     save_model_name = model_name + '_' + epoch.__str__() + '_' + batch.__str__() + '_' + lrn.__str__() + '_' + str(filter[0])
                                     # 取得字串 用來判斷是否有重複訓練過 去掉最後的_1.h5
@@ -570,7 +584,7 @@ class train():
                                         # 找名稱完全相同
                                         if lists[i].startswith(save_model_name) and lists[i].endswith('.h5'):
                                             count = count +1
-                                    
+                                    time = 0
                                     if train_signal:
                                         count = count +1 # 紀錄模型訓練次數
                                         history, time = self.fitModel(model,dataset_name,data ,train_dataset, valid_dataset,epoch, lrn ,model_path,save_model_name,count.__str__())
@@ -588,27 +602,27 @@ class train():
                                     Sensitivity_score = Sensitivity_score * 100
                                     Sensitivity_var = Sensitivity_var * 100
                                     
-                                    if train_signal:
-                                        f = open(self.data_class + '_' + self.data_date + '_summary.txt', 'a') # + save_model_name + '----------\n',
-                                        lines = ['----------Summary:' + dataset_name + '----------\n',
-                                                'Model: '+ save_model_name + '\n',
-                                                'Time: '+ str(time) + '\n',
-                                                'Jaccard index: '+ str(ji_score) + ' +- ' + str(ji_var) + '\n',
-                                                'Dice Coefficient: '+ str(dice_score) + ' +- ' + str(dice_var) + '\n',
-                                                'Sensitivity: '+ str(Sensitivity_score) + ' +- ' + str(Sensitivity_var) + '\n',
-                                                '----------------------------------------\n\n']
-                                        f.writelines(lines)
-                                        f.close()
-                                    
-                                        if ji_score > best_iou :
-                                            best_iou = ji_score
-                                            best_iou_var = ji_var
-                                            best_dice = dice_score
-                                            best_dice_var = dice_var
-                                            best_Sensitivity = Sensitivity_score
-                                            best_Sensitivity_var = Sensitivity_var
-                                            best_model = save_model_name
-                                            best_model_time = time
+                                    # if train_signal:
+                                    f = open(self.data_class + '_' + self.data_date + '_summary.txt', 'a') # + save_model_name + '----------\n',
+                                    lines = ['----------Summary:' + dataset_name + '----------\n',
+                                            'Model: '+ save_model_name + '\n',
+                                            'Time: '+ str(time) + '\n',
+                                            'Jaccard index: '+ str(ji_score) + ' +- ' + str(ji_var) + '\n',
+                                            'Dice Coefficient: '+ str(dice_score) + ' +- ' + str(dice_var) + '\n',
+                                            'Sensitivity: '+ str(Sensitivity_score) + ' +- ' + str(Sensitivity_var) + '\n',
+                                            '----------------------------------------\n\n']
+                                    f.writelines(lines)
+                                    f.close()
+                                
+                                    if ji_score > best_iou :
+                                        best_iou = ji_score
+                                        best_iou_var = ji_var
+                                        best_dice = dice_score
+                                        best_dice_var = dice_var
+                                        best_Sensitivity = Sensitivity_score
+                                        best_Sensitivity_var = Sensitivity_var
+                                        best_model = save_model_name
+                                        best_model_time = time
                     
                     if train_signal:         
                         self.best_model_record(best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_Sensitivity, best_Sensitivity_var)

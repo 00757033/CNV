@@ -2,13 +2,16 @@ import cv2
 import numpy as np
 import os
 import shutil
+
+
 def copy_file(input_img_path, input_mask_path, output_img_path, output_mask_path,layers= ["1","2","3","4"],label_layers={"4":"CC"}):
     print(input_img_path)
     for lay in os.listdir(input_img_path):
         if lay in layers:
-            print(lay)
             source = os.path.join(input_img_path, lay)
             dest = os.path.join(output_img_path, lay)
+
+            
             if os.path.exists(dest):
                 shutil.rmtree(dest)
             shutil.copytree(source, dest)
@@ -31,12 +34,12 @@ def copy_file(input_img_path, input_mask_path, output_img_path, output_mask_path
 
 
 if __name__ == "__main__":
-    date = '20240320'
+    date = '20240418'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
     inpaint = 'inpaint/'
-    mathods = 'crop_KAZE_FLANN_0.8'
+    mathods = 'crop_AKAZE_BF_0.8'
     input_img_path = PATH_BASE + inpaint + 'MATCH/'+ mathods
     input_mask_path = PATH_BASE + inpaint + 'MATCH_LABEL/' + mathods
     output_img_path = PATH_BASE + 'align/' 

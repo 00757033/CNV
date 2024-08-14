@@ -114,21 +114,24 @@ class inpaint():
             self.mask = mask
             # remove the unnecessary parts
             remove_img[self.y:self.y+self.height, self.x:self.x+self.width] = 0
-            cv2.imshow('remove_img', remove_img)
-            cv2.waitKey(0)
-            cv2.destroyAllWindows()
+            # cv2.imshow('remove_img', remove_img)
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
             # inpainting
             remove_img = cv2.cvtColor(remove_img, cv2.COLOR_RGB2BGR)
             mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
             dst = cv2.inpaint(remove_img, mask, 5, cv2.INPAINT_TELEA)
-            window_size = 30
-            dst = self.texture_synthesis(dst, self.y, self.x, self.height, self.width, 100, window_size)
+            window_size = 10
+            dst = self.texture_synthesis(dst, self.y, self.x, self.height, self.width, 200, window_size)
             return dst
         else:
             print("Failed to load the image.")
             return
     def print_points(self):
         print("x: {}, y: {}, height: {}, width: {}".format(self.x, self.y, self.height, self.width))
+        
+    def get_points(self):
+        return self.x, self.y, self.height, self.width
 
     def texture_synthesis(self,image, y, x, height, width, iterations, window_size):
         best_mse = float('inf')  # 用于存储最佳均方误差

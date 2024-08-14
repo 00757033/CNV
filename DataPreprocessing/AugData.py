@@ -11,9 +11,13 @@ class Augment():
         self.layers = layers
         self.train_test = ["train","test","valid"]
 
-    def albumentation(self, path,output,image_name):
+    def albumentation(self, path,data_dir,output,image_name):
         image = cv2.imread(path)
         mask = cv2.imread(path.replace('images','masks'))
+        image_original = None
+        if 'images_original' in data_dir:
+            image_original = cv2.imread(path.replace('images','images_original'))
+            image_original = cv2.resize(image_original, (304,304))
         
         # Define the augmentation pipeline
         transform = A.Compose([
@@ -37,6 +41,9 @@ class Augment():
         augmented = transform(image=image, mask=mask)
         aug_image = augmented['image']
         aug_mask = augmented['mask']
+        if image_original is not None:
+            aug_image_original = transform(image=image_original)['image']
+            cv2.imwrite(os.path.join(output,'images_original',image_name + '.png'), aug_image_original)
         # # show the augmented image
         # fig, ax = plt.subplots(2, 2, figsize=(10, 10))
         # ax[0, 0].imshow(image)
@@ -48,11 +55,7 @@ class Augment():
         # ax[1, 1].imshow(aug_mask)
         # ax[1, 1].axis('off')
         # plt.show()
-        
-            
-            
-        
-        
+
         
         cv2.imwrite(os.path.join(output,'images',image_name + '.png'), aug_image)
         cv2.imwrite(os.path.join(output,'masks',image_name + '.png'), aug_mask)
@@ -60,7 +63,10 @@ class Augment():
         
 
     def augumentation(self,input_path,output_name,augment_time = 5):
-        data_dir = ['images','masks']
+        data_dir = ['images','masks'] # images_original
+        if 'concate' in input_path: 
+            data_dir.append('images_original')
+
         for layer in self.layers:
             layer_input_path = tools.get_label_path(input_path, self.layers[layer])
             layer_output_path = tools.get_label_path(input_path + '_' + output_name, self.layers[layer])
@@ -74,15 +80,17 @@ class Augment():
                     output = os.path.join(output_dir,'train')
                     for  dir in data_dir:
                         tools.makefolder(os.path.join(output,  dir))
+                        
                     for image in pl.Path(input + '/'+ 'images').iterdir():
                         if image.suffix == ".png" :
                             image_name = image.stem
                             img_path = str(image)    
-                            cv2.imwrite(os.path.join(output,'images',image_name + '.png') ,cv2.imread(img_path))
-                            cv2.imwrite(os.path.join(output,'masks',image_name + '.png') ,cv2.imread(img_path.replace('images','masks')))
+                            for dir in data_dir:
+                                cv2.imwrite(os.path.join(output, dir, image_name + '.png'), cv2.imread(os.path.join(input, dir, image_name + '.png')))
+                                
                             
                             for time in range(augment_time):     
-                                self.albumentation(img_path,output,image_name + '_' + str(time))
+                                self.albumentation(img_path,data_dir,output,image_name + '_' + str(time))
 
                 else :
                     print('copytree')
@@ -98,7 +106,7 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '0305'
+    date = '20240502'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date
@@ -107,4 +115,4 @@ if __name__ == "__main__":
     preprocess = Augment(PATH_BASE + '/' + 'trainset')
     augment_time = [2]
     for time in augment_time:
-        preprocess.augumentation(disease + "_"+ date +  '_connectedComponent_bil510_clahe7_concate_42','aug' + str(time),time)    
+        preprocess.augumentation(disease + "_"+ date +  '_connectedComponent_bil51010_clah1016_concate34OCT_42','aug' + str(time),time)    

@@ -246,9 +246,6 @@ class DropBlock3D(tf.keras.layers.Layer):
 
 
 class Model():
-    def __init__(self, image_size, learning_rate):
-        self.input_size = (image_size, image_size, 3)
-        self.learning_rate = learning_rate
 
     def dice_coef(self, y_true, y_pred):
         smooth = 1.
@@ -280,9 +277,10 @@ class Model():
         for i in range(time_steps):
           if i == 0:
             x1 = keras.layers.Conv2D(filters, (3, 3), padding='same', kernel_initializer='he_normal')(x)
-            x1 = keras.layers.BatchNormalization()(x)
-            x1 = keras.layers.Activation('relu')(x)
-          x1 = keras.layers.Conv2D(filters, (3, 3), padding='same', kernel_initializer='he_normal')(x + x1)
+            x1 = keras.layers.BatchNormalization()(x1)
+            x1 = keras.layers.Activation('relu')(x1)
+          x1 = keras.layers.add([x, x1])
+          x1 = keras.layers.Conv2D(filters, (3, 3), padding='same', kernel_initializer='he_normal')(x1)
           x1 = keras.layers.BatchNormalization()(x1)
           x1 = keras.layers.Activation('relu')(x1)
         return x1
@@ -310,11 +308,11 @@ class Model():
     def standard_unit(self, inputs, filters, name = 'standard_unit'):
         conv1 = keras.layers.Conv2D(filters, (3, 3), kernel_initializer='he_normal', padding='same')(inputs)
         bn1 = keras.layers.BatchNormalization()(conv1)
-        relu1 = keras.layers.Activation('relu')(bn1)
-        conv2 = keras.layers.Conv2D(filters, (3, 3), kernel_initializer='he_normal', padding='same')(relu1)
+        relu1 = keras.layers.Activation('relu')(bn1) # leaky_relu
         
+        conv2 = keras.layers.Conv2D(filters, (3, 3), kernel_initializer='he_normal', padding='same')(relu1)
         bn2 = keras.layers.BatchNormalization()(conv2)
-        relu2 = keras.layers.Activation('relu')(bn2)
+        relu2 = keras.layers.Activation('relu')(bn2) # leaky_relu
         # 區域名稱
         # layer = keras.layers.Lambda(lambda x: x, name='standard_unit')(bn2)
         return relu2
@@ -360,7 +358,11 @@ class Model():
         return model
 
 class UNetPlusPlus(Model):
-
+    def __init__(self, image_size, learning_rate):
+        self.input_size = image_size
+        self.learning_rate = learning_rate
+        
+    
     def build_model(self, filters):
         inputs = keras.layers.Input(self.input_size)
         # encode
@@ -414,7 +416,9 @@ class UNetPlusPlus(Model):
         return model
 
 class UNet(Model):
-    
+    def __init__(self, image_size, learning_rate):
+        self.input_size = image_size
+        self.learning_rate = learning_rate
     def build_model(self, filters):
         inputs = keras.layers.Input(self.input_size)
         # downsampling
@@ -450,9 +454,8 @@ class UNet(Model):
 
 class SDUNet(Model):
     def __init__(self, image_size, learning_rate):
-        self.input_size = (image_size, image_size, 3)
+        self.input_size = image_size
         self.learning_rate = learning_rate
-
     def standard_unit(self, inputs, filters,keep_prob=0.01):
         conv1 = keras.layers.Conv2D(filters, (3, 3), kernel_initializer='he_normal', padding='same')(inputs)
         conv1 = tf.keras.layers.SpatialDropout2D(keep_prob)(conv1)
@@ -512,7 +515,7 @@ class SDUNet(Model):
 class AttentionUNet(Model):
     
   def __init__(self,image_size,learning_rate):
-    self.img_shape=(image_size, image_size, 3)
+    self.img_shape=image_size
     self.learning_rate = learning_rate
     self.df=64
     self.uf=64
@@ -588,7 +591,7 @@ class AttentionUNet(Model):
 
 class BCDUNet(Model):
     def __init__(self, image_size, learning_rate):
-        self.input_size = (image_size, image_size, 3)
+        self.input_size = image_size
         self.learning_rate = learning_rate
 
     def BConvLSTM(self, in1, in2, d, fi, fo):
@@ -639,8 +642,8 @@ class BCDUNet(Model):
 
 class R2UNet(Model):
   def __init__(self, image_size, learning_rate):
-       self.input_size = (image_size, image_size, 3)
-       self.learning_rate = learning_rate
+      self.input_size = image_size
+      self.learning_rate = learning_rate
 
 
   def RRCNN_block(self, input_layer, out_n_filters):
@@ -759,6 +762,9 @@ class R2UNet(Model):
 #         return model
   
 class FRUNet(Model):
+  def __init__(self, image_size, learning_rate):
+    self.input_size = image_size
+    self.learning_rate = learning_rate
   def residual_block(self, inputs, filters, strides=1, is_first=False):
       # feature extraction
       if not is_first:
@@ -808,6 +814,9 @@ class FRUNet(Model):
       return model  
 
 class R2UNetPlusPlus(Model):
+  def __init__(self, image_size, learning_rate):
+    self.input_size = image_size
+    self.learning_rate = learning_rate
   def RRCNN_block(self, input_layer, out_n_filters):
       x1 = keras.layers.Conv2D(out_n_filters, (3, 3), padding="same")(input_layer)
       x2 = self.residual_block(x1, out_n_filters)
@@ -885,6 +894,9 @@ class R2UNetPlusPlus(Model):
       return model
 
 class DenseUNet(Model):
+  def __init__(self, image_size, learning_rate):
+    self.input_size = image_size
+    self.learning_rate = learning_rate
   def dense_block(self, input_layer, out_n_filters):
       x1 = keras.layers.Conv2D(out_n_filters, (3, 3), padding="same")(input_layer)
       x2 = keras.layers.BatchNormalization()(x1)
@@ -1016,6 +1028,9 @@ class RecurrentUNet(Model):
       return model
   
 class ResUNet(Model):
+    def __init__(self, image_size, learning_rate):
+      self.input_size = image_size
+      self.learning_rate = learning_rate
     def residual_block(self,inputs,filters):
         conv1 = keras.layers.Conv2D(filters, (3, 3), activation='relu', kernel_initializer='he_normal', padding='same')(inputs)
         bn1 = keras.layers.BatchNormalization()(conv1)
@@ -1076,6 +1091,9 @@ class ResUNet(Model):
 
 # https://github.com/nibtehaz/MultiResUNet/blob/master/tensorflow/MultiResUNet.py
 class MultiResUNet(Model):
+  def __init__(self, image_size, learning_rate):
+    self.input_size = image_size
+    self.learning_rate = learning_rate
   def conv2d_bn(self, x, filters, kernel_size, strides=1, padding='same', activation='relu', use_bias=False):
     x = keras.layers.Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=use_bias)(x)
     if activation is not None:
@@ -1164,11 +1182,11 @@ class MultiResUNet(Model):
 # https://github.com/AngeLouCN/DC-UNet/blob/main/model.py
 class DCUNet(Model):
   def __init__(self, image_size, learning_rate):
-    self.input_size = (image_size, image_size, 3)
+    self.input_size =image_size
     self.learning_rate = learning_rate
-    self.img_shape=(image_size, image_size, 3)
-    self.df=64
-    self.uf=64
+    self.img_shape=image_size
+    self.df=32
+    self.uf=32
     
   def conv2d_bn(self,x, filters, kernel_size, padding='same', strides=(1, 1), activation='relu', name=None):
     x = keras.layers.Conv2D(filters, kernel_size, strides=strides, padding=padding, use_bias=False)(x)
@@ -1324,6 +1342,9 @@ class NestedUNet(Model):
 
 # https://github.com/clguo/CAR-UNet
 class CARUNet(Model):
+  def __init__(self, image_size, learning_rate):
+    self.input_size = image_size
+    self.learning_rate = learning_rate
   def meca_block(self,input_feature, k_size=3):
       channel_axis = 1 if tf.keras.backend.image_data_format() == "channels_first" else -1
       channel = input_feature.shape[channel_axis]

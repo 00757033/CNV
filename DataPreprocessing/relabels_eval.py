@@ -9,13 +9,10 @@ class reLabel():
         self.path = path
         self.layers = layers
 
-    def relabel(self,output_name,mathod = 'threshold',min_area = 50): # OTSU and then ROI
+    def relabel(self,output_name,mathod = 'threshold',min_area = 49): # OTSU and then ROI
         data_dir = ['images','masks']
 
-        
         for layer in self.layers:
-            # save figure
-            # tools.makefolder(os.path.join('..\\..\\PPT用',self.layers[layer]))
 
             layer_path = tools.get_label_path(output_name, self.layers[layer])
             intput_dir = os.path.join(self.path,  self.layers[layer],'images')
@@ -42,8 +39,6 @@ class reLabel():
                 image_label = cv2.resize(image_label, (304, 304))
                 img_1 = cv2.imread(os.path.join(self.path,  'ALL','1',image_name), cv2.IMREAD_GRAYSCALE)
                 img_2 = cv2.imread(os.path.join(self.path,  'ALL','2',image_name), cv2.IMREAD_GRAYSCALE)
-                img_ref_and = img_1&img_2
-                img_cut = (image - img_ref_and&image)
                 # fig , ax = plt.subplots(1,5)
                 # ax[0].imshow(image, cmap = 'gray')
                 # ax[1].imshow(image_label, cmap = 'gray')
@@ -56,12 +51,8 @@ class reLabel():
                     cv2.imwrite(os.path.join(output_dir, 'masks', img_path.split('\\')[-1]), threshold_label)
                 
                 if mathod == 'connectedComponent':
-                    img_new = cv2.addWeighted(image, 1, img_cut, 0.5, 0)
-                    blur = cv2.GaussianBlur(img_new,(3,3),0)
-                    img_clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(32,32)).apply(blur)
-                    # img_clahe = cv2.addWeighted(blur, 1, img_cut, 0.5, 0)
-                    
-                    ret, binary_image = cv2.threshold(img_clahe, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                    # blur = cv2.GaussianBlur(image,(2,2),0)
+                    ret, binary_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
                     # mask
 
                     label = image_label.copy()
@@ -69,7 +60,7 @@ class reLabel():
 
                     # 刪除小面積
                     # 連通域的數目 連通域的圖像 連通域的信息 矩形框的左上角坐標 矩形框的寬高 面積
-                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label, connectivity=8)
+                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(label, connectivity=4)
 
                     # 不同的連通域賦予不同的顏色
                 
@@ -145,7 +136,7 @@ class reLabel():
 
 
 if __name__ == "__main__":
-    date = '20240325'
+    date = '20240502'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date

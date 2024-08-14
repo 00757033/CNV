@@ -195,20 +195,25 @@ def LK(img1, img2, kp1, kp2, des1, des2, distance=0.8, method='SIFT',matcher='FL
     height, width= img2.shape
     im1Reg = cv2.warpPerspective(img1, new_H, (width, height))
 
-
+    # show the im1Reg
+    plt.imshow(im1Reg, cmap='gray')
+    plt.axis('off')
+    plt.show()
+    
+    
 
 
     return im1Reg, H
 
 if __name__ == '__main__':
-    pre_treatment = "..\\..\\Data\\PCV_1017\\ALL\\1\\08532554_R_20170830.png"
-    post_treatment = "..\\..\\Data\\PCV_1017\\ALL\\1\\08532554_R_20171206.png"
+    pre_treatment = "..\\..\\Data\\PPT\\9.jpg"
+    post_treatment = "..\\..\\Data\\PPT\\8.jpg"
     img1 = cv2.imread(pre_treatment,cv2.IMREAD_GRAYSCALE)
     img2 = cv2.imread(post_treatment, cv2.IMREAD_GRAYSCALE)
 
 
     start = time.time()
-    im1Reg, H = LK(img2, img1, None, None, None, None)
+    im1Reg, H = LK(img2, img1, None, None, None, None,method= 'AKAZE',matcher='FLANN',distance=0.8)
     end = time.time()
     print("LK time: ", end - start)
     

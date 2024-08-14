@@ -69,8 +69,8 @@ class finding():
 
 
 if __name__ == '__main__':
-    pre_treatment = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
-    post_treatment = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
+    pre_treatment = "..\\..\\Data\\PPT\\1.png"
+    post_treatment = "..\\..\\Data\\PPT\\2.png"
     
     date = '1120'
     disease = 'PCV'

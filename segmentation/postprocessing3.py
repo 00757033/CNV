@@ -45,11 +45,11 @@ class postprocessing():
             crf(image, annotated_image,output_image, use_2d = True)
 
 
-def crf(original_image, predict_image,output_image, use_2d = True):
+def crf(original_image, predict_image,output_image, use_2d = True,min_area = 10):
     # 用在血管分割上
     # 將分割結果轉成rgb
-    # original_image = original_image[:,:,0]
-    # original_image = gray2rgb(original_image)
+    original_image = original_image[:,:,0]
+    original_image = gray2rgb(original_image)
     annotated_image = predict_image.copy()
     if(len(annotated_image.shape)>2):
         annotated_image = annotated_image[:,:,0]

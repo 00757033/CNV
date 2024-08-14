@@ -57,7 +57,7 @@ class template_matcher():
 
     #將術後的影像切成4個角落跟中央，並分別跟術前影像做getPoints，找到5個template中R最高的位置，並回傳要位移的x跟y
     def pointMatch(self,image, template, method = cv2.TM_CCOEFF_NORMED):
-        # template_total      = template
+        template_total      = template
         template_center     = template[52:52+199, 52:52+199]
         template_left_up    = template[0:199, 0:199]
         template_right_up   = template[104:104+199, 0:199]
@@ -72,16 +72,15 @@ class template_matcher():
         elements_DR, r_4 = self.get_element(image, template_right_down, 104, 104, method)
         #----------------------------------------可視化用----------------------------------------
         # show template
-        # fig ,ax = plt.subplots(2,3) 
-        # plt rgb 
-        # template_total = cv2.cvtColor(template_total,cv2.COLOR_GRAY2BGR)
-        # template_center = cv2.cvtColor(template_center,cv2.COLOR_GRAY2BGR)
-        # template_left_up = cv2.cvtColor(template_left_up,cv2.COLOR_GRAY2BGR)
-        # template_right_up = cv2.cvtColor(template_right_up,cv2.COLOR_GRAY2BGR)
-        # template_left_down = cv2.cvtColor(template_left_down,cv2.COLOR_GRAY2BGR)
-        # template_right_down = cv2.cvtColor(template_right_down,cv2.COLOR_GRAY2BGR)
+        fig ,ax = plt.subplots(2,3) 
+        template_total = cv2.cvtColor(template_total,cv2.COLOR_GRAY2BGR)
+        template_center = cv2.cvtColor(template_center,cv2.COLOR_GRAY2BGR)
+        template_left_up = cv2.cvtColor(template_left_up,cv2.COLOR_GRAY2BGR)
+        template_right_up = cv2.cvtColor(template_right_up,cv2.COLOR_GRAY2BGR)
+        template_left_down = cv2.cvtColor(template_left_down,cv2.COLOR_GRAY2BGR)
+        template_right_down = cv2.cvtColor(template_right_down,cv2.COLOR_GRAY2BGR)
 
-
+        # print('template_total')
         # ax[0,0].imshow(template_total)
         # ax[0,0].set_title('template_total')
         # ax[0,0].axis('off' )
@@ -140,7 +139,25 @@ class template_matcher():
                 if r[i] > Relation:
                     Relation = r[i]
                     shift_x = e[i][0]
-                    shift_y = e[i][1]                
+                    shift_y = e[i][1]  
+        # # show template match
+        # fig ,ax = plt.subplots(1,3)
+        # ax[0].imshow(image)
+        # ax[0].set_title('image')
+        # ax[0].axis('off')
+        # ax[1].imshow(template_center, cmap='gray')
+        # ax[1].set_title('template_center')
+        # ax[1].axis('off')
+        
+        # temp = image.copy()
+        # cv2.rectangle(temp, (shift_x, shift_y), (shift_x + 199, shift_y + 199), (0, 255, 0), 2)
+        # ax[2].imshow(temp)
+        # ax[2].set_title('match')
+        # ax[2].axis('off')
+        # plt.show()
+        
+        
+                 
         if shift_x != None : 
             return shift_x, shift_y
         else:
@@ -713,9 +730,12 @@ def setFolder(path):
 
 
 if __name__ == '__main__':
-    # pre_treatment = "..\\..\\Data\\PPT\\00294362_20210511_1.png"
-    # post_treatment = "..\\..\\Data\\PPT\\00294362_20221222_1.png"
-    # matching().template_matching(pre_treatment, post_treatment)
+    pre_treatment = "..\\..\\Data\\PPT\\4.jpg"
+    post_treatment = "..\\..\\Data\\PPT\\shoot.jpg"
+    pre_treatment = cv2.imread(pre_treatment, cv2.IMREAD_GRAYSCALE)
+    pre_treatment = cv2.resize(pre_treatment, (304, 304))
+    post_treatment = cv2.imread(post_treatment, cv2.IMREAD_GRAYSCALE)
+    post_treatment = cv2.resize(post_treatment, (304, 304))
     date = '1120'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
@@ -726,11 +746,11 @@ if __name__ == '__main__':
     image_path = PATH_BASE + 'ALL/'
     PATH_MATCH = image_path + 'MATCH/' 
     PATH_MATCH_LABEL = image_path + 'MATCH_LABEL/' 
-    
-    
-
     Match = template_matcher(image_path,PATH_LABEL,PATH_MATCH,PATH_MATCH_LABEL)
-    shift_patient_dict = Match.alignment('PCV_exist.txt')
+    Match.pointMatch(pre_treatment, post_treatment)
+ 
+    
+    # shift_patient_dict = Match.alignment('PCV_exist.txt')
     # json_file = './shift_patient_dict.json'
     # tools.write_to_json_file(json_file, shift_patient_dict)
 

@@ -8,7 +8,7 @@ matplotlib.use('TkAgg')  # 使用TkAgg后端
 import tools.tools as tools
 import pathlib as pl
 class Concatenation() :
-    def __init__(self, PATH, image_path,layers = {"3":"OR","4":"CC"}):
+    def __init__(self, PATH, image_path,layers = {"4":"CC"}):
         self.PATH = PATH
         self.image_path = image_path
         self.layers = layers   
@@ -20,6 +20,7 @@ class Concatenation() :
             input_path=[os.path.join(self.image_path, path,'images') for path in concateLayer]
         print('input_path',input_path)
         tools.makefolder(os.path.join(self.image_path,output_file,'images'))
+        tools.makefolder(os.path.join(self.image_path,output_file,'images_original'))
         tools.makefolder(os.path.join(self.image_path,output_file,'masks'))
         for image_path in pl.Path( input_path[0]).iterdir():
             image_name = image_path.name
@@ -37,13 +38,25 @@ class Concatenation() :
                 image   = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
                 image   = cv2.resize(image, (304,304))
                 image   = np.expand_dims(image, axis = 2)
-
+                if i == 0:
+                    cv2.imwrite(os.path.join(self.image_path,output_file,'images_original',image_name),image)
 
                 if i > 0:
-                    # blur = cv2.GaussianBlur(image,(5,5),0)
-                    otsu_image = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-                    merged_image = np.dstack([merged_image, otsu_image[1]])
-                    # cv2.imshow('otsu_image',otsu_image[1])
+                    blur = cv2.GaussianBlur(image,(5,5),0)
+                    cl = cv2.createCLAHE(clipLimit=1.5, tileGridSize=(4,4)).apply(blur)
+                    otsu_image = cv2.threshold(cl, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                    # 刪除小面積
+                    # 連通域的數目 連通域的圖像 連通域的信息 矩形框的左上角坐標 矩形框的寬高 面積
+                    num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(otsu_image[1], connectivity=8)
+                    areas = stats[:, cv2.CC_STAT_AREA]
+                    without_background = otsu_image[1].copy()
+                    output = np.zeros((labels.shape[0], labels.shape[1], 3), dtype=np.uint8)
+                    for i in range(1, num_labels):
+                        if areas[i] < 50:
+                            without_background[labels == i] = 0
+                    merged_image = np.dstack([merged_image, without_background])
+
+                    # cv2.imshow('otsu_image' + str(i),without_background)
                     # cv2.waitKey(0)
                     # cv2.destroyAllWindows()
                 else:
@@ -73,16 +86,17 @@ class Concatenation() :
 
 if __name__ == "__main__":
     import cv2
-    date = '0306'
+    date = '20240502'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
     image_path = PATH + FILE
     data_groups = [ "CC"]
-    filters = "_connectedComponent_bil510_clahe7"
-    dict_concate = {'OR': [FILE  + filters+"_OR", FILE  + "_CC",FILE + "_OR"] , 'CC': [FILE  + filters+"_CC", "ALL/3/" ,"ALL/4_OCT/"]}
+    # filters = "_connectedComponent_bil92525_clah1016"
+    filters = "_connectedComponent_bil51010_clah1016"
+    dict_concate = {'OR': [FILE  + filters+"_OR", FILE  + "_CC",FILE + "_OR"] , 'CC': [FILE  + filters+"_CC", "ALL/4/", "ALL/3/" ,"ALL/4_OCT/"]}
     
     for data_group in data_groups:
         path = FILE + '/'+ data_group
         label= Concatenation(path,image_path)
-        label.getConcate(data_group,dict_concate[data_group] ,FILE  +filters,FILE  +filters + '_concateOCT_' + data_group)
+        label.getConcate(data_group,dict_concate[data_group] ,FILE  +filters,FILE  +filters + '_concate34OCT_' + data_group)

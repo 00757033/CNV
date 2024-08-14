@@ -19,7 +19,7 @@ class Statistic:
         self.layers = layers
         self.disease = disease
         
-        self.Morphologyfeature = [ 'VD','VLD','VDI']
+        self.Morphologyfeature = [ 'VD','VLD','VDI','FD']
         self.GLCMfeature = ['Contrast','Autocorrelation','Energy','Homogeneity','DifferenceEntropy','Dissimilarity']
         self.GLRLMfeature = ['ShortRunEmphasis','LongRunEmphasis','GrayLevelNonUniformity','RunLengthNonUniformity','RunPercentage','LowGrayLevelRunEmphasis','HighGrayLevelRunEmphasis','ShortRunLowGrayLevelEmphasis','ShortRunHighGrayLevelEmphasis','LongRunLowGrayLevelEmphasis','LongRunHighGrayLevelEmphasis']
         self.GLSZMfeature = ['SmallAreaEmphasis','LargeAreaEmphasis','GrayLevelNonUniformity','SizeZoneNonUniformity','GrayLevelVariance','SizeZoneVariance','ZonePercentage','GrayLevelEntropy']
@@ -186,7 +186,7 @@ def MannWhitney2( data_0, data_1, feature_name,layer, injection,disease,feature_
 if __name__ == '__main__':
     PATH_BASE = '../../Data/'
     data_class = 'PCV'
-    data_date = '20240320'
+    data_date = '20240418'
     PATH_BASE  =  PATH_BASE + data_class + '_' + data_date + '/'
     path = PATH_BASE +  '/compare/'
     disease = data_class + '_' + data_date
@@ -194,5 +194,5 @@ if __name__ == '__main__':
     statistic = Statistic(PATH_BASE,disease,path)
     feature_list = ['Morphology','GLCM','GLRLM','GLSZM','NGTDM','GLDM','SFM','DWT']
     
-    statistic.stat('./record/' + disease + '/classification.csv','HOG')
+    statistic.stat('./record/' + disease + '/classification_ROI.csv','Morphology')
     

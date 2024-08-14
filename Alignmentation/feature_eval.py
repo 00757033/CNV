@@ -13,7 +13,9 @@ from skimage.feature import corner_harris
 from skimage.metrics import mean_squared_error
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
+import pandas as pd
 import pathlib as pl
+from datetime import datetime
 def setFolder(path):
     os.makedirs(path, exist_ok=True)
 # pip install opencv-contrib-python
@@ -88,11 +90,61 @@ def ssim_ignore_zeros(img1, img2,img3):
     # print('ssim_index',ssim_index)
     return ssim_value
     
+
+def NCC_ignore_zeros(img1, img2,img3):
+    msk1 = img1 == 0
+    msk2 = img2 == 0
+    msk3 = img3 == 0
+    both_zeros_mask = np.logical_and(np.logical_and(msk1, msk2), msk3)
     
+    img1_non_zero = img1.copy()
+    img1_non_zero[both_zeros_mask] = 0
+    img2_non_zero = img2.copy()
+    img2_non_zero[both_zeros_mask] = 0
+    img3_non_zero = img3.copy()
+    img3_non_zero[both_zeros_mask] = 0
+    
+    # NCC
+    mean1 = np.mean(img1_non_zero.flatten())
+    mean2 = np.mean(img2_non_zero.flatten())
+    
+    ncc = np.sum((img1_non_zero.flatten() - mean1) * (img2_non_zero.flatten() - mean2)) / np.sqrt(np.sum((img1_non_zero.flatten() - mean1) ** 2) * np.sum((img2_non_zero.flatten() - mean2) ** 2))
+    # print('ncc',ncc)
+    return ncc    
+
+def NMI_ignore_zeros(img1, img2,img3):
+    msk1 = img1 == 0
+    msk2 = img2 == 0
+    msk3 = img3 == 0
+    both_zeros_mask = np.logical_and(np.logical_and(msk1, msk2), msk3)
+    
+    img1_non_zero = img1.copy()
+    img1_non_zero[both_zeros_mask] = 0
+    img2_non_zero = img2.copy()
+    img2_non_zero[both_zeros_mask] = 0
+    img3_non_zero = img3.copy()
+    img3_non_zero[both_zeros_mask] = 0
+    # NMI
+    nmi = normalized_mutual_info_score(img1_non_zero.flatten(), img2_non_zero.flatten())
+    # print('nmi',nmi)
+    return nmi
+
+def Correlation_coefficient_ignore_zeros(img1, img2,img3):
+    # 對於兩張影像 計算每個pixel 的差異
+    # 找出兩影像中相應像素都為零的位置
+    msk1 = img1 == 0
+    msk2 = img2 == 0
+    msk3 = img3 == 0
+    both_zeros_mask = np.logical_and(np.logical_and(msk1, msk2), msk3)
+    
+    corr = np.corrcoef(img1[~both_zeros_mask], img2[~both_zeros_mask])[0, 1]
+    # print('corr',corr)
+    return corr
+
             
 # 尋找OCTA 影像的黃斑中心
 class finding():
-    def __init__(self,label_path,image_path,label_list,output_label_path,output_image_path,methods,matchers,distance):
+    def __init__(self,label_path,image_path,label_list,data_groups,output_label_path,output_image_path,methods,matchers,distance,file_name):
         self.label_path = label_path
         self.image_path = image_path
         self.distances = distance
@@ -103,8 +155,21 @@ class finding():
         self.image_size= (304, 304)
         self.data_list = ['1','2', '3', '4', '1_OCT', '2_OCT', '3_OCT', '4_OCT']
         self.label_list = label_list
+        self.data_groups = data_groups
         self.methods_template = [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED, cv2.TM_CCORR , cv2.TM_CCORR_NORMED, cv2.TM_CCOEFF, cv2.TM_CCOEFF_NORMED]
         self.method_template_name = ['TM_SQDIFF', 'TM_SQDIFF_NORMED', 'TM_CCORR' , 'TM_CCORR_NORMED', 'TM_CCOEFF', 'TM_CCOEFF_NORMED']
+        self.inject(file = file_name)
+
+    def inject(self,file = '../../Data/打針資料.xlsx',label = ["診斷","病歷號","眼睛","打針前門診日期","三針後門診","六針後門診","九針後門診","十二針後門診"]):
+        # self.inject_df = pd.DataFrame()
+        print(file)
+        self.inject_df = pd.read_excel(file, sheet_name="20230830",na_filter = False, engine='openpyxl')
+        
+        # add pd.read_excel(file, sheet_name="20230831",na_filter = False, engine='openpyxl')
+        # self.inject_df = self.inject_df.append(pd.read_excel(file, sheet_name="20230831",na_filter = False, engine='openpyxl'))
+
+        self.inject_df['病歷號'] = self.inject_df['病歷號'].apply(lambda x: '{:08d}'.format(x))
+        self.inject_df = self.inject_df.sort_values(by=["病歷號","眼睛"])
 
 
     def evaluates(self, pre_treatment_img, post_treatment_img,matching_img):
@@ -134,6 +199,7 @@ class finding():
         # ssim = ssim * 100
         # img_one all 255
         img_white = np.ones(cmp_pre_treatment_img.shape) * 255
+        
         mse = mean_squared_error_ignore_zeros(cmp_pre_treatment_img ,cmp_post_treatment_img,img_white)
         psnr = psnr_ignore_zeros( cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
         ssim = ssim_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
@@ -201,10 +267,11 @@ class finding():
         return image
 
 
-    def find_center(self,image):
+    def find_center(self,image,image_size = (304,304)):
         image2 = image.copy()
-        image2 = self.preprocess(image2)
         
+        image2 = self.preprocess(image2)
+        image2 = cv2.resize(image2, image_size)
         # rst,image2 = cv2.threshold(image2, 0, 255,  cv2.THRESH_BINARY  + cv2.THRESH_OTSU)
         
         # 二值化 32 255
@@ -227,6 +294,7 @@ class finding():
 
         # 上色
         draw_image = image.copy()
+        draw_image= cv2.resize(draw_image, image_size)
         draw_image[labels == max_label] = (0, 0, 255)
 
         # 找到最大的面積的中心點
@@ -247,7 +315,7 @@ class finding():
         max_radius = int(math.ceil(max_radius))
         
         
-        t = 50
+        t = 40
         if int(center[0] - max_radius) < t :
             t = int(center[0] - max_radius)
         if int(center[1] - max_radius) < t :
@@ -279,7 +347,7 @@ class finding():
         # show the image wait 3 seconds and destroy
         return  crop_img , center , max_radius + t
 
-    def LK(self,img1, img2,center,radius,  distance=0.9, method='KAZE',matcher='BF'):
+    def LK(self,img1, img2,center,radius,  distance=0.9, method='KAZE',matcher='BF',N = 20):
         # Initiate SIFT detector
         if method == 'SIFT':
             sift = cv2.SIFT_create()
@@ -335,11 +403,13 @@ class finding():
         # Matching method
         if method == 'SIFT'  or method == 'BRISK' or method == 'BRIEF':
             if  matcher == 'BF':
-                bf = cv2.BFMatcher( cv2.NORM_L2)
+                bf = cv2.BFMatcher()
                 if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
                     H = np.array(np.eye(3))
                     return None
                 matches = bf.knnMatch(des1, des2, k=2)
+                matches = sorted(matches, key=lambda x: x[0].distance)
+                matches = matches[:N]
 
             elif matcher == 'FLANN':
                 FLANN_INDEX_KDTREE = 1
@@ -351,7 +421,8 @@ class finding():
                     H = np.array(np.eye(3))
                     return None
                 matches = flann.knnMatch(des1, des2, k=2)
-
+                matches = sorted(matches, key=lambda x: x[0].distance)
+                matches = matches[:N]
         elif method == 'ORB':
             if  matcher == 'BF':
                 bf = cv2.BFMatcher()
@@ -359,7 +430,8 @@ class finding():
                     H = np.array(np.eye(3))
                     return None
                 matches = bf.knnMatch(des1, des2, k=2)
-
+                matches = sorted(matches, key=lambda x: x[0].distance)
+                matches = matches[:N]
             elif matcher == 'FLANN':
                 FLANN_INDEX_LSH = 6
                 index_params= dict(algorithm = FLANN_INDEX_LSH,
@@ -376,7 +448,8 @@ class finding():
                     return None
                 flann = cv2.FlannBasedMatcher(index_params, search_params)
                 matches = flann.knnMatch(des1, des2, k=2)
-
+                matches = sorted(matches, key=lambda x: x[0].distance)
+                matches = matches[:N]
         elif method == 'KAZE' or method == 'AKAZE' or method == 'SURF' or method == 'FREAK':
             if  matcher == 'BF':
                 bf = cv2.BFMatcher( cv2.NORM_L2)
@@ -384,7 +457,8 @@ class finding():
                     H = np.array(np.eye(3))
                     return None
                 matches = bf.knnMatch(des1, des2, k=2)
-
+                matches = sorted(matches, key=lambda x: x[0].distance)
+                matches = matches[:N]
             elif matcher == 'FLANN':
                 FLANN_INDEX_KDTREE = 1
                 index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
@@ -395,6 +469,8 @@ class finding():
 
                 flann = cv2.FlannBasedMatcher(index_params, search_params)
                 matches = flann.knnMatch(des1, des2, k=2)
+                matches = sorted(matches, key=lambda x: x[0].distance)
+                matches = matches[:N]
         if not matches:
 
             return None
@@ -418,8 +494,8 @@ class finding():
 
                         if m.distance > 1.5 * min_dist:
                             break
-            # Draw matches
-            img3 = cv2.drawMatchesKnn(img1 , kp1, img2, kp2, good, None, flags=2)
+            # Draw 保留的matches
+            img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=2)
             
         elif matcher == 'FLANN':
             # Need to draw only good matches, so create a mask
@@ -444,13 +520,13 @@ class finding():
                     singlePointColor = (255,0,0),
                     matchesMask = matchesMask,
                     flags = 0)
-                img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,matches,None,**draw_params)
+                img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
 
 
-        # plt.imshow(img3)
-        # plt.axis('off')
-        # plt.title(method)
-        # plt.show()
+        plt.imshow(img3)
+        plt.axis('off')
+        plt.title(method)
+        plt.show()
 
         # 計算img1 需要旋轉 縮放 平移矩陣 原本img1的實際中心點為center
         pts1 = np.array(pts1)
@@ -592,8 +668,9 @@ class finding():
             print('No Match')
             return 0,0        
     
-    def feature(self, feature, matcher, distance):
+    def feature(self, feature, matcher, distance,data_groups,mask_folder_name = 'predict'):
         patient_dict = {}
+        eyes = {'R':'OD','L':'OS'}
         image_folder = self.output_image_path+ '/1/'
         filenames = sorted(os.listdir(image_folder))
         self.output_path  = self.image_path + '/' + 'crop_'+ feature + '_' + matcher + '_' + str(distance) + '/'
@@ -614,13 +691,29 @@ class finding():
                 patient_id, eye, date = filename.split('.png')[0].split('_')
                 # patient_id = '07838199'
                 # eye = 'L'
+                
+                if patient_id in self.inject_df['病歷號'].values:
+                    print(patient_id, eye, date)
+                    if eyes[eye] not in self.inject_df[(self.inject_df['病歷號'] == patient_id)]['眼睛'].values:
+                        continue
+                    predate = str(self.inject_df[(self.inject_df['病歷號'] == patient_id) & (self.inject_df['眼睛'] == eyes[eye])]['打針前門診日期'].values[0])
+                    if predate != 'nan':
+                        if 'T' in  predate:
+                            predate = predate.split('T')[0]
+                        if ' '  in predate:
+                            predate = predate.split(' ')[0]
+                        formatted_date_str = datetime.strptime(predate, '%Y-%m-%d').strftime('%Y%m%d')
+                        if date < formatted_date_str:
+                            continue
+                else:
+                    continue
+                
 
-                if patient_id + '_' + eye not in patient_dict :
+                if patient_id + '_' + eye not in patient_dict:
                     patient_dict[patient_id + '_' + eye] = {}
                     pre_treatment_file = filename
                     pre_treatment = date
                     # pre_treatment = '20211013'
-
                 else:
                     post_treatment_file = filename
                     post_treatment = date
@@ -628,21 +721,49 @@ class finding():
                     patient_dict[patient_id + '_' + eye][post_treatment] = {}
                     if pre_treatment_file != '' and post_treatment_file != '':
                         pre_image = cv2.imread(self.output_image_path + '1/' + patient_id + '_' + eye + '_' + str(pre_treatment) + '.png')
+                        pre_image_2 = cv2.imread(self.output_image_path + '2/' + patient_id + '_' + eye + '_' + str(pre_treatment) + '.png')
                         post_image = cv2.imread(self.output_image_path + '1/' + patient_id + '_' + eye + '_' + str(post_treatment) + '.png')
-                        
+                        post_image_2 = cv2.imread(self.output_image_path + '2/' + patient_id + '_' + eye + '_' + str(post_treatment) + '.png')
 
                         
                         pre_image = cv2.resize(pre_image, (304, 304))
+                        pre_image_2 = cv2.resize(pre_image_2, (304, 304))
                         post_image = cv2.resize(post_image, (304, 304))
+                        post_image_2 = cv2.resize(post_image_2, (304, 304))
 
                         pre_image = cv2.normalize(pre_image, None, 0, 255, cv2.NORM_MINMAX)
+                        pre_image_2 = cv2.normalize(pre_image_2, None, 0, 255, cv2.NORM_MINMAX)
+                        post_image = cv2.normalize(post_image, None, 0, 255, cv2.NORM_MINMAX)
+                        post_image_2 = cv2.normalize(post_image_2, None, 0, 255, cv2.NORM_MINMAX)
+                        
+                        # clean
+                        mask = np.zeros(pre_image.shape[:2], dtype=np.uint8)
+                        
+                        
+                        if pre_image is None or pre_image_2 is None :
+                            for i in range(pre_image.shape[0]):
+                                for j in range(pre_image.shape[1]):
+                                    if np.array_equal( pre_image[i][j], pre_image_2[i][j]):
+                                        mask[i][j] = 255
+                                        
+                        pre_image= cv2.inpaint( pre_image, mask, 3, cv2.INPAINT_TELEA) 
+                        pre_image = cv2.normalize(pre_image, None, 0, 255, cv2.NORM_MINMAX)
+                        mask = np.zeros(pre_image.shape[:2], dtype=np.uint8)
+                        
+                        if post_image is None or post_image_2 is None :
+                            for i in range(post_image.shape[0]):
+                                for j in range(post_image.shape[1]):
+                                    if np.array_equal( post_image[i][j], post_image_2[i][j]):
+                                        mask[i][j] = 255
+                                        
+                        post_image= cv2.inpaint( post_image, mask, 3, cv2.INPAINT_TELEA)
                         post_image = cv2.normalize(post_image, None, 0, 255, cv2.NORM_MINMAX)
                         
                         pre_image_original = pre_image.copy()
                         post_image_original = post_image.copy()
                         # show histogram
-                        
-                        crop_img ,center,radius = self.find_center(post_image)
+                        magnification = 1
+                        crop_img ,center,radius = self.find_center(post_image, image_size = (int(304 * magnification), int(304 * magnification)))
                         
                         
                         # pre_image_gray = cv2.cvtColor(pre_image, cv2.COLOR_BGR2GRAY)
@@ -658,9 +779,11 @@ class finding():
 
                         # pre_image2 = cv2.equalizeHist(pre_image2)
                         # crop_img = cv2.equalizeHist(crop_img)
+                        h , w ,c = crop_img.shape
+                        pre_image2 = pre_image.copy()
                         
-
-                        H = self.LK(pre_image,crop_img,center=(center[0],center[1]), radius = int(radius), distance=distance, method=feature, matcher=matcher)
+                        pre_image2 = cv2.resize(pre_image2, (int(304 * magnification), int(304 * magnification)))
+                        H = self.LK(pre_image2,crop_img,center=(center[0],center[1]), radius = int(radius), distance=distance, method=feature, matcher=matcher)
                         
 
                         if H is not None:
@@ -670,6 +793,8 @@ class finding():
                             translation = (H[0, 2], H[1, 2])
                             
                         if H is  None or not self.check_H_range(H):
+                            crop_img = cv2.resize(crop_img, (h, w ))
+                            radius = radius // magnification
                             shift_x, shift_y = self.pointMatch(pre_image,crop_img,center,radius, method = cv2.TM_CCOEFF_NORMED)
                             if shift_x > 304 // 2 or shift_x < -304 // 2 or shift_y > 304 // 2 or shift_y < -304 // 2:
                                 H = None
@@ -680,28 +805,28 @@ class finding():
                         if H is  None or not self.check_H_range(H):   
                             H = np.array(np.eye(3))
                     
-                        # post_image = cv2.warpPerspective(post_image, H, (post_image.shape[1], post_image.shape[0]))
-                        # post_image2= post_image.copy()
-                        # post_image2[: : , : , 0] = 0
-                        # post_image2[: : , : , 2] = 0
-                        # visimg1= cv2.addWeighted(pre_image, 0.5, post_image2, 0.5, 0)
-                        # visimg2 = cv2.addWeighted(post_image_original, 0.5, post_image2, 0.5, 0)
+                        post_image = cv2.warpPerspective(post_image, H, (post_image.shape[1], post_image.shape[0]))
+                        post_image2= post_image.copy()
+                        post_image2[: : , : , 0] = 0
+                        post_image2[: : , : , 2] = 0
+                        visimg1= cv2.addWeighted(pre_image, 0.5, post_image2, 0.5, 0)
+                        visimg2 = cv2.addWeighted(post_image_original, 0.5, post_image2, 0.5, 0)
                     
 
-                        # fig , ax =  plt.subplots(1,6,figsize=(20,20))
-                        # ax[0].imshow(pre_image)
-                        # ax[0].set_title('pre_image')
-                        # ax[1].imshow(post_image_original)
-                        # ax[1].set_title('post_image_original')
-                        # ax[2].imshow(crop_img)
-                        # ax[2].set_title('crop_img')
-                        # ax[3].imshow(post_image)
-                        # ax[3].set_title('post_image')
-                        # ax[4].imshow(visimg1)
-                        # ax[4].set_title('visimg1')
-                        # ax[5].imshow(visimg2)
-                        # ax[5].set_title('visimg2')
-                        # plt.show()
+                        fig , ax =  plt.subplots(1,6,figsize=(20,20))
+                        ax[0].imshow(pre_image)
+                        ax[0].set_title('pre_image')
+                        ax[1].imshow(post_image_original)
+                        ax[1].set_title('post_image_original')
+                        ax[2].imshow(crop_img)
+                        ax[2].set_title('crop_img')
+                        ax[3].imshow(post_image)
+                        ax[3].set_title('post_image')
+                        ax[4].imshow(visimg1)
+                        ax[4].set_title('visimg1')
+                        ax[5].imshow(visimg2)
+                        ax[5].set_title('visimg2')
+                        plt.show()
                         translation = (H[0, 2], H[1, 2])
                         rotation_rad = math.atan2(H[1, 0], H[0, 0])
                         rotation_angle= np.arctan2(H[1, 0], H[0, 0]) * 180 / np.pi
@@ -770,23 +895,23 @@ class finding():
                                 
                                     # cv2.imwrite(self.output_path + data + '_vis/' + patient_id + '_' + eye + '_' + post_treatment + '.png', vis)
                         match_par = 'crop_'+ feature + '_' + matcher + '_' + str(distance) 
-                        for label in self.label_list:
-                            if 'CC' in label:
+                        
+                        
+                        for layer in data_groups:
+                            if 'CC' in layer:
                                 output_label = 'CC'
                             else:
                                 output_label = 'OR'
-                                        
+                                
                                     
                             if not os.path.exists(self.output_label_path + '/' + match_par +  '/' + output_label ):
                                 os.makedirs(self.output_label_path + '/' +match_par  +  '/' + output_label )
                             if not os.path.exists(self.output_label_path + '/' +match_par  +  '/' + output_label +'_move/'):
                                 os.makedirs(self.output_label_path + '/' + match_par + '/' + output_label +'_move/')
                                 
-                            mask_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(self.image_path))),label,'masks')
+                            mask_path = os.path.join(self.label_path + '_' + layer,mask_folder_name)
 
-                            
                             if os.path.exists(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
-                                # print('------',mask_path + '/'+ patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.imread(mask_path + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
                                 pre_label = cv2.resize(pre_label, self.image_size)
                                 # pre_label = cv2.normalize(pre_label, None, 0, 255, cv2.NORM_MINMAX)
@@ -889,6 +1014,9 @@ class finding():
         matching_mse_list = []
         matching_psnr_list = []
         matching_ssim_list = []
+        pre_treatment_file = ''
+        post_treatment_file = ''
+        
         for filename in filenames: 
             if filename.endswith(".png"):
                 patient_id, eye, date = filename.split('.png')[0].split('_')
@@ -896,10 +1024,12 @@ class finding():
                     patient[patient_id + '_' + eye] = {}
                     post_treatment = ''
                     pre_treatment = date
+                    pre_treatment_file = filename
                     # patient[patient_id + '_' + eye]['pre_treatment'] = date
                 else :
                     patient[patient_id + '_' + eye][date] = {}
                     post_treatment =  date 
+                    post_treatment_file = filename
 
                     if pre_treatment_file != '' and post_treatment_file != '':
                         patient[patient_id + '_' + eye][date]['pre_treatment'] = pre_treatment
@@ -1090,33 +1220,34 @@ def get_data_from_txt_file(filename):
 
 
 if __name__ == '__main__':
-    pre_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
-    post_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
+    # pre_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
+    # post_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
     
-    date = '20240320'
+    date = '20240418'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
-
-    label_path = PATH_DATA + '20240311_label' + '/'
+    data_groups = ['CC']
+    label_path = PATH_BASE  + '/' + disease + '_' + date + '_connectedComponent_bil51010_clah1016_concate34OCT'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
     output_image_path = PATH_BASE + 'inpaint/'
     image_path = PATH_BASE + 'inpaint/MATCH/' 
-    label_path_name = [disease + '_' + date + '_connectedComponent_CC']
+    label_path_name = [disease + '_' + date + '_connectedComponent']
     output_label_path = output_image_path + 'MATCH_LABEL/' 
     distances = [0.8]
     features = ['SIFT','KAZE','AKAZE','ORB','BRISK' ,'FREAK','BRIEF']#,
     matchers = ['BF','FLANN']# ,'FLANN'
-    patient_list = get_data_from_txt_file('PCV.txt')
+    # patient_list = get_data_from_txt_file('PCV.txt')
     setFolder('./record/'+ disease + '_' + date + '/') 
+    
     for distance in distances:
         for feature in features:
             for matcher in matchers:
                 # print(image_path + 'crop' + '_' +  feature + '_' + matcher + '_' + str(distance))
 
-                find = finding(label_path,image_path,label_path_name,output_label_path,output_image_path,features,matchers,distance)
+                find = finding(label_path,image_path,label_path_name,data_groups,output_label_path,output_image_path,features,matchers,distance,file_name='../../Data/打針資料.xlsx')
                 
-                find_dict = find.feature(feature,matcher,distance)
+                find_dict = find.feature(feature,matcher,distance,data_groups)
                 find_dict = convert_float32_to_float(find_dict)
                 json_file = './record/'+ disease + '_' + date + '/'+ 'crop_'+feature + '_' + matcher + '_' + str(distance) + '_align.json'
                 tools.write_to_json_file(json_file, find_dict)

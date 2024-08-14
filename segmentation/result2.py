@@ -21,7 +21,7 @@ def mean_pixel_accuracy(y_true, y_pred):
 
 
 def jaccard_ind(y_true, y_pred):
-    smooth = 1e-5
+    smooth = 1e-8
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     intersection = tf.reduce_sum(y_true * y_pred)
@@ -33,17 +33,18 @@ def jaccard_ind(y_true, y_pred):
     return jac
 
 def dice_coef(y_true, y_pred):
-    smooth = 1e-5
+    smooth = 1e-8
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     intersection = tf.reduce_sum(y_true * y_pred)
-    dic = (2. * intersection + smooth) / (tf.reduce_sum(y_true) + tf.reduce_sum(y_pred) + smooth)
+    union = tf.reduce_sum(y_true) + tf.reduce_sum(y_pred)
+    dic = (2. * intersection + smooth) /(union + smooth)
     # tf.Tensor to  int
     dic = dic.numpy()
     return dic
     
 def recall_score(y_true, y_pred):
-    smooth = 1e-5
+    smooth = 1e-8
     y_true = tf.cast(y_true, tf.float32)
     y_pred = tf.cast(y_pred, tf.float32)
     recall =  tf.reduce_sum(y_true * y_pred) / (tf.reduce_sum(y_true) + smooth)

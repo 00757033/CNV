@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import csv
 from sklearn.metrics import jaccard_score, recall_score
-from UNetModel2 import *
+from segmentation.UNetModel import *
 import tensorflow as tf
 from Deeplab import *
 model_classes = {

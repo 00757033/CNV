@@ -69,12 +69,12 @@ class inpaint():
         df = pd.DataFrame({'time': time ,'x': self.x, 'y': self.y, 'height': self.height, 'width': self.width}, index=[0])
 
         # if the file exists, append the new data to the file
-        if os.path.exists('points.csv'):
-            df.to_csv('points.csv', mode='a', header=False, index=False)
+        if os.path.exists('./record/points.csv'):
+            df.to_csv('./record/points.csv', mode='a', header=False, index=False)
         else:
-            df.to_csv('points.csv', index=False)
+            df.to_csv('./record/points.csv', index=False)
 
-    def extraneous_information(self,file,newpoint =False,point = 'points.csv'):
+    def extraneous_information(self,file,newpoint =False,point = './record/points.csv'):
         # remove unnecessary Information from the image
         data_dir = ['images','masks']
         # x = 7

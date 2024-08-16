@@ -14,7 +14,7 @@ from datetime import datetime
 
 # # 將 my_project 資料夾的路徑添加到 Python 解釋器的搜索路徑
 # sys.path.append(my_project_path)
-import tools.tools as tools
+import tools 
 
 class Analyze():
     def __init__(self,data_path = '../../Data/OCTA',layers = {"3":"OR","4":"CC"},layer_list = ['1','2','3','4','6','7']):
@@ -114,10 +114,7 @@ class Analyze():
         print('inject case',count)
         
         return inject_dict
-                
-                
-    
-        
+                        
     def find_missing_records(self,data):
         missing_records = dict()
         for patient_id, eyes in data.items():
@@ -142,7 +139,6 @@ class Analyze():
         print('missing records',count)
         return missing_records
       
-
     def check_date(self, patient_in_list,patient_in_folder): # patient_in_list 病患資料表中的病患  patient_in_folder 病歷表中的病患
         # 病歷表中的病患 
         eye_change = {'OD':'R','OS':'L'}
@@ -153,7 +149,6 @@ class Analyze():
                 print(patient_in_folder[patient_id])
             
         return patient,found_patient
-
 
     def read_file(self,path = '../../Data/OCTA'):
         need_collect = dict()
@@ -175,8 +170,7 @@ class Analyze():
                                 
         tools.pop_empty_dict(need_collect)
         return need_collect
-                                                    
-                
+                                                                 
     # Uncollected patients
     def Uncollected_patients(self,patient_in_excell_list,patient_in_folder,inject_dict):
         uncollect_patient = dict()
@@ -238,8 +232,7 @@ class Analyze():
                 count += len(eyes)
         print('uncollect patient',count)
         return uncollect_patient,collect_patient
-
-    
+ 
     def disease_txt(dict_AMD, dict_PCV,dict_other,file_name = 'AMD_PCV.txt'):
         tools.remove_exist_file(file_name)
         tools.patientID_to_txt_file(file_name,dict_AMD,'AMD',True)
@@ -353,6 +346,8 @@ class Analyze():
 
 def sort_by_patient_id(item):
     return item[0]                         
+
+
 if __name__ == '__main__':
     analyze = Analyze()
     # 收集病患資料

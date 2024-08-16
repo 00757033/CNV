@@ -5,7 +5,6 @@ import numpy as np
 import pandas as pd
 import os
 from inpaint import inpaint
-from destripe import destripe_octa_image
 import json
 import matplotlib.pyplot as plt
 import datetime
@@ -216,7 +215,7 @@ class getData():
 if __name__ == '__main__':
     # 20240525 toinpaint = False clean = False
     # 20240524 toinpaint = True clean = True
-    date = '20240814'
+    date = '20240524'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date

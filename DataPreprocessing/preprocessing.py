@@ -436,7 +436,7 @@ def get_label_path(input_path, layer_name):
     return layer_path
 
 if __name__ == "__main__":
-    date = '20240814'
+    date = '20240524'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date

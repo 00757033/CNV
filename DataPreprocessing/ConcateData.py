@@ -128,14 +128,14 @@ class Concatenation() :
 
 if __name__ == "__main__":
     import cv2
-    date = '20240814'
+    date = '20240524'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
     image_path = PATH + FILE
     data_groups = [ "CC"]
     filters = "_connectedComponent_bil31010_clah0712"
-    dict_concate = {'OR': [FILE  + filters+"_OR", FILE  + "_CC",FILE + "_OR"] , 'CC': [FILE  + filters+"_CC", "ALL/4/", "ALL/3/" ,"ALL/4_OCT/"]}# ,"ALL/4_OCT/"
+    dict_concate = { 'CC': [FILE  + filters+"_CC", "ALL/4/", "ALL/3/" ,"ALL/4_OCT/"]}# ,"ALL/4_OCT/"
     
     for data_group in data_groups:
         path = FILE + '/'+ data_group

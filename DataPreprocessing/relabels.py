@@ -138,7 +138,7 @@ class reLabel():
 
 if __name__ == "__main__":
     # date = '20240524' # 20240524  20240525:original
-    date = '20240814'
+    date = '20240524'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date

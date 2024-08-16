@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import os
 from pathlib import Path
-import tools.tools as tools
+import tools
 from matplotlib import pyplot as plt
 class reLabel():
     def __init__(self,path,layers = {"4":"CC"}):

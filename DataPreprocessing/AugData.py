@@ -1,6 +1,6 @@
 import albumentations as A
 import cv2
-import tools.tools as tools
+import tools
 import pathlib as pl
 import shutil
 import os

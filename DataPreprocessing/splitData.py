@@ -1,6 +1,6 @@
 from sklearn.model_selection import train_test_split
 
-import tools.tools as tools
+import tools
 import os
 import cv2
 import shutil

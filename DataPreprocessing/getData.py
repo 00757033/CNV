@@ -91,6 +91,11 @@ class getData():
         img_scp = cv2.normalize (img_scp, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
         img_dcp = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,'2'+'.png'))
         img_dcp = cv2.normalize (img_dcp, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+        img_or = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,'3'+'.png'))
+        img_or = cv2.normalize (img_or, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+        img_cc = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,'4'+'.png'))
+        img_cc = cv2.normalize (img_cc, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
+        
         
         if img_scp is None or img_dcp is None:
             return None
@@ -99,7 +104,7 @@ class getData():
         mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
         for i in range(img_scp.shape[0]):
             for j in range(img_scp.shape[1]):
-                if np.array_equal(img_scp[i][j], img_dcp[i][j]):
+                if np.array_equal(img_scp[i][j], img_dcp[i][j]) and not np.array_equal(img_dcp[i][j] , img_or[i][j]) and not np.array_equal(img_dcp[i][j] , img_cc[i][j]):
                     mask[i][j] = 255
         return mask
 
@@ -131,22 +136,33 @@ class getData():
             tools.makefolder( output_path + '/ALL/' + lay )
 
         for patientID in label_dict :
-            print(patientID)
             for date in label_dict[patientID]:
                 for eyes in label_dict[patientID][date]:
                     new_image_name = patientID + '_' + eyes + '_' + date
                     
                     if not self.errorimage('CC_'+new_image_name,erase ) : #and  not self.errorimage('OR_'+new_image_name) 刪除錯誤圖片
                         mask = None
-                        mask = self.denoise_image(patientID,date,eyes)
+                        mask = np.zeros((304,304),dtype = np.uint8)
+                        if clean:
+                            mask = self.denoise_image(patientID,date,eyes)
+                        # plt.imshow(mask,cmap = 'gray')
+                        # plt.axis('off')
+                        # plt.show()
+                        
 
                         for lay in self.all_layers:
                             for image in pl.Path(os.path.join(self.image_path,patientID,date,eyes)).iterdir():
                                 if image.stem == lay and image.suffix == '.png':
                                     if '_OCT' not in lay and toinpaint: # inpaint
                                         save_image = preprocess.extraneous_information(str(image))
+                                        # plt.imshow(save_image,cmap = 'gray')
+                                        # plt.axis('off')
+                                        # plt.show()
                                         x,y,h,w = preprocess.get_points()
                                         mask[y:y+h,x:x+w] = 0
+                                        # plt.imshow(mask,cmap = 'gray')
+                                        # plt.axis('off')
+                                        # plt.show()
                                         
                                     else :
                                         save_image = cv2.imread(os.path.join(self.image_path,patientID,date,eyes,lay+'.png'))
@@ -155,13 +171,16 @@ class getData():
                                         continue
                                     
                                     save_image = cv2.resize(save_image,(304,304))
+
                                     
                                     if clean and mask is not None:
                                         save_image = self.process_image(save_image,mask)
                                     else:
                                         save_image = cv2.resize(save_image,(304,304))
                                     save_image = cv2.normalize(save_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
-                                        
+                                    # plt.imshow(save_image,cmap = 'gray')
+                                    # plt.axis('off')
+                                    # plt.show()    
                                     cv2.imwrite(output_path + '/ALL/' + lay + '/' + new_image_name+'.png' ,save_image)
                                     
                                     if copy_image:
@@ -195,7 +214,9 @@ class getData():
             
                 
 if __name__ == '__main__':
-    date = '20240502'
+    # 20240525 toinpaint = False clean = False
+    # 20240524 toinpaint = True clean = True
+    date = '20240814'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date
@@ -209,6 +230,6 @@ if __name__ == '__main__':
     # health = data.health('../DataAnalyze/PCV_disease.json')
     # data.writeLabelJson('./record/label_dict.json')
     types = ['disease','health']
-    data.getData(disease,PATH_BASE,'disease',toinpaint = True,copy_image = True,copy_label = True,erase = True,clean = True)
+    data.getData(disease,PATH_BASE,'disease',toinpaint = False,copy_image = True,copy_label = True,erase = True,clean = False)
 
 

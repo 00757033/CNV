@@ -12,7 +12,7 @@ class Augment():
         self.train_test = ["train","test","valid"]
 
     def albumentation(self, path,data_dir,output,image_name):
-        image = cv2.imread(path)
+        image = cv2.imread(path,cv2.IMREAD_UNCHANGED)
         mask = cv2.imread(path.replace('images','masks'))
         image_original = None
         if 'images_original' in data_dir:
@@ -23,37 +23,42 @@ class Augment():
         transform = A.Compose([
             A.HorizontalFlip(p=0.5),
             A.VerticalFlip(p=0.5),
-            A.RandomRotate90(p=0.5),
-            A.Transpose(p=0.5),
-            A.GridDistortion(p=0.5),
-            A.OpticalDistortion(p=0.5),
+            A.Rotate(limit=10, p=0.5),
+            A.RandomScale(scale_limit=0.1, p=0.5),
+            # A.Transpose(p=0.5),
             A.RandomBrightnessContrast(p=0.5),
-            A.GridDistortion(p=0.5),
-            A.OneOf([
-                A.MotionBlur(p=0.2),
-                A.MedianBlur(blur_limit=3, p=0.1),
-                A.Blur(blur_limit=3, p=0.1),
-            ], p=0.2), 
-        ],is_check_shapes=False)
+            # A.GridDistortion(p=0.5),
+            # A.OpticalDistortion(p=0.5),
+            # A.Blur(blur_limit=3, p=0.1),
+        ], additional_targets={'image_original': 'image'}, is_check_shapes=False)
         
-
+        inputs = {'image': image, 'mask': mask}
+        if image_original is not None:
+             inputs['image_original'] = image_original 
         # Augment an image
-        augmented = transform(image=image, mask=mask)
+        augmented = transform(**inputs)
         aug_image = augmented['image']
         aug_mask = augmented['mask']
+        
         if image_original is not None:
-            aug_image_original = transform(image=image_original)['image']
+            aug_image_original = augmented['image_original']
             cv2.imwrite(os.path.join(output,'images_original',image_name + '.png'), aug_image_original)
-        # # show the augmented image
-        # fig, ax = plt.subplots(2, 2, figsize=(10, 10))
+        # show the augmented image
+        # fig, ax = plt.subplots(2, 3, figsize=(10, 10))
         # ax[0, 0].imshow(image)
         # ax[0, 0].axis('off')
         # ax[0, 1].imshow(mask)
         # ax[0, 1].axis('off')
+        # if image_original is not None:
+        #     ax[0, 2].imshow(image_original)
+        #     ax[0, 2].axis('off')
         # ax[1, 0].imshow(aug_image)
         # ax[1, 0].axis('off')
         # ax[1, 1].imshow(aug_mask)
         # ax[1, 1].axis('off')
+        # if image_original is not None:
+        #     ax[1, 2].imshow(aug_image_original)
+        #     ax[1, 2].axis('off')
         # plt.show()
 
         
@@ -86,7 +91,7 @@ class Augment():
                             image_name = image.stem
                             img_path = str(image)    
                             for dir in data_dir:
-                                cv2.imwrite(os.path.join(output, dir, image_name + '.png'), cv2.imread(os.path.join(input, dir, image_name + '.png')))
+                                cv2.imwrite(os.path.join(output, dir, image_name + '.png'), cv2.imread(os.path.join(input, dir, image_name + '.png'), cv2.IMREAD_UNCHANGED))
                                 
                             
                             for time in range(augment_time):     
@@ -106,13 +111,13 @@ def make_output_path(path ,output_name, layer_name):
         return output_image, output_label
 
 if __name__ == "__main__":
-    date = '20240502'
+    date = '20240524'
     disease = 'PCV'
     PATH = "../../Data/"
     PATH_BASE =  PATH + "/" + disease + "_"+ date
     PATH_LABEL = PATH + "/" + "new_label"
     PATH_IMAGE = PATH + "/" + "OCTA"
     preprocess = Augment(PATH_BASE + '/' + 'trainset')
-    augment_time = [2]
+    augment_time = [1]
     for time in augment_time:
-        preprocess.augumentation(disease + "_"+ date +  '_connectedComponent_bil51010_clah1016_concate34OCT_42','aug' + str(time),time)    
+        preprocess.augumentation(disease + "_"+ date +  '_connectedComponent_bil31010_clah0708_concate34OCT_30','aug' + str(time),time)    

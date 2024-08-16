@@ -520,7 +520,7 @@ class finding():
                     singlePointColor = (255,0,0),
                     matchesMask = matchesMask,
                     flags = 0)
-                img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
+                # img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
 
 
         # plt.imshow(img3)

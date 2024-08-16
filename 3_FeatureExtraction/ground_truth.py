@@ -13,11 +13,11 @@ from sklearn.preprocessing import StandardScaler
 
 if __name__ == '__main__':
     disease   = 'PCV'
-    date    = '20240411'
+    date    = '20240502'
     PATH_BASE    = "../../Data/" + disease + '_' + date + '/'
     PATH_FEATURE = PATH_BASE + 'feature/'
     
-    data = './record/' + disease + '_' + date +'/'+'regression_ROI.csv'
+    data = './record/' + disease + '_' + date +'/'+'classification_ROI.csv'
     feature = pd.read_csv(data)
     feature = feature.dropna()
     # scaler = MinMaxScaler()

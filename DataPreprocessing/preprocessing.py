@@ -9,7 +9,7 @@ import math
 from skimage.metrics import mean_squared_error
 from skimage.metrics import structural_similarity
 from skimage.metrics import peak_signal_noise_ratio
-import tools.tools as tools
+
 import pandas as pd
 import os
 from skimage.filters import unsharp_mask
@@ -41,7 +41,7 @@ class PreprocessData():
         for layer in self.layers : 
             output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
             print(self.layers[layer])
-            label_path = tools.get_label_path(input_path,self.layers[layer])
+            label_path = get_label_path(input_path,self.layers[layer])
             file = path + self.layers[layer] + '_filter_parameter.csv'
             if new_parameter or not os.path.exists(file) :
                 [d,sigmaColor,sigmaSpace] = self.filter_parameter(label_path)
@@ -148,48 +148,14 @@ class PreprocessData():
                                     df.to_csv(file,index=False)
         return best_psnr_parameter
 
-    # # get all parameter
-    # def preprocess(self,input_path,output_name,save_img =True,new_parameter = False,path = './record/'):
-    #     for layer in self.layers : 
-    #         output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
-    #         print(self.layers[layer])
-    #         label_path = tools.get_label_path(input_path,self.layers[layer])
-    #         if new_parameter or not os.path.exists(path + self.layers[layer] + '_all_parameter.csv'):
-    #             [d,sigmaColor,sigmaSpace,clip,kernel] = self.all_parameter(label_path)
-    #             self.save_all_parameter(self.layers[layer],[d,sigmaColor,sigmaSpace,clip,kernel])
-    #         d,sigmaColor,sigmaSpace,clip,kernel = self.get_all_parameter(input_path,self.layers[layer])
-    #         # not return none
-    #         if d == None or sigmaColor == None or sigmaSpace == None or clip == None or kernel == None:
-    #             [d,sigmaColor,sigmaSpace,clip,kernel] = self.all_parameter(label_path)
-    #             self.save_all_parameter(input_path,self.layers[layer],[d,sigmaColor,sigmaSpace,clip,kernel])
-    #         d,sigmaColor,sigmaSpace,clip,kernel = self.get_all_parameter(input_path,self.layers[layer])
-    #         print('all_parameter',d,sigmaColor,sigmaSpace,clip,kernel)
-    #         if save_img:
-    #             for image in pl.Path(self.path+ '/' +label_path + '/'+ 'images').iterdir():
-    #                 if image.suffix == '.png':
-    #                     image_name = image.name
-    #                     img_path = str(image)
-    #                     gray_image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-    #                     mask_path = img_path.replace('images','masks')
-    #                     image_label = cv2.imread(mask_path, 0)
-                        
-    #                     bilateral_image = cv2.bilateralFilter(gray_image, d, sigmaColor,sigmaSpace )
-    #                     clahe = cv2.createCLAHE(clipLimit=clip, tileGridSize=(kernel,kernel))
-    #                     cl = clahe.apply(bilateral_image)
-
-    #                     cv2.imwrite(output_image + '/'+image_name,cl)
-    #                     cv2.imwrite(output_label + '/'+image_name,image_label)
 
     def preprocess(self,input_path,output_name,parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=True ,cut = True,bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/'):
         for layer in self.layers : 
             output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
     
-            label_path = tools.get_label_path(input_path,self.layers[layer])
-            print('input_path',label_path,self.path+ '/' +label_path + '/'+ 'images')
+            label_path = get_label_path(input_path,self.layers[layer])
             d,sigmaColor,sigmaSpace,clip,kernel = parm[layer]
             
-            # not return none
-            print('all_parameter',d,sigmaColor,sigmaSpace,clip,kernel)
             if save_img:
                 for image in pl.Path(self.path+ '/' +label_path + '/'+ 'images').iterdir():
                     if image.suffix == '.png':
@@ -200,52 +166,19 @@ class PreprocessData():
                         image_label = cv2.imread(mask_path, 0)
                         gray_image = cv2.normalize(gray_image, None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8U)
                         preprocessing_image = gray_image.copy()
-                        
-                                                     # Defining the kernel to be used in Top-Hat 
-                        # preprocessing_image2 = preprocessing_image.copy()
 
-                        # filterSize =(3, 3) 
-                        # kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, 
-                        #                                 filterSize) 
-                        # tophat_img = cv2.morphologyEx(preprocessing_image2,  
-                        #         cv2.MORPH_TOPHAT, 
-                        #         kernel2) 
-                        # fig , ax =  plt.subplots(2,2)
-                        # print(image_name)
-                        # ax[0][0].imshow(preprocessing_image2,cmap='gray')
-                        # ax[0][1].imshow(tophat_img,cmap='gray')
-                        
-                        # plt.show()
 
                         if  fastNlMeansDenoising:
                             # Apply non-local means denoising
                             preprocessing_image = cv2.fastNlMeansDenoising(preprocessing_image, None, 7, 7,21)
-                        # if cut:
-                        #     result = preprocessing_image.copy()
-                        #     preprocessing_image_1 = cv2.imread(os.path.join(self.path,  'ALL','1',image_name), cv2.IMREAD_GRAYSCALE)
-                        #     preprocessing_image_2 = cv2.imread(os.path.join(self.path,  'ALL','2',image_name), cv2.IMREAD_GRAYSCALE)
-                        #     # 找到两个图像的共通部分
-                        #     for i in range(preprocessing_image.shape[0]):
-                        #         for j in range(preprocessing_image.shape[1]):
-                        #             if np.array_equal(preprocessing_image_1[i][j], preprocessing_image_2[i][j]):
-                        #                 if np.all(preprocessing_image_1[i][j] >=  preprocessing_image_2[i][j]):
-                        #                     mask = np.zeros_like(preprocessing_image_1)
-                        #                     mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
-                        #                     mask[i][j] = 255
-                        #                     result= cv2.inpaint( result , mask, 3, cv2.INPAINT_TELEA)
-                        #     preprocessing_image = result                
-                                
-                            
-                            # fig , ax =  plt.subplots(2,2)
-                            # ax[0][0].imshow(gray_image,cmap='gray')
-                            # ax[0][1].imshow(common_noise,cmap='gray')
-                            # ax[1][0].imshow(preprocessing_image,cmap='gray')
-                            # ax[1][1].imshow(preprocessing_image,cmap='gray')
-                            # plt.show()
+
                             
                 
                         if bilateralFilter : 
                             preprocessing_image = cv2.bilateralFilter(preprocessing_image, d, sigmaColor,sigmaSpace )
+                            # plt.imshow(preprocessing_image,cmap='gray')
+                            # plt.axis('off')
+                            # plt.show()
 
 
                         if Unsharp :
@@ -255,31 +188,10 @@ class PreprocessData():
                         if clahe :
                             clahe = cv2.createCLAHE(clipLimit=clip, tileGridSize=(kernel,kernel))
                             preprocessing_image = clahe.apply(preprocessing_image)
-                            # denoised_img_image = clahe.apply(denoised_img)
+                            # plt.imshow(preprocessing_image,cmap='gray')
+                            # plt.axis('off')
+                            # plt.show()
                             
-                        # fig , ax =  plt.subplots(2,2)
-                        # print(image_name)
-                        # ax[0][0].imshow(gray_image,cmap='gray')
-                        # ax[0][1].imshow(denoised_img,cmap='gray')
-                        # ax[1][0].imshow(preprocessing_image,cmap='gray')
-                        # ax[1][1].imshow(denoised_img_image,cmap='gray')
-                        
-                        # plt.show()
-                            
-                            #  # Defining the kernel to be used in Top-Hat 
-                            # preprocessing_image2 = preprocessing_image.copy()
-
-                            # filterSize =(3, 3) 
-                            # kernel2 = cv2.getStructuringElement(cv2.MORPH_RECT, 
-                            #                                 filterSize) 
-                            # tophat_img = cv2.morphologyEx(preprocessing_image2,  
-                            #         cv2.MORPH_BLACKHAT, 
-                            #         kernel2) 
-
-                            # cv2.imshow("original",preprocessing_image2) 
-                            # cv2.imshow("tophat", tophat_img) 
-                            # cv2.waitKey(5000) 
-                            # cv2.destroyAllWindows()
 
                             
                         cv2.imwrite(output_image + '/'+image_name,preprocessing_image)
@@ -307,7 +219,7 @@ class PreprocessData():
         for layer in self.layers : 
             output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
             print(self.layers[layer])
-            label_path = tools.get_label_path(input_path,self.layers[layer])
+            label_path = get_label_path(input_path,self.layers[layer])
             if new_parameter or not os.path.exists(path + self.layers[layer] + '_clahe_parameter.csv'):
                 [clip , kernel]  = self.clahe_parameter(label_path)
                 self.save_clahe_parameter(self.layers[layer],[clip , kernel])
@@ -333,22 +245,6 @@ class PreprocessData():
                         cv2.imwrite(output_image + '/'+image_name,cl)
                         cv2.imwrite(output_label + '/'+image_name,image_label)
 
-    def destripe(self,input_path,output_name):
-        for layer in self.layers : 
-            output_image, output_label = make_output_path(self.path,output_name, self.layers[layer])
-            print(self.layers[layer])
-            label_path = tools.get_label_path(input_path,self.layers[layer])
-            # 
-            for image in pl.Path(self.path+ '/' +label_path + '/'+ 'images').iterdir():
-                if image.suffix == '.png':
-                    image_name = image.name
-                    img_path = str(image)
-                    gray_image = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
-                    mask_path = img_path.replace('images','masks')
-                    image_label = cv2.imread(mask_path, 0)
-                    new_img = self.destripe_octa_image(gray_image)
-                    cv2.imwrite(output_image + '/'+image_name,new_img)
-                    cv2.imwrite(output_label + '/'+image_name,image_label)
 
     def filter_parameter(self,layer,save_para = True,file_path = './record/'):
         file_name = file_path + layer + '_' + 'bilateralFilter' + '.csv'
@@ -493,36 +389,36 @@ class PreprocessData():
 
         return sharpened_image
 
-    def destripe_octa_image(self,octa_image):
-        # Convert OCTA image to floating point for processing
-        octa_image = octa_image.astype(np.float32)
+    # def destripe_octa_image(self,octa_image):
+    #     # Convert OCTA image to floating point for processing
+    #     octa_image = octa_image.astype(np.float32)
 
-        # Apply a bilateral filter to the OCTA image to smooth out noise while preserving edges
-        # smoothed_image = cv2.bilateralFilter(octa_image, -1, sigma_s, sigma_r)
+    #     # Apply a bilateral filter to the OCTA image to smooth out noise while preserving edges
+    #     # smoothed_image = cv2.bilateralFilter(octa_image, -1, sigma_s, sigma_r)
 
 
-        # Calculate the mean intensity profile along the A-scan (vertical) direction
-        mean_profile = np.mean(octa_image, axis=1)
+    #     # Calculate the mean intensity profile along the A-scan (vertical) direction
+    #     mean_profile = np.mean(octa_image, axis=1)
 
-        # Subtract the mean profile from each A-scan to remove horizontal stripes
-        destriped_image = octa_image - mean_profile[:, np.newaxis]
+    #     # Subtract the mean profile from each A-scan to remove horizontal stripes
+    #     destriped_image = octa_image - mean_profile[:, np.newaxis]
 
-        # Calculate the mean intensity profile along the B-scan (horizontal) direction
-        mean_profile = np.mean(destriped_image, axis=0)
+    #     # Calculate the mean intensity profile along the B-scan (horizontal) direction
+    #     mean_profile = np.mean(destriped_image, axis=0)
 
-        # Subtract the mean profile from the entire image to remove vertical stripes
-        destriped_image -= mean_profile
+    #     # Subtract the mean profile from the entire image to remove vertical stripes
+    #     destriped_image -= mean_profile
 
-        # Clip negative values to ensure the image remains non-negative
-        destriped_image[destriped_image < 0] = 0
+    #     # Clip negative values to ensure the image remains non-negative
+    #     destriped_image[destriped_image < 0] = 0
 
-        # Normalize the destriped image to the range [0, 255] for display
-        destriped_image = (destriped_image / np.max(destriped_image)) * 255
+    #     # Normalize the destriped image to the range [0, 255] for display
+    #     destriped_image = (destriped_image / np.max(destriped_image)) * 255
 
-        # Convert the destriped image back to uint8 for display
-        destriped_image = destriped_image.astype(np.uint8)
+    #     # Convert the destriped image back to uint8 for display
+    #     destriped_image = destriped_image.astype(np.uint8)
 
-        return destriped_image
+    #     return destriped_image
 
 def make_output_path(path ,output_name, layer_name):
         output_image = os.path.join(path, f"{output_name}_{layer_name}/images")
@@ -531,9 +427,16 @@ def make_output_path(path ,output_name, layer_name):
             os.makedirs(output_dir, exist_ok=True)
         
         return output_image, output_label
+    
+def get_label_path(input_path, layer_name):
+    if input_path:
+        layer_path = f"{input_path}_{layer_name}"
+    else:
+        layer_path = layer_name
+    return layer_path
 
 if __name__ == "__main__":
-    date = '20240502'
+    date = '20240814'
     disease = 'PCV'
     PATH = "../../Data/"
     FILE = disease + "_"+ date
@@ -544,4 +447,4 @@ if __name__ == "__main__":
     # preprocess.clahe_preprocess(FILE + '_otsu_bil',FILE + '_otsu_bil_clahe')
     # preprocess.preprocess('' ,FILE + '_bil510_clahe7',parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/')
     # preprocess(self,input_path,output_name,parm = { "3": [5,10,10,0.7,3],"4":[5,10,10,0.7,12]},fastNlMeansDenoising=True ,cut = True,bilateralFilter =True ,Unsharp = True,clahe =True,   save_img =True,new_parameter = False,path = './record/'):
-    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil51010_clah1016',parm = {"4":[5,10,10,1.0,16]},fastNlMeansDenoising=False,cut = False,bilateralFilter =True ,Unsharp = False,clahe =True, save_img =True,new_parameter = False,path = './record/')
+    preprocess.preprocess(FILE +'_connectedComponent' ,FILE + '_connectedComponent_bil31010_clah0712',parm = {"4":[3,10,10,0.7,12]},fastNlMeansDenoising=False,cut = False,bilateralFilter =True ,Unsharp = False,clahe =True, save_img =True,new_parameter = False,path = './record/')

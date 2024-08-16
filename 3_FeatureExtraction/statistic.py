@@ -19,321 +19,144 @@ class Statistic:
         self.layers = layers
         self.disease = disease
         
-        self.Morphologyfeature = [ 'VD','VLD','VAPR','VLA','VDI']
-        self.GLCMfeature = ['Contrast','Autocorrelation','Energy','Homogeneity','DifferenceEntropy','Dissimilarity']
-        self.GLRLMfeature = ['ShortRunEmphasis','LongRunEmphasis','GrayLevelNonUniformity','RunLengthNonUniformity','RunPercentage','LowGrayLevelRunEmphasis','HighGrayLevelRunEmphasis','ShortRunLowGrayLevelEmphasis','ShortRunHighGrayLevelEmphasis','LongRunLowGrayLevelEmphasis','LongRunHighGrayLevelEmphasis']
-        self.GLSZMfeature = ['SmallAreaEmphasis','LargeAreaEmphasis','GrayLevelNonUniformity','SizeZoneNonUniformity','GrayLevelVariance','SizeZoneVariance','ZonePercentage','GrayLevelEntropy']
-        self.NGTDMfeature = ['Coarseness','Contrast','Busyness','Complexity','Strength']
-        self.GLDMfeature = ['LowGrayLevelEmphasis','HighGrayLevelEmphasis','GrayLevelNonUniformity','GrayLevelNonUniformityNormalized','GrayLevelVariance','GrayLevelVarianceNormalized']
-        self.SFMfeature = ['Periodicity','Roughness']
-        self.HOGfeature = ['HOG']
-        self.LBPfeature = ['LBP']
-        self.DWTfeature = ['avg_LH','avg_HL','std_LH','std_HL']
+        self.Morphologyfeature = [ 'VAD','VSD','VDI','VPI']
         
         
         
-    def stat(self, file_name,feature_names = "Morphologyfeature"):
+    def stat(self, file_name):
         # read json file
         with open('./record/' + self.disease+ '/'+ file_name) as f:
-            data = json.load(f)
-        
-        
-
-        injection = ["0","1","2"]
+            data = json.load(f)   
         
         feature_avg = {}
-        if feature_names == "Morphology":
-            feature = self.Morphologyfeature
-            
-        elif feature_names == "GLCM":
-            feature = self.GLCMfeature
-            
-        elif feature_names == "GLRLM":
-            feature = self.GLRLMfeature
-            
-        elif feature_names == "GLSZM":
-            feature = self.GLSZMfeature
-            
-        elif feature_names == "NGTDM":
-            feature = self.NGTDMfeature
-            
-        elif feature_names == "GLDM":
-            feature = self.GLDMfeature
-            
-        elif feature_names == "SFM":
-            feature = self.SFMfeature
-            
-        elif feature_names == "Statistic":
-            feature = self.Statisticfeature
-            
-        elif feature_names == "LBP":
-            feature = self.LBPfeature
-        
-        elif feature_names == "HOG":
-            feature = self.HOGfeature
-            
-        elif feature_names == "DWT":
-            feature = self.DWTfeature
-            
-            
-            
-        
-        
-        
+        # if feature_names == "Morphology":
+        #     feature = self.Morphologyfeature
+              
+        #     for feature_name in feature:
+        #         feature_avg[feature_name] = {}
+        #         CC_0 = []
+        #         CC_1 = []
+        #         for patient in data.keys():
+        #             if "Pre-treatment"  in data[patient]:
+        #                 CC_0.append(data[patient]["Pre-treatment"][feature_name + '_CC'])
+        #             if "Post-treatment"  in data[patient]:
+        #                 CC_1.append(data[patient]["Post-treatment"][feature_name + '_CC'])
+                        
+        #         print('feature_name',feature_name)        
+        #         # Mann-Whitney U test
+        #         print("Mann-Whitney U test")
+        #         if len(CC_0) != 0 and len(CC_1) != 0 :
+        #             CC_0_avg,CC_1_avg = MannWhitney2(CC_0, CC_1,  feature_name ,'CC', self.disease,feature_names)
+        #             feature_avg[feature_name]['CC'] = {}
+        #             feature_avg[feature_name]['CC']['Pre-treatment'] = CC_0_avg
+        #             feature_avg[feature_name]['CC']["Post-treatment"] = CC_1_avg
+                    
+                        
+        # else:
+        print('keys',data[list(data.keys())[0]]["Pre-treatment"].keys())
+        feature= data[list(data.keys())[0]]["Pre-treatment"].keys()
         for feature_name in feature:
+            if feature_name == 'Date':
+                continue
+            if  feature_name == 'HOG Hist8_CC' or feature_name == 'HOG Median _CC' :
+                continue
+            if 'freq_0.05' in  feature_name :
+                continue
             feature_avg[feature_name] = {}
-            OR_0 = []
-            OR_1 = []
-            OR_2 = []
             CC_0 = []
             CC_1 = []
-            CC_2 = []
             for patient in data.keys():
-                if str(0)  in data[patient]:
-                    if feature_name + '_OR' in data[patient][str(0)]:
-                        OR_0.append(data[patient][str(0)][feature_name + '_OR'])
-                    if feature_name + '_CC' in data[patient][str(0)]:
-                        CC_0.append(data[patient][str(0)][feature_name + '_CC'])
-                if str(1)  in data[patient]:
-                    if feature_name + '_OR' in data[patient][str(1)]:
-                        OR_1.append(data[patient][str(1)][feature_name + '_OR'])
-                    if feature_name + '_CC' in data[patient][str(1)]:
-                        CC_1.append(data[patient][str(1)][feature_name + '_CC'])
-                if str(2)  in data[patient]:
-                    if feature_name + '_OR' in data[patient][str(2)]:
-                        OR_2.append(data[patient][str(2)][feature_name + '_OR'])
-                    if feature_name + '_CC' in data[patient][str(2)]:
-                        CC_2.append(data[patient][str(2)][feature_name + '_CC'])
-                        
-            print(feature_name)
-            print("OR_0",len(OR_0))
-            print("OR_1",len(OR_1))
-            print("OR_2",len(OR_2))
-            print("CC_0",len(CC_0))
-            print("CC_1",len(CC_1))
-            print("CC_2",len(CC_2))
-
+                if "Pre-treatment"  in data[patient]:
+                    CC_0.append(data[patient]["Pre-treatment"][feature_name])
+                if "Post-treatment"  in data[patient]:
+                    CC_1.append(data[patient]["Post-treatment"][feature_name])
+            print('feature_name',feature_name)        
             # Mann-Whitney U test
             print("Mann-Whitney U test")
-            if len(OR_0) != 0 and len(OR_1) != 0 and len(OR_2) != 0:
-                if feature_names == "LBP":
-                    ArrayMannWhitney(OR_0, OR_1, OR_2, feature_name ,'OR', injection, self.disease,feature_names)     
-                else:
-                    # OR_0_avg,OR_1_avg,OR_2_avg = MannWhitney(OR_0, OR_1, OR_2, feature_name ,'OR', injection, self.disease,feature_names)
-                    OR_0_avg,OR_1_avg = MannWhitney2(OR_0, OR_1, feature_name ,'OR', injection, self.disease,feature_names)
-                    feature_avg[feature_name]['OR'] = {}
-                    feature_avg[feature_name]['OR']['Pre-treatment'] = OR_0_avg
-                    feature_avg[feature_name]['OR']['1-injection'] = OR_1_avg
-                    # feature_avg[feature_name]['OR']['2-injection'] = OR_2_avg  
- 
-                    
-            if len(CC_0) != 0 and len(CC_1) != 0 and len(CC_2) != 0:
-                if feature_names == "LBP":
-                    ArrayMannWhitney(CC_0, CC_1, CC_2, feature_name ,'CC', injection, self.disease,feature_names)
-                else:
-                    # CC_0_avg,CC_1_avg,CC_2_avg = MannWhitney(CC_0, CC_1, CC_2, feature_name ,'CC', injection, self.disease,feature_names)
-                    CC_0_avg,CC_1_avg = MannWhitney2(CC_0, CC_1,  feature_name ,'CC', injection, self.disease,feature_names)
-            
-                    feature_avg[feature_name]['CC'] = {}
-                    feature_avg[feature_name]['CC']['Pre-treatment'] = CC_0_avg
-                    feature_avg[feature_name]['CC']['1-injection'] = CC_1_avg
-                    # feature_avg[feature_name]['CC']['2-injection'] = CC_2_avg
-            
+            if len(CC_0) != 0 and len(CC_1) != 0 :
+                CC_0_avg,CC_1_avg = MannWhitney2(CC_0, CC_1,  feature_name ,'CC', self.disease)
+                feature_avg[feature_name]= {}
+                feature_avg[feature_name]['Pre-treatment'] = CC_0_avg
+                feature_avg[feature_name]["Post-treatment"] = CC_1_avg
 
-        # save feature_avg
-        with open('./record/' + self.disease+ '/'+ 'feature_avg.json', 'w') as fp:
-            json.dump(feature_avg, fp, indent=4)
-            
     
-        return feature_avg    
-            
-            
-def ArrayMannWhitney( data_0, data_1, data_2, feature_name,layer, injection,disease,feature_names): 
-    # for data_0[0] is array
+def MannWhitney2( data_0, data_1, feature_name,layer,disease):
     print(feature_name,layer)
-    statistic_0 , pvalue_0 = stats.mannwhitneyu(data_0, data_1)
-    statistic_1 , pvalue_1 = stats.mannwhitneyu(data_1, data_2)
-    statistic_2 , pvalue_2 = stats.mannwhitneyu(data_0, data_2)
+    feature_name = feature_name.split('_CC')[0]
+    statistic_0 , pvalue_0 = stats.mannwhitneyu(data_0, data_1,alternative='two-sided')
     print(statistic_0,pvalue_0)
-    print(statistic_1,pvalue_1)
-    print(statistic_2,pvalue_2)
-    order = ["Pre-treatment", "1-injection", "2-injection"]
-    group_pairs = [("Pre-treatment", "1-injection"), ("1-injection", "2-injection"), ("Pre-treatment", "2-injection")]
-    fig, ax = plt.subplots()
-    print(len(statistic_0))
-    for i in range(len(statistic_0)):
-        
-        print("plot boxplot")
-        feature_data_0 = [t for t in zip(*data_0)][i]
-        feature_data_1 = [t for t in zip(*data_1)][i]
-        feature_data_2 = [t for t in zip(*data_2)][i]
-        df2 = pd.DataFrame (list(zip(feature_data_0,feature_data_1,feature_data_2)),columns=['Pre-treatment', '1-injection', '2-injection'])
-        ax = sns.boxplot(data=df2, palette="Set3")
-        ax.set_title(feature_names + ' : ' + feature_name  + ' ' + str(i) + ' in  ' + layer)
-        ax.set_ylabel('Value')
-        ax.set_xlabel('Injection')
-        ax.set_xticklabels(injection)
-        annotator = Annotator( ax,pairs = group_pairs , data=df2, order=order)
-        annotator.configure(test='Mann-Whitney', text_format='star', loc='inside', verbose=3)
-        annotator.apply_and_annotate()
-        # show title p < 0.05 p < 0.01 p < 0.001
-        
-        
-        
-        tools.makefolder('./record/'+ disease+ '/'+ feature_name + '/' + layer)
-        plt.savefig('./record/'+ disease+ '/'+ feature_name + '/' + layer + '/' + str(i) + '.png')
-        # plt.show()
-        plt.clf()
-        
-        
-        
-    # 0 : Pre-treatment
-    # 1 : 1-injection
-    # 2 : 2-injection
-
-    print(data_0[0][0])
-    for i in range(len(data_0[0])):
-        print(i)
-        
-        
-               
-                             
-def MannWhitney( data_0, data_1, data_2, feature_name,layer, injection,disease,feature_names):
-    print(feature_name,layer)
-    statistic_0 , pvalue_0 = stats.mannwhitneyu(data_0, data_1)
-    statistic_1 , pvalue_1 = stats.mannwhitneyu(data_1, data_2)
-    statistic_2 , pvalue_2 = stats.mannwhitneyu(data_0, data_2)
-    print("0 vs 1",stats.mannwhitneyu(data_0, data_1))
-    print("1 vs 2",stats.mannwhitneyu(data_1, data_2))
-    print("0 vs 2",stats.mannwhitneyu(data_0, data_2))   
-    print("plot boxplot")
-    # 0 : Pre-treatment
-    # 1 : 1-injection
-    # 2 : 2-injection
-    order = ["Pre-treatment", "1st Post-treatment", "2nd Post-treatment"]
-    df2 = pd.DataFrame( list(zip( data_0, data_1, data_2)), columns=['Pre-treatment', '1st Post-treatment', '2nd Post-treatment'])
-
-    
-    print(df2)
-    group_pairs = [("Pre-treatment", "1st Post-treatment"), ("1st Post-treatment", "2nd Post-treatment"), ("Pre-treatment", "2nd Post-treatment")]
-    # fig, ax = plt.subplots(figsize=(3, 10))
-    ax = sns.boxplot(data=df2, palette="Set3")
-    # ax.set_title(feature_names + ' : ' + feature_name + ' in  ' + layer)
-    # ax.set_ylabel('Value')
-    # ax.set_xlabel('Injection')
-    feature_vis = feature_name
-    if feature_name == 'avg_LH' or feature_name == 'avg_HL' or feature_name == 'std_LH' or feature_name == 'std_HL':
-        if 'avg' in feature_name:
-            feature_vis = 'Average of ' + feature_name[4:]
-        else:
-            feature_vis = 'Standard deviation of ' + feature_name[4:]
-                    
-    if layer == 'OR':
-        ax.set_title('Outer Retina : ' + feature_vis)
-        
-    elif layer == 'CC':
-        ax.set_title('Choriocapillaris : ' + feature_vis)
-    
-    annotator = Annotator( ax,pairs = group_pairs , data=df2, order=order)
-    annotator.configure(test='Mann-Whitney', text_format='star', loc='inside', verbose=3)
-    annotator.apply_and_annotate()
-    # legend 在外面 內容為 order 並標註顏色
-    # ax.legend(loc='upper right', labels=order)
-    # add average and std in new row
-    df2.loc['mean'] = df2.mean().round(2) 
-    df2.loc['std'] = df2.std().round(2)
-    # relative change
-    relative1 = (df2['1st Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean']
-    relative2 = (df2['2nd Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean']
-    df2.loc['relative change'] = [0,relative1 * 100,relative2 * 100]
-    
-    
-    # show title p < 0.05 p < 0.01 p < 0.001
-    tools.makefolder('./record/'+ disease+ '/'+ feature_names )
-    plt.savefig('./record/'+ disease+ '/'+ feature_names + '/'+ feature_name + '_' + layer + '.png')
-    plt.show()
-    plt.clf()
-    
-    # save df2
-    df2.to_csv('./record/'+ disease+ '/'+ feature_names + '/'+ feature_name + '_' + layer + '.csv')
-    
-    data_0_avg = round(sum(data_0)/len(data_0),2)
-    data_1_avg = round(sum(data_1)/len(data_1),2)
-    data_2_avg = round(sum(data_2)/len(data_2),2)
-    
-    data_0_std = round(np.std(data_0),2)
-    data_1_std = round(np.std(data_1),2)
-    data_2_std = round(np.std(data_2),2)
-    
-    # return avg and std
-    
-    data0 = [data_0_avg,data_0_std]
-    data1 = [data_1_avg,data_1_std]
-    data2 = [data_2_avg,data_2_std]
-    
-    return data0,data1,data2
-    
-    
-def MannWhitney2( data_0, data_1, feature_name,layer, injection,disease,feature_names):
-    print(feature_name,layer)
-    statistic_0 , pvalue_0 = stats.mannwhitneyu(data_0, data_1)
-    
     #plot boxplot
-    order = ["Pre-treatment", "1st Post-treatment"]
-    df2 = pd.DataFrame( list(zip( data_0, data_1)), columns=['Pre-treatment', '1st Post-treatment'])
-    group_pairs = [("Pre-treatment", "1st Post-treatment")]
-    ax = sns.boxplot(data=df2, palette="Set3")
-    
-    
-   
-    feature_vis = feature_name
-    if feature_name == 'avg_LH' or feature_name == 'avg_HL' or feature_name == 'std_LH' or feature_name == 'std_HL':
-        if 'avg' in feature_name:
-            feature_vis = 'Average of ' + feature_name[4:]
-        else:
-            feature_vis = 'Standard deviation of ' + feature_name[4:]
-                    
-    if layer == 'OR':
-        ax.set_title('Outer Retina : ' + feature_vis)
+    # 繪製直方圖
+    # sns.histplot(data_0, kde=True)
+    # plt.title('Histogram')
+    # plt.show()
+    # sns.histplot(data_1, kde=True)
+    # plt.title('Histogram')
+    # plt.show()
+    Morphology = ['VAD','VSD','VDI','VPI','VCI']
+    clinical = ['CMT','SFCT']
+
+    if pvalue_0 < 0.05 or (feature_name in Morphology) or (feature_name in clinical):
         
-    elif layer == 'CC':
-        ax.set_title('Choriocapillaris : ' + feature_vis)
+        orders = ["Pre-Treatment", "Post-Treatment"]
+        df2 = pd.DataFrame( list(zip( data_0, data_1)), columns=['Pre-Treatment', 'Post-Treatment'])
+        # plt.figure(figsize=(8,8), dpi= 80)
+        ax = sns.boxplot(data=df2, palette="Set3", width=0.8, linewidth=1.5,order=orders)
+        ax.set_title( feature_name, fontsize=15)
+        ax.set_ylabel('Value',fontsize=15)
+        ax.tick_params(axis='both', which='major', labelsize=12)
+        ax.set_xticklabels(['Pre-Treatment', 'Post-Treatment'], fontsize=15)
+        annotator = Annotator( ax, pairs = [("Pre-Treatment", "Post-Treatment")], data=df2, order=orders)
+        annotator.configure(test='Mann-Whitney', text_format='star', loc='inside',fontsize=15)
+        p_value_annotation = annotator.apply_and_annotate()
+        
+        # del ns in plot
+        for annotation in ax.texts:
+            if 'ns' in annotation.get_text():
+                annotation.set_visible(False)
+                
+        # print(p_value_annotation)
+        
+
+            
+        # Extract and print the p-value
+        p_value = p_value_annotation[1][0]
+        print("Mann-Whitney U test p-value:", p_value)
+        tools.makefolder('./record/'+ disease+ '/' + 'features')
+        plt.savefig('./record/'+ disease+ '/'+ 'features' + '/' + feature_name + '.png')
+        plt.clf()
     
-    annotator = Annotator( ax,pairs = group_pairs , data=df2, order=order)
-    annotator.configure(test='Mann-Whitney', text_format='star', loc='inside', verbose=3)
-    annotator.apply_and_annotate()
-    # legend 在外面 內容為 order 並標註顏色
-    # ax.legend(loc='upper right', labels=order)
-    # add average and std in new row
-    df2.loc['mean'] = df2.mean().round(2) 
-    df2.loc['std'] = df2.std().round(2)
-    df2.loc['relative change'] = [0,(df2['1st Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean'] * 100]
-    # relative change
-    relative1 = (df2['1st Post-treatment']['mean'] - df2['Pre-treatment']['mean'] ) / df2['Pre-treatment']['mean']
-    print("relative1",relative1)
+        df2.to_csv('./record/'+ disease+ '/'+ 'features' + '/' + feature_name + '.csv')
     
-    
-    # show title p < 0.05 p < 0.01 p < 0.001
-    tools.makefolder('./record/'+ disease+ '/'+ feature_names )
-    plt.savefig('./record/'+ disease+ '/'+ feature_names + '/'+ feature_name + '_' + layer + '.png')
-    plt.show()
-    plt.clf()
-    
-    # save df2
-    df2.to_csv('./record/'+ disease+ '/'+ feature_names + '/'+ feature_name + '_' + layer + '.csv')
-    
-    data_0_avg = round(sum(data_0)/len(data_0),2)
-    data_1_avg = round(sum(data_1)/len(data_1),2)
-    
-    data_0_std = round(np.std(data_0),2)
-    data_1_std = round(np.std(data_1),2)
-    
-    # return avg and std
-    
-    data0 = [data_0_avg,data_0_std]
-    data1 = [data_1_avg,data_1_std]
-    
-    return data0,data1         
+        avg_0 = np.mean(data_0)
+        avg_1 = np.mean(data_1)
+        std_0 = np.std(data_0, ddof=1)
+        std_1 = np.std(data_1, ddof=1)
+        
+        relative = (avg_1 - avg_0) / avg_0 * 100
+        
+        # save statistic
+        with open('./record/'+ disease+ '/'+ 'features' + '/' + feature_name + '.csv', 'a') as f:
+            f.write('Pre-treatment,Post-treatment\n')
+            f.write(str(avg_0) + ',' + str(avg_1) + '\n')
+            f.write(str(std_0) + ',' + str(std_1) + '\n')
+            f.write(str(relative) + '\n')
+            f.write(str(p_value) + '\n')
+            
+        feature_static_path =  os.path.join('./record/'+ disease+ '/'+'features'+ '/' +'feature_static' + '.csv')
+        if not os.path.exists(feature_static_path):
+            with open(feature_static_path, 'a') as f:
+                f.write('Feature,Pre-treatment,std-pre,Post-treatment,std-post,relative\n')
+        with open(feature_static_path, 'a') as f:
+            f.write(feature_name + ',' + str(avg_0) + ',' + str(std_0) + ',' + str(avg_1) + ',' + str(std_1) + ',' + str(relative) +'\n')
+            
+            
+             
+    avg_0 = np.mean(data_0)
+    avg_1 = np.mean(data_1)                
+        
+    return avg_0,avg_1
+
                     
                 
             
@@ -350,13 +173,13 @@ def MannWhitney2( data_0, data_1, feature_name,layer, injection,disease,feature_
 if __name__ == '__main__':
     PATH_BASE = '../../Data/'
     data_class = 'PCV'
-    data_date = '0205'
+    data_date = '20240524'
     PATH_BASE  =  PATH_BASE + data_class + '_' + data_date + '/'
     path = PATH_BASE +  '/compare/'
     disease = data_class + '_' + data_date
     
     statistic = Statistic(PATH_BASE,disease,path)
-    feature_list = ['Morphology','GLCM','GLRLM','GLSZM','NGTDM','GLDM','SFM','DWT']
+    # feature_list = ['Morphology','GLCM','GLRLM','GLSZM','NGTDM','GLDM','SFM','DWT']
     
-    statistic.stat('VesselFeature_Morphology.json','Morphology')
+    statistic.stat('VesselFeature_ROI.json')
     

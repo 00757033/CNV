@@ -58,31 +58,46 @@ def pearson_correlation_heatmap(df:pd.DataFrame,feature):
 
 def delete_feature(df:pd.DataFrame,feature):
     feature = df
+    feature_name = feature.columns
+    # kendall spearman pearson
     corr = feature.corr( method='kendall')
     dup = {}
     for f in feature.columns:
-        if len(corr[f][corr[f] ==1]) > 0 or len(corr[f][corr[f] ==-1]) > 0:
+        if len(corr[f][corr[f] == 1]) > 0 or len(corr[f][corr[f] ==-1]) > 0:
             for item in corr[f][((corr[f] ==1)  | (corr[f] ==-1)) & (corr[f].index != f)].index:
+                print('-'*50)
+                print(f,item,corr[f][item])
                 if item in dup:
                     dup[item].append(f)
                 else:
                     dup[item] = [f]
-                print(f,item,corr[f][item])
     print(len(dup),dup)
+    # # 高度相關的特徵每組僅保留一個
+    # new_del_feature = set()
+    # for f in feature_name:
+    #     for item in dup[f]:
+    #         if f in feature_name:
+    #             new_del_feature.add(f)
+    #             feature_name.drop(f)
+    # print('new_del_feature',len(new_del_feature),new_del_feature)
+    # print('feature_name',feature_name)
+
+                
+    
     
 
     
     feature_name = [f for f in feature.columns if f  in dup ]
-    feature_name 
-    feature = feature[feature_name]
-    corr = feature.corr( method='kendall')
-    # Plot heatmap
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(corr, annot=True, cmap='coolwarm', annot_kws={"size": 16})
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.title("Correlation Heatmap")
-    plt.show()
+    # feature_name 
+    # feature = feature[feature_name]
+    # corr = feature.corr( method='kendall')
+    # # Plot heatmap
+    # # plt.figure(figsize=(10, 8))
+    # # sns.heatmap(corr, annot=True, cmap='coolwarm', annot_kws={"size": 16})
+    # # plt.xticks(fontsize=12)
+    # # plt.yticks(fontsize=12)
+    # # plt.title("Correlation Heatmap")
+    # # plt.show()
     # 倆倆配對僅保留一個
     for f in feature_name:
         for item in dup[f]:
@@ -105,18 +120,18 @@ def delete_feature(df:pd.DataFrame,feature):
 
 if __name__ == '__main__':
     disease   = 'PCV'
-    date    = '20240418'
+    date    = '20240524'
     PATH_BASE    = "../../Data/" + disease + '_' + date + '/'
     PATH_FEATURE = PATH_BASE + 'feature/'
     
-    data = './record/' + disease + '_' + date +'/'+'regression.csv'
+    data = './record/' + disease + '_' + date +'/'+'classification_ROI.csv'
     feature = pd.read_csv(data)
     feature = feature.dropna()
     # 移除常數特徵
     feature = feature.loc[:, feature.apply(pd.Series.nunique) != 1]
     print(len(feature.columns))
     feature_names = {
-        'Morphology' :[ 'VD','VLD','VDI'],
+        'Morphology' :[ 'VD','VLD','VDI','FD'],
         'GLCM' : ['Autocorrelation',
                   'ClusterProminence',
                     'ClusterShade',
@@ -179,12 +194,10 @@ if __name__ == '__main__':
                     'GrayLevelVarianceNormalized']
         }
         
-        
-        
-    
+  
     
     # not regression vision and classification
-    feature = feature.drop(columns=['regression','vision','patient'])
+    feature = feature.drop(columns=['classification','patient'])
 
     feature_columns = feature.columns
     #normalization
@@ -192,9 +205,14 @@ if __name__ == '__main__':
     feature = scaler.fit_transform(feature)
     feature = pd.DataFrame(feature, columns = feature_columns)
     feature_del = delete_feature(feature,feature_names)
-    print(feature_del)
+    #save  delete feature
+    output_file = './record/' + disease + '_' + date +'/'+'classification_ROI_del.csv'
+    
+    feature_del_df = pd.DataFrame(feature_del,columns = ['feature'])
+    feature_del_df.to_csv(output_file, index=False)
     feature = feature.drop(columns=feature_del)
-    # print(feature.columns)
+    # print(feature.columns,len(feature.columns))
+    #save 
     # pearson_correlation_heatmap(feature,feature_names)
     
     

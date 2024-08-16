@@ -5,6 +5,7 @@ from pathlib import Path
 import tools.tools as tools
 import pandas as pd
 import datetime 
+import matplotlib.pyplot as plt
 
 class inpaint():
     def __init__(self,path,layers = {"3":"OR","4":"CC"}):
@@ -112,17 +113,33 @@ class inpaint():
             mask[0:img.shape[0], 0:self.x] = 0
             mask[0:img.shape[0], self.x+self.width:img.shape[1]] = 0
             self.mask = mask
+            
+            # plt.imshow(remove_img)
+            # plt.axis('off')
+            # plt.show()
+            
+            # plt.imshow(mask)
+            # plt.axis('off')
+            # plt.show()
+            
             # remove the unnecessary parts
             remove_img[self.y:self.y+self.height, self.x:self.x+self.width] = 0
-            # cv2.imshow('remove_img', remove_img)
-            # cv2.waitKey(0)
-            # cv2.destroyAllWindows()
+            
+            # plt.imshow(remove_img)
+            # plt.axis('off')
+            # plt.show()
+            
+
             # inpainting
             remove_img = cv2.cvtColor(remove_img, cv2.COLOR_RGB2BGR)
             mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
-            dst = cv2.inpaint(remove_img, mask, 5, cv2.INPAINT_TELEA)
+            dst = cv2.inpaint(remove_img, mask,2, cv2.INPAINT_TELEA)
             window_size = 10
-            dst = self.texture_synthesis(dst, self.y, self.x, self.height, self.width, 200, window_size)
+            dst = self.texture_synthesis(remove_img, self.y, self.x, self.height, self.width, 200, window_size)
+            
+            # plt.imshow(dst, cmap='gray')
+            # plt.axis('off')
+            # plt.show()
             return dst
         else:
             print("Failed to load the image.")

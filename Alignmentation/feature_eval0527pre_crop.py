@@ -13,6 +13,8 @@ from skimage.feature import corner_harris
 from skimage.metrics import mean_squared_error
 from skimage.metrics import peak_signal_noise_ratio as psnr
 from skimage.metrics import structural_similarity as ssim
+from sklearn.metrics import normalized_mutual_info_score
+from skimage.filters import unsharp_mask
 import pandas as pd
 import pathlib as pl
 from datetime import datetime
@@ -160,10 +162,10 @@ class finding():
         self.method_template_name = ['TM_SQDIFF', 'TM_SQDIFF_NORMED', 'TM_CCORR' , 'TM_CCORR_NORMED', 'TM_CCOEFF', 'TM_CCOEFF_NORMED']
         self.inject(file = file_name)
 
-    def inject(self,file = '../../Data/打針資料.xlsx',label = ["診斷","病歷號","眼睛","打針前門診日期","三針後門診","六針後門診","九針後門診","十二針後門診"]):
+    def inject(self,file = '../../Data/打針資料.xlsx',label = ["診斷","病歷號","眼睛","打針前門診日期","三針後門診"]):
         # self.inject_df = pd.DataFrame()
         print(file)
-        self.inject_df = pd.read_excel(file, sheet_name="20230830",na_filter = False, engine='openpyxl')
+        self.inject_df = pd.read_excel(file, sheet_name="Focea_collect",na_filter = False, engine='openpyxl')
         
         # add pd.read_excel(file, sheet_name="20230831",na_filter = False, engine='openpyxl')
         # self.inject_df = self.inject_df.append(pd.read_excel(file, sheet_name="20230831",na_filter = False, engine='openpyxl'))
@@ -177,14 +179,17 @@ class finding():
         cmp_post_treatment_img = cv2.imread(post_treatment_img, cv2.IMREAD_GRAYSCALE)
         cmp_matching_img = cv2.imread(matching_img, cv2.IMREAD_GRAYSCALE)
         
+        evaluate = dict()
                           
         
         if cmp_pre_treatment_img is None or cmp_post_treatment_img is None or cmp_matching_img is None:
-            return -1 , -1 , -1,-1 , -1 , -1
+            return evaluate
 
         if cmp_pre_treatment_img.shape != cmp_post_treatment_img.shape and cmp_post_treatment_img.shape != cmp_matching_img.shape : 
-            return -1 , -1 , -1,-1 , -1 , -1
+            return evaluate
         
+
+
         
         # mse = mean_squared_error_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
         # psnr = psnr_ignore_zeros( cmp_pre_treatment_img ,    cmp_post_treatment_img,cmp_matching_img)
@@ -204,6 +209,9 @@ class finding():
         psnr = psnr_ignore_zeros( cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
         ssim = ssim_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
         ssim = ssim * 100
+        ncc = NCC_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
+        nmi = NMI_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
+        corr = Correlation_coefficient_ignore_zeros(cmp_pre_treatment_img ,    cmp_post_treatment_img,img_white)
         
         cmp_pre_treatment_img[cmp_matching_img == 0] = 0
         cmp_post_treatment_img[cmp_matching_img == 0] = 0
@@ -211,10 +219,26 @@ class finding():
         matching_psnr = psnr_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
         matching_ssim = ssim_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
         matching_ssim = matching_ssim * 100
-
-
+        matching_ncc = NCC_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
+        matching_nmi = NMI_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
+        matching_corr = Correlation_coefficient_ignore_zeros(cmp_pre_treatment_img, cmp_matching_img,cmp_matching_img)
         
-        return mse,psnr,ssim ,matching_mse,matching_psnr,matching_ssim
+
+        evaluate['mse'] = mse
+        evaluate['psnr'] = psnr
+        evaluate['ssim'] = ssim
+        evaluate['ncc'] = ncc
+        evaluate['nmi'] = nmi
+        evaluate['corr'] = corr
+        evaluate['matching_mse'] = matching_mse
+        evaluate['matching_psnr'] = matching_psnr
+        evaluate['matching_ssim'] = matching_ssim
+        evaluate['matching_ncc'] = matching_ncc
+        evaluate['matching_nmi'] = matching_nmi
+        evaluate['matching_corr'] = matching_corr
+        
+        return evaluate
+        
 
 
 
@@ -246,28 +270,39 @@ class finding():
     #     return img1, img2_scaled
 
     def preprocess(self, image):
+        if len(image.shape) == 3:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        image_preprocess = image.copy()
+
         
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
+        image_preprocess = cv2.equalizeHist(image_preprocess)
+  
+   
+        kernel = np.ones((5, 5), np.uint8)
+
+        # # # 開運算
+        image_preprocess = cv2.morphologyEx(image_preprocess, cv2.MORPH_OPEN, kernel)
+        image_preprocess = cv2.normalize(image_preprocess, None, 0, 255, cv2.NORM_MINMAX)
+
+        # image_preprocess = cv2.equalizeHist(image_preprocess)
+
+        # fig, ax = plt.subplots(1, 3)
+        # ax[0].imshow(image, cmap='gray')
+        # ax[0].set_title('original')
+        # ax[0].axis('off')
+        # ax[1].imshow(image_preprocess, cmap='gray')
+        # ax[1].set_title('preprocessed')
+        # ax[1].axis('off')
+        # ax[2].hist(image.ravel(), bins=256, range=(0, 255), alpha=0.4, color='r', label='original')
+        # ax[2].hist(image_preprocess.ravel(), bins=256, range=(0, 255), alpha=0.4, color='b', label='preprocessed')
+        # ax[2].legend(loc='upper right')
+        # plt.show()
         
-        image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
-        imageequal = cv2.GaussianBlur(image, (3, 3), 0)
-        imageequal = cv2.equalizeHist(imageequal)
-
-        # top hat
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (40, 40))
-        tophat = cv2.morphologyEx(imageequal, cv2.MORPH_TOPHAT, kernel)
-        # black hat
-        blackhat = cv2.morphologyEx(image, cv2.MORPH_BLACKHAT, kernel)
-        # add and subtract between morphological gradient and image
-        image = tophat
-        image = cv2.add(image, tophat)
-        image = cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX)
-
-        return image
+        return image_preprocess
 
 
-    def find_center(self,image,image_size = (304,304)):
+    def find_center(self,image,image_size = (304,304),save_path = None,save_name = None):
         image2 = image.copy()
         
         image2 = self.preprocess(image2)
@@ -275,7 +310,7 @@ class finding():
         # rst,image2 = cv2.threshold(image2, 0, 255,  cv2.THRESH_BINARY  + cv2.THRESH_OTSU)
         
         # 二值化 32 255
-        rst,image2 = cv2.threshold(image2, 64, 255,  cv2.THRESH_BINARY)
+        rst,image2 = cv2.threshold(image2, 16, 255,  cv2.THRESH_BINARY)
         
         image2 = cv2.bitwise_not(image2)
         # 找到影像中 最白的最大面積的圓
@@ -294,6 +329,8 @@ class finding():
 
         # 上色
         draw_image = image.copy()
+        if len(draw_image.shape) == 2:
+            draw_image = cv2.cvtColor(draw_image, cv2.COLOR_GRAY2BGR)
         draw_image= cv2.resize(draw_image, image_size)
         draw_image[labels == max_label] = (0, 0, 255)
 
@@ -341,58 +378,58 @@ class finding():
 
         # ax[1].set_title('image')
         # plt.show()
-        
+        if save_path :
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
+            cv2.imwrite(save_path + save_name + '.png', draw_image)
+            cv2.imwrite(save_path + save_name + '_origin.png', image)
+            
 
         crop_img = image[int(center[1] - max_radius)-t:int(center[1] + max_radius)+t, int(center[0] - max_radius)-t:int(center[0] + max_radius)+t]
         # show the image wait 3 seconds and destroy
         return  crop_img , center , max_radius + t
 
-    def LK(self,img1, img2,center,radius,  distance=0.9, method='KAZE',matcher='BF',N = 20):
+    def LK(self,img1, img2, distance=0.9, method='KAZE',matcher='BF',N = 20):
         # Initiate SIFT detector
         if method == 'SIFT':
-            sift = cv2.SIFT_create()
+            detector  = cv2.xfeatures2d.SIFT_create()
         elif method == 'KAZE':
-            sift = cv2.KAZE_create()
+            detector  = cv2.KAZE_create()
         elif method == 'AKAZE':
-            sift = cv2.AKAZE_create()
+            detector  = cv2.AKAZE_create()
         elif method == 'ORB':
-            sift = cv2.ORB_create()
+            detector  = cv2.ORB_create()
         elif method == 'BRISK':
-            sift = cv2.BRISK_create()
+            detector  = cv2.BRISK_create()
         elif method == 'BRIEF':
             detector = cv2.FastFeatureDetector_create()
-            brief = cv2.xfeatures2d.BriefDescriptorExtractor_create( )
+            descriptor  = cv2.xfeatures2d.BriefDescriptorExtractor_create( )
 
         elif method == 'FREAK':
             detector = cv2.FastFeatureDetector_create()
-            freak = cv2.xfeatures2d.FREAK_create()
-
-        if method == 'FREAK':
+            descriptor = cv2.xfeatures2d.FREAK_create()
+        if method in ['BRIEF', 'FREAK']:
             kp1 = detector.detect(img1)
             kp2 = detector.detect(img2)
-            kp1, des1 = freak.compute(img1, kp1)
-            kp2, des2 = freak.compute(img2, kp2)
-        elif method == 'BRIEF':
-            kp1 = detector.detect(img1)
-            kp2 = detector.detect(img2)
-            kp1, des1 = brief.compute(img1, kp1)
-            kp2, des2 = brief.compute(img2, kp2)
+            kp1, des1 = descriptor.compute(img1, kp1)
+            kp2, des2 = descriptor.compute(img2, kp2)
+        
         elif method == 'ORB':
-            kp1, des1 = sift.detectAndCompute(img1, None)
-            kp2, des2 = sift.detectAndCompute(img2, None)
+            kp1, des1 = detector.detectAndCompute(img1, None)
+            kp2, des2 = detector.detectAndCompute(img2, None)
 
         else:
-            kp1 = sift.detect(img1, None)
-            kp2 = sift.detect(img2, None)
+            kp1 = detector.detect(img1, None)
+            kp2 = detector.detect(img2, None)
 
-            kp1, des1 = sift.compute(img1, kp1)
-            kp2, des2 = sift.compute(img2, kp2)
+            kp1, des1 = detector.compute(img1, kp1)
+            kp2, des2 = detector.compute(img2, kp2)
 
 
         # img1_draw = cv2.drawKeypoints(img1, kp1, img1, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         # img2_draw = cv2.drawKeypoints(img2, kp2, img2, flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
         # Convert to numpy arrays
-        if des1 is None or des2 is None:
+        if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2 :
             H = np.array(np.eye(3))
             return None
 
@@ -401,126 +438,173 @@ class finding():
         des2 = des2.astype(np.float32)
 
         # Matching method
-        if method == 'SIFT'  or method == 'BRISK' or method == 'BRIEF':
-            if  matcher == 'BF':
-                bf = cv2.BFMatcher()
-                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
-                    H = np.array(np.eye(3))
-                    return None
-                matches = bf.knnMatch(des1, des2, k=2)
-                matches = sorted(matches, key=lambda x: x[0].distance)
-                matches = matches[:N]
-
-            elif matcher == 'FLANN':
-                FLANN_INDEX_KDTREE = 1
-                index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-                search_params = dict(checks=1000)
-
-                flann = cv2.FlannBasedMatcher(index_params, search_params)
-                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
-                    H = np.array(np.eye(3))
-                    return None
-                matches = flann.knnMatch(des1, des2, k=2)
-                matches = sorted(matches, key=lambda x: x[0].distance)
-                matches = matches[:N]
-        elif method == 'ORB':
-            if  matcher == 'BF':
-                bf = cv2.BFMatcher()
-                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
-                    H = np.array(np.eye(3))
-                    return None
-                matches = bf.knnMatch(des1, des2, k=2)
-                matches = sorted(matches, key=lambda x: x[0].distance)
-                matches = matches[:N]
-            elif matcher == 'FLANN':
-                FLANN_INDEX_LSH = 6
-                index_params= dict(algorithm = FLANN_INDEX_LSH,
-                                table_number = 6, # 12
-                                key_size = 12,     # 20
-                                multi_probe_level = 1)
-
-                search_params = dict(checks=60)
-                # Make sure descriptors are 2D arrays
-                des1 = np.array(des1).astype(np.uint8)
-                des2 = np.array(des2).astype(np.uint8)
-                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
-                    H = np.array(np.eye(3))
-                    return None
-                flann = cv2.FlannBasedMatcher(index_params, search_params)
-                matches = flann.knnMatch(des1, des2, k=2)
-                matches = sorted(matches, key=lambda x: x[0].distance)
-                matches = matches[:N]
-        elif method == 'KAZE' or method == 'AKAZE' or method == 'SURF' or method == 'FREAK':
-            if  matcher == 'BF':
-                bf = cv2.BFMatcher( cv2.NORM_L2)
-                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
-                    H = np.array(np.eye(3))
-                    return None
-                matches = bf.knnMatch(des1, des2, k=2)
-                matches = sorted(matches, key=lambda x: x[0].distance)
-                matches = matches[:N]
-            elif matcher == 'FLANN':
-                FLANN_INDEX_KDTREE = 1
-                index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
-                search_params = dict(checks=60)
-                if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
-                    H = np.array(np.eye(3))
-                    return None
-
-                flann = cv2.FlannBasedMatcher(index_params, search_params)
-                matches = flann.knnMatch(des1, des2, k=2)
-                matches = sorted(matches, key=lambda x: x[0].distance)
-                matches = matches[:N]
-        if not matches:
-
-            return None
-        if matcher == 'BF': 
-            # Need to draw only good matches, so create a mask
-            matches = sorted(matches, key=lambda x: x[0].distance)
-            if matches:
-                min_dist = matches[0][0].distance
-
-                # Apply ratio test
-                good = []
-                pts1 = []
-                pts2 = []
-                for i, mn in enumerate(matches):
-                    if len(mn)== 2 :
-                        m,n = mn
-                        if m.distance < distance* n.distance:
-                            good.append([m])
-                            pts2.append(kp2[m.trainIdx].pt)
-                            pts1.append(kp1[m.queryIdx].pt)
-
-                        if m.distance > 1.5 * min_dist:
-                            break
-            # Draw 保留的matches
-            # img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=2)
-            
+        if matcher == 'BF':
+                if method == 'ORB':
+                    bf = cv2.BFMatcher()
+                else:
+                    bf = cv2.BFMatcher()
         elif matcher == 'FLANN':
-            # Need to draw only good matches, so create a mask
-            matchesMask = [[0, 0] for i in range(len(matches))]
-            pts1 = []
-            pts2 = []
-            if matches and matches[0]:
-                # matches = sorted(matches, key=lambda x: x[0].distance)
-                min_dist = matches[0][0].distance
-                # ratio test as per Lowe's paper
+            if method == 'ORB':
+                index_params = dict(algorithm=6, table_number=6, key_size=12, multi_probe_level=1)
+                search_params = dict(checks=60)
+                des1 = des1.astype(np.uint8)
+                des2 = des2.astype(np.uint8)
+            else:
+                index_params = dict(algorithm=1, trees=5)
+                search_params = dict(checks=1000)
+            bf = cv2.FlannBasedMatcher(index_params, search_params)
+   
+        # if method == 'SIFT'  or method == 'BRISK' or method == 'BRIEF':
+        #     if  matcher == 'BF':
+        #         bf = cv2.BFMatcher()
+        #         if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+        #             H = np.array(np.eye(3))
+        #             return None
+        #         matches = bf.knnMatch(des1, des2, k=2)
+        #         matches = sorted(matches, key=lambda x: x[0].distance)
+        #         matches = matches[:N]
+
+        #     elif matcher == 'FLANN':
+        #         FLANN_INDEX_KDTREE = 1
+        #         index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+        #         search_params = dict(checks=1000)
+
+        #         flann = cv2.FlannBasedMatcher(index_params, search_params)
+        #         if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+        #             H = np.array(np.eye(3))
+        #             return None
+        #         matches = flann.knnMatch(des1, des2, k=2)
+        #         matches = sorted(matches, key=lambda x: x[0].distance)
+        #         matches = matches[:N]
+        # elif method == 'ORB':
+        #     if  matcher == 'BF':
+        #         bf = cv2.BFMatcher()
+        #         if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+        #             H = np.array(np.eye(3))
+        #             return None
+        #         matches = bf.knnMatch(des1, des2, k=2)
+        #         matches = sorted(matches, key=lambda x: x[0].distance)
+        #         matches = matches[:N]
+        #     elif matcher == 'FLANN':
+        #         FLANN_INDEX_LSH = 6
+        #         index_params= dict(algorithm = FLANN_INDEX_LSH,
+        #                         table_number = 6, # 12
+        #                         key_size = 12,     # 20
+        #                         multi_probe_level = 1)
+
+        #         search_params = dict(checks=60)
+        #         # Make sure descriptors are 2D arrays
+        #         des1 = np.array(des1).astype(np.uint8)
+        #         des2 = np.array(des2).astype(np.uint8)
+        #         if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+        #             H = np.array(np.eye(3))
+        #             return None
+        #         flann = cv2.FlannBasedMatcher(index_params, search_params)
+        #         matches = flann.knnMatch(des1, des2, k=2)
+        #         matches = sorted(matches, key=lambda x: x[0].distance)
+        #         matches = matches[:N]
+        # elif method == 'KAZE' or method == 'AKAZE' or method == 'SURF' or method == 'FREAK':
+        #     if  matcher == 'BF':
+        #         bf = cv2.BFMatcher( cv2.NORM_L2)
+        #         if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+        #             H = np.array(np.eye(3))
+        #             return None
+        #         matches = bf.knnMatch(des1, des2, k=2)
+        #         matches = sorted(matches, key=lambda x: x[0].distance)
+        #         matches = matches[:N]
+        #     elif matcher == 'FLANN':
+        #         FLANN_INDEX_KDTREE = 1
+        #         index_params = dict(algorithm=FLANN_INDEX_KDTREE, trees=5)
+        #         search_params = dict(checks=60)
+        #         if des1 is None or des2 is None or len(des1) < 2 or len(des2) < 2:
+        #             H = np.array(np.eye(3))
+        #             return None
+
+        #         flann = cv2.FlannBasedMatcher(index_params, search_params)
+        #         matches = flann.knnMatch(des1, des2, k=2)
+        #         matches = sorted(matches, key=lambda x: x[0].distance)
+        #         matches = matches[:N]
+        # if not matches:
+        #     return None
+        # Match descriptors
+        matches = bf.knnMatch(des1, des2, k=2)
+        
+        matches = [m for m in matches if len(m) == 2]
+        if len(matches) > 0:
+            matches = sorted(matches, key=lambda x: x[0].distance)
+        else:
+            return None
+        
+        # Apply ratio test
+        good_matches = []
+        pts1 = []
+        pts2 = []
+        for m, n in matches:
+            if m.distance < distance * n.distance:
+                good_matches.append([m])
+                pts2.append(kp2[m.trainIdx].pt)
+                pts1.append(kp1[m.queryIdx].pt)
+        print(len(pts1),len(pts2))        
+        if len(pts1) < 4 or len(pts2) < 4:
+            H = np.array(np.eye(3))
+            return None
+        
+        # # Draw matches
+        # img3 = cv2.drawMatchesKnn(img1, kp1, img2, kp2, good_matches, None, flags=2)
+        # plt.imshow(img3)
+        # plt.axis('off')
+        # plt.title(method)
+        # plt.show()
+        
+        
+        
+        # if matcher == 'BF': 
+        #     # Need to draw only good matches, so create a mask
+        #     matches = sorted(matches, key=lambda x: x[0].distance)
+        #     if matches:
+        #         min_dist = matches[0][0].distance
+
+        #         # Apply ratio test
+        #         good = []
+        #         pts1 = []
+        #         pts2 = []
+        #         for i, mn in enumerate(matches):
+        #             if len(mn)== 2 :
+        #                 m,n = mn
+        #                 if m.distance < distance* n.distance:
+        #                     good.append([m])
+        #                     pts2.append(kp2[m.trainIdx].pt)
+        #                     pts1.append(kp1[m.queryIdx].pt)
+
+        #                 if m.distance > 1.5 * min_dist:
+        #                     break
+        #     # Draw 保留的matches
+        #     # img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=2)
+            
+        # elif matcher == 'FLANN':
+        #     # Need to draw only good matches, so create a mask
+        #     matchesMask = [[0, 0] for i in range(len(matches))]
+        #     pts1 = []
+        #     pts2 = []
+        #     if matches and matches[0]:
+        #         # matches = sorted(matches, key=lambda x: x[0].distance)
+        #         min_dist = matches[0][0].distance
+        #         # ratio test as per Lowe's paper
                 
-                for i, match in enumerate(matches):
-                    if len(match) != 2 or match[0] is None or match[1] is None:
-                        continue
-                    if len(match) == 2:
-                        m, n = match
-                    if m.distance < distance * n.distance:
-                        matchesMask[i] = [1, 0]
-                        pts2.append(kp2[m.trainIdx].pt)
-                        pts1.append(kp1[m.queryIdx].pt)
-                draw_params = dict(matchColor = (0,255,0),
-                    singlePointColor = (255,0,0),
-                    matchesMask = matchesMask,
-                    flags = 0)
-                img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
+        #         for i, match in enumerate(matches):
+        #             if len(match) != 2 or match[0] is None or match[1] is None:
+        #                 continue
+        #             if len(match) == 2:
+        #                 m, n = match
+        #             if m.distance < distance * n.distance:
+        #                 matchesMask[i] = [1, 0]
+        #                 pts2.append(kp2[m.trainIdx].pt)
+        #                 pts1.append(kp1[m.queryIdx].pt)
+        #         draw_params = dict(matchColor = (0,255,0),
+        #             singlePointColor = (255,0,0),
+        #             matchesMask = matchesMask,
+        #             flags = 0)
+        #         img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
 
 
         # plt.imshow(img3)
@@ -532,35 +616,26 @@ class finding():
         pts1 = np.array(pts1)
         pts2 = np.array(pts2)
 
-        if len(pts1) == 0 or len(pts2) == 0:
-            H = np.array(np.eye(3))
-
-            return  None
-            # Find homography
-        if len(pts1) < 4 or len(pts2) < 4:
-            H = np.array(np.eye(3))
-            return None
-
         H, _ = cv2.findHomography(pts2, pts1, cv2.RANSAC, 5.0)
 
         return H
 
-    def evaluate(self,image ,original_image):
-        image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
-        original_image = cv2.imread(original_image, cv2.IMREAD_GRAYSCALE)
-        if image is None or original_image is None:
-            return 0 , 0 , 1000000
+    # def evaluate(self,image ,original_image):
+    #     image = cv2.imread(image, cv2.IMREAD_GRAYSCALE)
+    #     original_image = cv2.imread(original_image, cv2.IMREAD_GRAYSCALE)
+    #     if image is None or original_image is None:
+    #         return 0 , 0 , 1000000
 
-        if image.shape != original_image.shape:
-            return 0 , 0 , 1000000
+    #     if image.shape != original_image.shape:
+    #         return 0 , 0 , 1000000
             
         
-        mse = mean_squared_error(image, original_image)
-        psnr = peak_signal_noise_ratio(image, original_image)
-        ssim = structural_similarity(image, original_image)
-        ssim = ssim * 100
+    #     mse = mean_squared_error(image, original_image)
+    #     psnr = peak_signal_noise_ratio(image, original_image)
+    #     ssim = structural_similarity(image, original_image)
+    #     ssim = ssim * 100
 
-        return mse,psnr,ssim
+    #     return mse,psnr,ssim
 
     def match_histogram(self,source, reference):
         # Convert images to grayscale
@@ -619,6 +694,7 @@ class finding():
             return False
 
     def getPoints(self,img, template, method=cv2.TM_CCOEFF_NORMED):
+        # print('shape',img.shape,template.shape)
         result = cv2.matchTemplate(img, template, method) # 回傳的是相關係數矩陣
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result) # 找到最大值和最小值的位置 也就是左上角的位置 以及右下角的位置
         if self.method_template_name[method] in ['TM_SQDIFF', 'TM_SQDIFF_NORMED']:
@@ -691,80 +767,68 @@ class finding():
                 patient_id, eye, date = filename.split('.png')[0].split('_')
                 # patient_id = '07838199'
                 # eye = 'L'
-                
-                if patient_id in self.inject_df['病歷號'].values:
-                    print(patient_id, eye, date)
-                    if eyes[eye] not in self.inject_df[(self.inject_df['病歷號'] == patient_id)]['眼睛'].values:
-                        continue
-                    predate = str(self.inject_df[(self.inject_df['病歷號'] == patient_id) & (self.inject_df['眼睛'] == eyes[eye])]['打針前門診日期'].values[0])
-                    if predate != 'nan':
-                        if 'T' in  predate:
-                            predate = predate.split('T')[0]
-                        if ' '  in predate:
-                            predate = predate.split(' ')[0]
-                        formatted_date_str = datetime.strptime(predate, '%Y-%m-%d').strftime('%Y%m%d')
-                        if date < formatted_date_str:
+                print(patient_id, eye, date)
+                if patient_id + '_' + eye not in patient_dict:   
+                    if patient_id in self.inject_df['病歷號'].values:
+                        if eyes[eye] not in self.inject_df[(self.inject_df['病歷號'] == patient_id)]['眼睛'].values:
                             continue
-                else:
-                    continue
-                
-
-                if patient_id + '_' + eye not in patient_dict:
+                        predate = str(self.inject_df[(self.inject_df['病歷號'] == patient_id) & (self.inject_df['眼睛'] == eyes[eye])]['打針前門診日期'].values[0])
+                        if predate != 'nan' and predate != 'NaT':
+                            if 'T' in  predate:
+                                predate = predate.split('T')[0]
+                            if ' '  in predate:
+                                predate = predate.split(' ')[0]
+                            formatted_date_str = datetime.strptime(predate, '%Y-%m-%d').strftime('%Y%m%d')
+                            if date < formatted_date_str:
+                                continue
+                    else:
+                        continue
                     patient_dict[patient_id + '_' + eye] = {}
                     pre_treatment_file = filename
                     pre_treatment = date
-                    # pre_treatment = '20211013'
+                    # pre_treatment = '20211013'   
                 else:
+                    if patient_id in self.inject_df['病歷號'].values:
+                        if eyes[eye] not in self.inject_df[(self.inject_df['病歷號'] == patient_id)]['眼睛'].values:
+                                continue
+                        postdate = str(self.inject_df[(self.inject_df['病歷號'] == patient_id) & (self.inject_df['眼睛'] == eyes[eye])]['三針後門診'].values[0])
+                        if postdate != 'nan' and postdate != 'NaT':
+                            if 'T' in  postdate:
+                                postdate = postdate.split('T')[0]
+                            if ' '  in postdate:
+                                postdate = postdate.split(' ')[0]
+                            formatted_date_str = datetime.strptime(postdate, '%Y-%m-%d').strftime('%Y%m%d')
+                            if date != formatted_date_str:
+                                continue
+                            
                     post_treatment_file = filename
                     post_treatment = date
                     # post_treatment = '20220328'
                     patient_dict[patient_id + '_' + eye][post_treatment] = {}
                     if pre_treatment_file != '' and post_treatment_file != '':
                         pre_image = cv2.imread(self.output_image_path + '1/' + patient_id + '_' + eye + '_' + str(pre_treatment) + '.png')
-                        pre_image_2 = cv2.imread(self.output_image_path + '2/' + patient_id + '_' + eye + '_' + str(pre_treatment) + '.png')
                         post_image = cv2.imread(self.output_image_path + '1/' + patient_id + '_' + eye + '_' + str(post_treatment) + '.png')
-                        post_image_2 = cv2.imread(self.output_image_path + '2/' + patient_id + '_' + eye + '_' + str(post_treatment) + '.png')
-
                         
                         pre_image = cv2.resize(pre_image, (304, 304))
-                        pre_image_2 = cv2.resize(pre_image_2, (304, 304))
                         post_image = cv2.resize(post_image, (304, 304))
-                        post_image_2 = cv2.resize(post_image_2, (304, 304))
-
-                        pre_image = cv2.normalize(pre_image, None, 0, 255, cv2.NORM_MINMAX)
-                        pre_image_2 = cv2.normalize(pre_image_2, None, 0, 255, cv2.NORM_MINMAX)
-                        post_image = cv2.normalize(post_image, None, 0, 255, cv2.NORM_MINMAX)
-                        post_image_2 = cv2.normalize(post_image_2, None, 0, 255, cv2.NORM_MINMAX)
                         
-                        # clean
-                        mask = np.zeros(pre_image.shape[:2], dtype=np.uint8)
+                        pre_image_gray = cv2.cvtColor(pre_image, cv2.COLOR_BGR2GRAY)
+                        post_image_gray = cv2.cvtColor(post_image, cv2.COLOR_BGR2GRAY)
                         
+                        ##############################################
+                        # pre_image_gray = cv2.bilateralFilter(pre_image_gray, 3, 10, 10)
+                        # pre_image_gray = cv2.createCLAHE(clipLimit=0.7, tileGridSize=(8, 8)).apply(pre_image_gray)
+                        # pre_image_gray = cv2.normalize(pre_image_gray, None, 0, 255, cv2.NORM_MINMAX)
                         
-                        if pre_image is None or pre_image_2 is None :
-                            for i in range(pre_image.shape[0]):
-                                for j in range(pre_image.shape[1]):
-                                    if np.array_equal( pre_image[i][j], pre_image_2[i][j]):
-                                        mask[i][j] = 255
-                                        
-                        pre_image= cv2.inpaint( pre_image, mask, 3, cv2.INPAINT_TELEA) 
-                        pre_image = cv2.normalize(pre_image, None, 0, 255, cv2.NORM_MINMAX)
-                        mask = np.zeros(pre_image.shape[:2], dtype=np.uint8)
+                        # post_image_gray = cv2.bilateralFilter(post_image_gray, 3, 10, 10)
+                        # post_image_gray = cv2.createCLAHE(clipLimit=0.7, tileGridSize=(8, 8)).apply(post_image_gray)
+                        # post_image_gray = cv2.normalize(post_image_gray, None, 0, 255, cv2.NORM_MINMAX)
+                        ##############################################
                         
-                        if post_image is None or post_image_2 is None :
-                            for i in range(post_image.shape[0]):
-                                for j in range(post_image.shape[1]):
-                                    if np.array_equal( post_image[i][j], post_image_2[i][j]):
-                                        mask[i][j] = 255
-                                        
-                        post_image= cv2.inpaint( post_image, mask, 3, cv2.INPAINT_TELEA)
-                        post_image = cv2.normalize(post_image, None, 0, 255, cv2.NORM_MINMAX)
-                        
-                        pre_image_original = pre_image.copy()
-                        post_image_original = post_image.copy()
                         # show histogram
                         magnification = 1
-                        crop_img ,center,radius = self.find_center(post_image, image_size = (int(304 * magnification), int(304 * magnification)))
-                        
+                        pre_crop ,pre_center ,pre_radius = self.find_center(pre_image_gray,save_path = self.output_path + 'cut' + '/',save_name = patient_id + '_' + eye + '_' + post_treatment + 'pre')
+                        post_crop ,post_center ,post_radius = self.find_center(post_image_gray,save_path = self.output_path + 'cut' + '/',save_name = patient_id + '_' + eye + '_' + post_treatment + 'post')
                         
                         # pre_image_gray = cv2.cvtColor(pre_image, cv2.COLOR_BGR2GRAY)
                         # post_image_gray = cv2.cvtColor(post_image, cv2.COLOR_BGR2GRAY)
@@ -779,23 +843,29 @@ class finding():
 
                         # pre_image2 = cv2.equalizeHist(pre_image2)
                         # crop_img = cv2.equalizeHist(crop_img)
-                        h , w ,c = crop_img.shape
+                        if post_crop is None:
+                            continue
+                        if len(post_crop.shape) == 2:
+                            h , w  = post_crop.shape
+                        else:
+                            h , w ,c = post_crop.shape
                         pre_image2 = pre_image.copy()
                         
                         pre_image2 = cv2.resize(pre_image2, (int(304 * magnification), int(304 * magnification)))
-                        H = self.LK(pre_image2,crop_img,center=(center[0],center[1]), radius = int(radius), distance=distance, method=feature, matcher=matcher)
-                        
+                        H = self.LK(pre_crop,post_crop, distance=distance, method=feature, matcher=matcher)
+                        # print(H)
 
                         if H is not None:
                             # 平移
-                            H[0,2] -= (center[0] - int(radius))
-                            H[1,2]-=(center[1] - int(radius))
+                            H[0,2] -= (pre_center[0] - post_center[0])
+                            H[1,2]-=(pre_center[1] - post_center[1])
                             translation = (H[0, 2], H[1, 2])
+                            check = self.check_H_range(H)
                             
-                        if H is  None or not self.check_H_range(H):
-                            crop_img = cv2.resize(crop_img, (h, w ))
-                            radius = radius // magnification
-                            shift_x, shift_y = self.pointMatch(pre_image,crop_img,center,radius, method = cv2.TM_CCOEFF_NORMED)
+                        if H is  None or not check:
+                            post_crop = cv2.resize(post_crop, (h, w ))
+                            post_radius = post_radius // magnification
+                            shift_x, shift_y = self.pointMatch(pre_image_gray,post_crop,post_center,post_radius, method = cv2.TM_CCOEFF_NORMED)
                             if shift_x > 304 // 2 or shift_x < -304 // 2 or shift_y > 304 // 2 or shift_y < -304 // 2:
                                 H = None
                             else:
@@ -806,11 +876,11 @@ class finding():
                             H = np.array(np.eye(3))
                     
                         post_image = cv2.warpPerspective(post_image, H, (post_image.shape[1], post_image.shape[0]))
-                        post_image2= post_image.copy()
-                        post_image2[: : , : , 0] = 0
-                        post_image2[: : , : , 2] = 0
-                        visimg1= cv2.addWeighted(pre_image, 0.5, post_image2, 0.5, 0)
-                        visimg2 = cv2.addWeighted(post_image_original, 0.5, post_image2, 0.5, 0)
+                        # post_image2= post_image.copy()
+                        # post_image2[: : , : , 0] = 0
+                        # post_image2[: : , : , 2] = 0
+                        # visimg1= cv2.addWeighted(pre_image, 0.5, post_image2, 0.5, 0)
+                        # visimg2 = cv2.addWeighted(post_image_original, 0.5, post_image2, 0.5, 0)
                     
 
                         # fig , ax =  plt.subplots(1,6,figsize=(20,20))
@@ -827,6 +897,7 @@ class finding():
                         # ax[5].imshow(visimg2)
                         # ax[5].set_title('visimg2')
                         # plt.show()
+                        
                         translation = (H[0, 2], H[1, 2])
                         rotation_rad = math.atan2(H[1, 0], H[0, 0])
                         rotation_angle= np.arctan2(H[1, 0], H[0, 0]) * 180 / np.pi
@@ -839,15 +910,26 @@ class finding():
 
 
                             if os.path.exists(self.output_image_path + data + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'):
-                                pre_image = cv2.imread(self.output_image_path + data + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png')
+                                pre_image = cv2.imread(self.output_image_path + data + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png', cv2.IMREAD_GRAYSCALE)
                                 pre_image = cv2.resize(pre_image, (304, 304))
+                                
+                                ##############################################
+                                # pre_image = cv2.bilateralFilter(pre_image, 3, 10, 10)
+                                # pre_image = cv2.createCLAHE(clipLimit=0.7, tileGridSize=(8, 8)).apply(pre_image)
+                                ##############################################
                                 pre_image = cv2.normalize(pre_image, None, 0, 255, cv2.NORM_MINMAX)
 
                         
                                 cv2.imwrite(self.output_path + data + '/' + patient_id + '_' + eye + '_' + pre_treatment + '.png', pre_image)
                                 if os.path.exists(self.output_image_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png'):
-                                    post_image = cv2.imread(self.output_image_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png')
+                                    post_image = cv2.imread(self.output_image_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png', cv2.IMREAD_GRAYSCALE)
                                     post_image = cv2.resize(post_image, (304, 304))
+                                    
+                                    ##############################################
+                                    # post_image = cv2.bilateralFilter(post_image, 3, 10, 10)
+                                    # post_image = cv2.createCLAHE(clipLimit=0.7, tileGridSize=(8, 8)).apply(post_image)
+                                    ##############################################
+                                    
                                     post_image = cv2.normalize(post_image, None, 0, 255, cv2.NORM_MINMAX)
 
                                     # print(self.output_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png')
@@ -872,8 +954,8 @@ class finding():
                                     patient_dict[patient_id + '_' + eye][post_treatment]['rotation_rad'] = rotation_rad
                                     patient_dict[patient_id + '_' + eye][post_treatment]['rotation_angle'] = rotation_angle
                                     patient_dict[patient_id + '_' + eye][post_treatment]['scale'] = [scale_x, scale_y]
-                                    patient_dict[patient_id + '_' + eye][post_treatment]['center'] = [center[0], center[1]]
-                                    patient_dict[patient_id + '_' + eye][post_treatment]['radius'] = radius
+                                    # patient_dict[patient_id + '_' + eye][post_treatment]['center'] = [center[0], center[1]]
+                                    # patient_dict[patient_id + '_' + eye][post_treatment]['radius'] = radius
 
 
                                     filled = result.copy()
@@ -886,10 +968,10 @@ class finding():
 
                                     cv2.imwrite(self.output_path + data + '/' + patient_id + '_' + eye + '_' + post_treatment + '.png', filled)
 
-                                    # add the two images together
-                                    vis_img = filled.copy()
-                                    vis_img[:,:,0] = 0
-                                    vis_img[:,:,2] = 0
+                                    # # add the two images together
+                                    # vis_img = filled.copy()
+                                    # vis_img[:,:,0] = 0
+                                    # vis_img[:,:,2] = 0
                                     # vis = cv2.addWeighted(pre_image, 0.5, vis_img, 0.5, 0)
                                     # cv2.rectangle(vis, (int(center[0] - radius), int(center[1] - radius)), (int(center[0] + radius), int(center[1] + radius)), (255, 0, 255), 3)
                                 
@@ -963,22 +1045,22 @@ class finding():
                         
                         
                                     
-                        if  translation[0] !=0 or translation[1]!=0 or rotation_angle !=0 or scale_x != 1 or scale_y != 1:
-                            pre_treatment_img = self.output_image_path+ '1/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'
-                            post_treatment_img = self.output_image_path + '1/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
-                            matching_img = self.output_path  + '/1_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png'                              
-                            mse,psnr,ssim, matching_mse,matching_psnr,matching_ssim = self.evaluates(pre_treatment_img,post_treatment_img,matching_img)
-                        
-                            if psnr == float('inf') :
-                                continue
-                            if ssim == float('inf') : 
-                                continue
-                            if matching_psnr == float('inf') :
-                                continue
-                            if matching_ssim == float('inf')  :
-                                continue
-                            if ssim  < 0 or psnr < 0 or mse <0 or matching_ssim  < 0 or  matching_psnr < 0 or matching_mse <0 :
-                                continue
+                        # if  translation[0] !=0 or translation[1]!=0 or rotation_angle !=0 or scale_x != 1 or scale_y != 1:
+                        #     pre_treatment_img = self.output_image_path+ '1/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'
+                        #     post_treatment_img = self.output_image_path + '1/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
+                        #     matching_img = self.output_path  + '/1_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png'                              
+                        #     evaluate = self.evaluates(pre_treatment_img,post_treatment_img,matching_img)
+
+                        #     if evaluate is None:
+                        #         continue
+                        #     if evaluate['psnr'] == float('inf') or evaluate['matching_psnr'] == float('inf') or evaluate['psnr'] < 0 or evaluate['matching_psnr'] < 0:
+                        #         continue
+                        #     if evaluate['ssim'] == float('inf') or evaluate['matching_ssim'] == float('inf') or evaluate['ssim'] < 0 or evaluate['matching_ssim'] < 0:
+                        #         continue
+                        #     if evaluate['mse'] == float('inf') or evaluate['matching_mse'] == float('inf') or evaluate['mse'] < 0 or evaluate['matching_mse'] < 0:
+                        #         continue
+   
+                           
                                 
                                 # patient_dict[patient_id + '_' + eye][post_treatment]['original'] = [mse,psnr,ssim]
                                 # patient_dict[patient_id + '_' + eye][post_treatment]['matching'] = [matching_mse,matching_psnr,matching_ssim]                                 
@@ -1011,9 +1093,15 @@ class finding():
         mse_list = []
         psnr_list = []
         ssim_list = []
+        ncc_list = []
+        nmi_list = []
+        corr_list = []
         matching_mse_list = []
         matching_psnr_list = []
         matching_ssim_list = []
+        matching_ncc_list = []
+        matching_nmi_list = []
+        matching_corr_list = []
         pre_treatment_file = ''
         post_treatment_file = ''
         
@@ -1036,50 +1124,82 @@ class finding():
                         pre_treatment_img = self.output_image_path+ '1/' + patient_id + '_' + eye + '_' + pre_treatment + '.png'
                         post_treatment_img = self.output_image_path + '1/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
                         matching_img = match_path  + '/1_move/' + patient_id + '_' + eye + '_' + post_treatment + '.png'
-                        mse,psnr,ssim, matching_mse,matching_psnr,matching_ssim = self.evaluates(pre_treatment_img,post_treatment_img,matching_img)
+                        evaluate = self.evaluates(pre_treatment_img,post_treatment_img,matching_img)
 
-                        if psnr == float('inf') :
+                        if evaluate['psnr'] == float('inf') or evaluate['matching_psnr'] == float('inf') or evaluate['psnr'] < 0 or evaluate['matching_psnr'] < 0:
                             continue
-                        if ssim == float('inf') : 
+                        if evaluate['ssim'] == float('inf') or evaluate['matching_ssim'] == float('inf') or evaluate['ssim'] < 0 or evaluate['matching_ssim'] < 0:
                             continue
-                        if matching_psnr == float('inf') :
+                        if evaluate['mse'] == float('inf') or evaluate['matching_mse'] == float('inf') or evaluate['mse'] < 0 or evaluate['matching_mse'] < 0:
                             continue
-                        if matching_ssim == float('inf')  :
-                            continue
-                        if ssim  < 0 or psnr < 0 or mse <0 or matching_ssim  < 0 or  matching_psnr < 0 or matching_mse <0 :
-                            continue
+                        mse = evaluate['mse']
+                        psnr = evaluate['psnr']
+                        ssim = evaluate['ssim']
+                        ncc = evaluate['ncc']
+                        nmi = evaluate['nmi']
+                        corr = evaluate['corr']
                         
-                        patient[patient_id + '_' + eye][date]['original'] = [mse,psnr,ssim]
-                        patient[patient_id + '_' + eye][date]['matching'] = [matching_mse,matching_psnr,matching_ssim]
+                        matching_mse = evaluate['matching_mse']
+                        matching_psnr = evaluate['matching_psnr']
+                        matching_ssim = evaluate['matching_ssim']
+                        matching_ncc = evaluate['matching_ncc']
+                        matching_nmi = evaluate['matching_nmi']
+                        matching_corr = evaluate['matching_corr']
+                        
+                        patient[patient_id + '_' + eye][date]['original'] = dict()
+                        patient[patient_id + '_' + eye][date]['matching'] = dict()  
+                        
+                        patient[patient_id + '_' + eye][date]['original']['mse'] = mse
+                        patient[patient_id + '_' + eye][date]['original']['psnr'] = psnr
+                        patient[patient_id + '_' + eye][date]['original']['ssim'] = ssim
+                        patient[patient_id + '_' + eye][date]['original']['ncc'] = ncc
+                        patient[patient_id + '_' + eye][date]['original']['nmi'] = nmi
+                        patient[patient_id + '_' + eye][date]['original']['corr'] = corr
+                        
+                        patient[patient_id + '_' + eye][date]['matching']['mse'] = matching_mse
+                        patient[patient_id + '_' + eye][date]['matching']['psnr'] = matching_psnr
+                        patient[patient_id + '_' + eye][date]['matching']['ssim'] = matching_ssim
+                        patient[patient_id + '_' + eye][date]['matching']['ncc'] = matching_ncc
+                        patient[patient_id + '_' + eye][date]['matching']['nmi'] = matching_nmi
+                        patient[patient_id + '_' + eye][date]['matching']['corr'] = matching_corr
+                        
+                        
                         mse_list.append(mse)
                         psnr_list.append(psnr)
                         ssim_list.append(ssim)
+                        ncc_list.append(ncc)
+                        nmi_list.append(nmi)
+                        corr_list.append(corr)
                         matching_mse_list.append(matching_mse)
                         matching_psnr_list.append(matching_psnr)
                         matching_ssim_list.append(matching_ssim)
+                        matching_ncc_list.append(matching_ncc)
+                        matching_nmi_list.append(matching_nmi)
+                        matching_corr_list.append(matching_corr)
 
+
+                        # if matching_ssim > ssim :
+                        #     patient[patient_id + '_' + eye][date]['ssim'] = 'better'
+                        # elif matching_ssim == ssim :
+                        #     patient[patient_id + '_' + eye][date]['ssim'] = 'same'
+                        # else :
+                        #     patient[patient_id + '_' + eye][date]['ssim'] = 'worse'
+
+                        # if matching_psnr > psnr :
+                        #     patient[patient_id + '_' + eye][date]['psnr'] = 'better'
+                        # elif matching_psnr == psnr :
+                        #     patient[patient_id + '_' + eye][date]['psnr'] = 'same'
+                        # else :
+                        #     patient[patient_id + '_' + eye][date]['psnr'] = 'worse'
+
+                        # if matching_mse < mse :
+                        #     patient[patient_id + '_' + eye][date]['mse'] = 'better'
+                        # elif matching_mse == mse :
+                        #     patient[patient_id + '_' + eye][date]['mse'] = 'same'
+                        # else :
+                        #     patient[patient_id + '_' + eye][date]['mse'] = 'worse'
                         
-
-                        if matching_ssim > ssim :
-                            patient[patient_id + '_' + eye][date]['ssim'] = 'better'
-                        elif matching_ssim == ssim :
-                            patient[patient_id + '_' + eye][date]['ssim'] = 'same'
-                        else :
-                            patient[patient_id + '_' + eye][date]['ssim'] = 'worse'
-
-                        if matching_psnr > psnr :
-                            patient[patient_id + '_' + eye][date]['psnr'] = 'better'
-                        elif matching_psnr == psnr :
-                            patient[patient_id + '_' + eye][date]['psnr'] = 'same'
-                        else :
-                            patient[patient_id + '_' + eye][date]['psnr'] = 'worse'
-
-                        if matching_mse < mse :
-                            patient[patient_id + '_' + eye][date]['mse'] = 'better'
-                        elif matching_mse == mse :
-                            patient[patient_id + '_' + eye][date]['mse'] = 'same'
-                        else :
-                            patient[patient_id + '_' + eye][date]['mse'] = 'worse'
+                        
 
                         if matching_ssim - ssim > best_differece_ssim :
                             best_differece_ssim = matching_ssim - ssim
@@ -1125,37 +1245,61 @@ class finding():
         matching_avg_mse = round(sum(matching_mse_list)/len(matching_mse_list),2)
         matching_avg_psnr = round(sum(matching_psnr_list)/len(matching_psnr_list),2)
         matching_avg_ssim = round(sum(matching_ssim_list)/len(matching_ssim_list),2)
+        matching_avg_ncc = round(sum(matching_ncc_list)/len(matching_ncc_list),2)
+        matching_avg_nmi = round(sum(matching_nmi_list)/len(matching_nmi_list),2)
+        matching_avg_corr = round(sum(matching_corr_list)/len(matching_corr_list),2)
         matching_mse_std = round(np.std(matching_mse_list, ddof=1),2)
         matching_psnr_std = round(np.std(matching_psnr_list, ddof=1),2)
         matching_ssim_std = round(np.std(matching_ssim_list, ddof=1),2)
+        matching_ncc_std = round(np.std(matching_ncc_list, ddof=1),2)
+        matching_nmi_std = round(np.std(matching_nmi_list, ddof=1),2)
+        matching_corr_std = round(np.std(matching_corr_list, ddof=1),2)
 
         avg_mse = round(sum(mse_list)/len(mse_list),2)
         avg_psnr = round(sum(psnr_list)/len(psnr_list),2)
         avg_ssim = round(sum(ssim_list)/len(ssim_list),2)
+        avg_ncc = round(sum(ncc_list)/len(ncc_list),2)
+        avg_nmi = round(sum(nmi_list)/len(nmi_list),2)
+        avg_corr = round(sum(corr_list)/len(corr_list),2)
         mse_std = round(np.std(mse_list, ddof=1),2)
         psnr_std = round(np.std(psnr_list, ddof=1),2)
         ssim_std = round(np.std(ssim_list, ddof=1),2)
+        ncc_std = round(np.std(ncc_list, ddof=1),2)
+        nmi_std = round(np.std(nmi_list, ddof=1),2)
+        corr_std = round(np.std(corr_list, ddof=1),2)
             
         patient['avg'] = {}
         patient['avg']['original'] = {}
         patient['avg']['original']['mse'] =avg_mse
         patient['avg']['original']['psnr'] = avg_psnr
         patient['avg']['original']['ssim'] = avg_ssim
+        patient['avg']['original']['ncc'] = avg_ncc
+        patient['avg']['original']['nmi'] = avg_nmi
+        patient['avg']['original']['corr'] = avg_corr
         patient['avg']['matching'] = {}
         patient['avg']['matching']['mse'] = matching_avg_mse
         patient['avg']['matching']['psnr'] = matching_avg_psnr
         patient['avg']['matching']['ssim'] = matching_avg_ssim
+        patient['avg']['matching']['ncc'] = matching_avg_ncc
+        patient['avg']['matching']['nmi'] = matching_avg_nmi
+        patient['avg']['matching']['corr'] = matching_avg_corr
         
         patient['std'] = {}
         patient['std']['original'] = {}
         patient['std']['original']['mse'] = mse_std
         patient['std']['original']['psnr'] = psnr_std
         patient['std']['original']['ssim'] = ssim_std
+        patient['std']['original']['ncc'] = ncc_std
+        patient['std']['original']['nmi'] = nmi_std
+        patient['std']['original']['corr'] = corr_std
         
         patient['std']['matching'] = {}
         patient['std']['matching']['mse'] = matching_mse_std
         patient['std']['matching']['psnr'] = matching_psnr_std
         patient['std']['matching']['ssim'] = matching_ssim_std
+        patient['std']['matching']['ncc'] = matching_ncc_std
+        patient['std']['matching']['nmi'] = matching_nmi_std
+        patient['std']['matching']['corr'] = matching_corr_std
         
         
 
@@ -1223,20 +1367,20 @@ if __name__ == '__main__':
     # pre_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
     # post_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
     
-    date = '20240502'
+    date = '20240524'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
     data_groups = ['CC']
-    label_path = PATH_BASE  + '/' + disease + '_' + date + '_connectedComponent_bil51010_clah1016_concate34OCT'
+    label_path = PATH_BASE  + '/' + disease + '_' + date + '_connectedComponent_bil31010_clah0712_concate34OCT'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
     output_image_path = PATH_BASE + 'ALL/'
     image_path = PATH_BASE + 'ALL/MATCH/' 
     label_path_name = [disease + '_' + date + '_connectedComponent']
     output_label_path = output_image_path + 'MATCH_LABEL/' 
     distances = [0.8]
-    features = ['SIFT','KAZE','AKAZE','ORB','BRISK' ,'FREAK','BRIEF']#,
-    matchers = ['BF','FLANN']# ,'FLANN'
+    features = ['KAZE']#,'KAZE','AKAZE','ORB','BRISK' ,'FREAK','BRIEF'
+    matchers = ['BF']# ,'FLANN'
     # patient_list = get_data_from_txt_file('PCV.txt')
     setFolder('./record/'+ disease + '_' + date + '/') 
     
@@ -1257,54 +1401,82 @@ if __name__ == '__main__':
                 # tools.write_to_json_file(json_file2, eval)
                 eval = find.all_evaluate(image_path + 'crop' + '_' +  feature + '_' + matcher + '_' + str(distance))
                 csv_file = './record/'+ disease + '_' + date + '/'+ feature + '_' + matcher + '_' + str(distance) + '_evals.csv'
+                # tools.write_to_json_file(json_file2, eval)
                 cases = 0
+                # save evaluation to csv
+                # print('eval',eval)
+                #[mse,psnr,ssim,ncc,nmi,corr]
                 with open(csv_file, 'w' , newline='') as f:
-                    csv_writer = csv.writer(f)
-                    csv_writer.writerow(['patient', 'eye','post_treatment', 'pre_treatment', 'mse', 'psnr', 'ssim', 'matching_mse', 'matching_psnr', 'matching_ssim'])
+                    writer = csv.writer(f)  
+                    writer.writerow(['patient', 'eye','post_treatment', 'pre_treatment', 'mse', 'psnr', 'ssim','ncc','nmi','corr','matching_mse', 'matching_psnr', 'matching_ssim','matching_ncc','matching_nmi','matching_corr'])
                     for patient_eye in eval:
-                        # print("patient_eye",patient_eye)
                         if "best_case" not in patient_eye and "worst_case" not in patient_eye and "avg" not in patient_eye and "std" not in patient_eye:
                             patient, eye = patient_eye.split('_')
                             
-                            for treatment in eval[patient_eye]:
-                                if treatment != "pre_treatment":
-                                    # print('date',eval[patient_eye][date]['pre_treatment'])
+                            for post_treatment in eval[patient_eye]:
+                                if 'pre_treatment' in eval[patient_eye][post_treatment]:
                                     cases += 1
-                                    if 'original' in eval[patient_eye][treatment] and 'matching' in eval[patient_eye][treatment]:
-                                        csv_writer.writerow([patient,eye, treatment, 
-                                                                eval[patient_eye][treatment]['pre_treatment'],
-                                                                eval[patient_eye][treatment]['original'][0],
-                                                                eval[patient_eye][treatment]['original'][1],
-                                                                eval[patient_eye][treatment]['original'][2],
-                                                                eval[patient_eye][treatment]['matching'][0],
-                                                                eval[patient_eye][treatment]['matching'][1],
-                                                                eval[patient_eye][treatment]['matching'][2]])
+                                    
+                                    writer.writerow([patient,eye, 
+                                                    post_treatment,
+                                                    eval[patient_eye][post_treatment]['pre_treatment'],
+                                                     eval[patient_eye][post_treatment]['original']['mse'],
+                                                     eval[patient_eye][post_treatment]['original']['psnr'],
+                                                     eval[patient_eye][post_treatment]['original']['ssim'],
+                                                     eval[patient_eye][post_treatment]['original']['ncc'],
+                                                     eval[patient_eye][post_treatment]['original']['nmi'],
+                                                     eval[patient_eye][post_treatment]['original']['corr'],
+                                                     eval[patient_eye][post_treatment]['matching']['mse'],
+                                                     eval[patient_eye][post_treatment]['matching']['psnr'],
+                                                     eval[patient_eye][post_treatment]['matching']['ssim'],
+                                                     eval[patient_eye][post_treatment]['matching']['ncc'],
+                                                     eval[patient_eye][post_treatment]['matching']['nmi'],
+                                                     eval[patient_eye][post_treatment]['matching']['corr']])
+                                                     
+                                        
+
+                                    
                     
-                    csv_writer.writerow(['avg', '', '', '', eval["avg"]['original']['mse'], eval["avg"]['original']['psnr'], eval["avg"]['original']['ssim'], eval["avg"]['matching']['mse'], eval["avg"]['matching']['psnr'], eval["avg"]['matching']['ssim']])
-                    csv_writer.writerow(['std', '', '', '', eval["std"]['original']['mse'], eval["std"]['original']['psnr'], eval["std"]['original']['ssim'], eval["std"]['matching']['mse'], eval["std"]['matching']['psnr'], eval["std"]['matching']['ssim']])
+                        
+                        
+                        
+                        
+               
                         
                 aligment_file = './record/'+ disease + '_' + date + '/' + 'evaluations.csv'
                 if not os.path.exists(aligment_file):
                     with open(aligment_file, 'w', newline='') as f:
                         csv_writer = csv.writer(f)  
-                        csv_writer.writerow(['feature', 'cases','avg_mse', 'avg_psnr', 'avg_ssim','std_mse', 'std_psnr', 'std_ssim','avg_matching_mse', 'avg_matching_psnr', 'avg_matching_ssim','std_matching_mse', 'std_matching_psnr', 'std_matching_ssim'])
-
+                        csv_writer.writerow(['feature', 'cases','avg_mse','std_mse', 'avg_psnr', 'std_psnr', 'avg_ssim', 'std_ssim','avg_ncc','std_ncc','avg_nmi','std_nmi','avg_corr','std_corr','avg_matching_mse','std_matching_mse', 'avg_matching_psnr', 'std_matching_psnr', 'avg_matching_ssim', 'std_matching_ssim','avg_matching_ncc','std_matching_ncc','avg_matching_nmi','std_matching_nmi','avg_matching_corr','std_matching_corr'])
                 with open(aligment_file, 'a', newline='') as f:
                     csv_writer = csv.writer(f)
                     csv_writer.writerow([feature + '_' + matcher + '_' + str(distance),
                                             cases ,
                                             eval["avg"]['original']['mse'],
-                                            eval["avg"]['original']['psnr'],
-                                            eval["avg"]['original']['ssim'],
                                             eval["std"]['original']['mse'],
+                                            eval["avg"]['original']['psnr'],
                                             eval["std"]['original']['psnr'],
+                                            eval["avg"]['original']['ssim'],
                                             eval["std"]['original']['ssim'],
+                                            eval["avg"]['original']['ncc'],
+                                            eval["std"]['original']['ncc'],
+                                            eval["avg"]['original']['nmi'],
+                                            eval["std"]['original']['nmi'],
+                                            eval["avg"]['original']['corr'],
+                                            eval["std"]['original']['corr'],
                                             eval["avg"]['matching']['mse'],
-                                            eval["avg"]['matching']['psnr'],
-                                            eval["avg"]['matching']['ssim'],
                                             eval["std"]['matching']['mse'],
+                                            eval["avg"]['matching']['psnr'],
                                             eval["std"]['matching']['psnr'],
-                                            eval["std"]['matching']['ssim']
+                                            eval["avg"]['matching']['ssim'],
+                                            eval["std"]['matching']['ssim'],
+                                            eval["avg"]['matching']['ncc'],
+                                            eval["std"]['matching']['ncc'],
+                                            eval["avg"]['matching']['nmi'],
+                                            eval["std"]['matching']['nmi'],
+                                            eval["avg"]['matching']['corr'],
+                                            eval["std"]['matching']['corr']
                                             ])
+                    
 
 

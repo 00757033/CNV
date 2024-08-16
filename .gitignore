@@ -6,6 +6,14 @@ logs/
 Model/
 Semi/
 mlruns/
+record/
 *.csv
 *.txt
 *.mp4
+*.json
+*.yaml
+*.yml
+*.pkl
+*.pth
+*.pt
+*.ckpt

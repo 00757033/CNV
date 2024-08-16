@@ -511,7 +511,7 @@ class finding():
                         if m.distance > 1.5 * min_dist:
                             break
             # Draw 保留的matches
-            img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=2)
+            # img3 = cv2.drawMatchesKnn(img1,kp1,img2,kp2,good,None,flags=2)
             
         elif matcher == 'FLANN':
             # Need to draw only good matches, so create a mask
@@ -536,7 +536,7 @@ class finding():
                     singlePointColor = (255,0,0),
                     matchesMask = matchesMask,
                     flags = 0)
-                img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
+                # img3 = cv2.drawMatchesKnn(img1,pts1,img2,pts2,matches,None,**draw_params)
 
 
         # plt.imshow(img3)
@@ -904,7 +904,7 @@ class finding():
                                     patient_dict[patient_id + '_' + eye][post_treatment]['rotation_rad'] = rotation_rad
                                     patient_dict[patient_id + '_' + eye][post_treatment]['rotation_angle'] = rotation_angle
                                     patient_dict[patient_id + '_' + eye][post_treatment]['scale'] = [scale_x, scale_y]
-                                    patient_dict[patient_id + '_' + eye][post_treatment]['center'] = [center[0], center[1]]
+                                    patient_dict[patient_id + '_' + eye][post_treatment]['center'] = [int(center[0]), int(center[1])]
                                     patient_dict[patient_id + '_' + eye][post_treatment]['radius'] = radius
 
 
@@ -1255,20 +1255,20 @@ if __name__ == '__main__':
     # pre_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20161130.png"
     # post_treatment_file = "..\\..\\Data\\PCV_1120\\ALL\\1\\08707452_L_20170118.png"
     
-    date = '20240418'
+    date = '20240502'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
     data_groups = ['CC']
     label_path = PATH_BASE  + '/' + disease + '_' + date + '_connectedComponent_bil51010_clah1016_concate34OCT'
     PATH_IMAGE = PATH_DATA + 'OCTA/' 
-    output_image_path = PATH_BASE + 'inpaint/'
-    image_path = PATH_BASE + 'inpaint/MATCH/' 
+    output_image_path = PATH_BASE + 'ALL/'
+    image_path = PATH_BASE + 'ALL/MATCH/' 
     label_path_name = [disease + '_' + date + '_connectedComponent']
     output_label_path = output_image_path + 'MATCH_LABEL/' 
     distances = [0.8]
-    features = ['SIFT','KAZE','AKAZE','ORB','BRISK' ,'FREAK','BRIEF']#,
-    matchers = ['BF','FLANN']# ,'FLANN'
+    features = ['SIFT','AKAZE','ORB','BRISK' ,'FREAK','BRIEF']#,'KAZE',
+    matchers = ['BF']#,'FLANN' 
     # patient_list = get_data_from_txt_file('PCV.txt')
     setFolder('./record/'+ disease + '_' + date + '/') 
     

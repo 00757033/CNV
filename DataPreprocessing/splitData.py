@@ -82,7 +82,8 @@ class splitData():
 
 if __name__ == "__main__":
     path = "../../Data"
-    date = '20240502'
+    # date = '20240524'
+    date = '20240525' # 20240524  20240525:original
     disease = 'PCV'
     NAME = disease + "_" + date
     path_base =  path + "/" + disease + "_"+ date
@@ -90,6 +91,10 @@ if __name__ == "__main__":
     output_path = path_base 
 
     split = splitData(path_base)
-    split.splitData(NAME + '_connectedComponent' ,NAME + '_connectedComponent_42')
-    # split.splitData(NAME + '_connectedComponent_bil525_clahe1515' ,NAME + '_connectedComponent_bil525_clahe1515_30')
-    split.splitData(NAME + '_connectedComponent_bil51010_clah1016_concate34OCT' ,NAME + '_connectedComponent_bil51010_clah1016_concate34OCT_42')
+    split.splitData(NAME + '_connectedComponent' ,NAME + '_connectedComponent_30',random = 30)
+    # split.splitData(NAME + '_connectedComponent_bil31010_clah0712_concate34' ,NAME + '_connectedComponent_bil31010_clah0712_concate34_30',random = 30)
+
+    # split.splitData(NAME + '_connectedComponent_bil31010_clah0712_concate34OCT' ,NAME + '_connectedComponent_bil31010_clah0712_concate34OCT_30',random = 30)
+
+
+    # split.splitData(NAME + '_connectedComponent_bil31010_clah1516_concate34OCT' ,NAME + '_connectedComponent_bil31010_clah1516_concate34OCT_30',random = 30)

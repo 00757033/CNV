@@ -34,12 +34,12 @@ def copy_file(input_img_path, input_mask_path, output_img_path, output_mask_path
 
 
 if __name__ == "__main__":
-    date = '20240418'
+    date = '20240524'
     disease = 'PCV'
     PATH_DATA = '../../Data/' 
     PATH_BASE = PATH_DATA  + disease + '_' + date + '/'
-    inpaint = 'inpaint/'
-    mathods = 'crop_AKAZE_BF_0.8'
+    inpaint = 'ALL/'
+    mathods = 'crop_SIFT_BF_0.8_feature_matching_template_match_expand_80'
     input_img_path = PATH_BASE + inpaint + 'MATCH/'+ mathods
     input_mask_path = PATH_BASE + inpaint + 'MATCH_LABEL/' + mathods
     output_img_path = PATH_BASE + 'align/' 

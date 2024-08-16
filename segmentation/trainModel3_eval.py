@@ -1,24 +1,23 @@
 
 import timeit
+import sys
 from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score , confusion_matrix
 import glob
 import cv2
 import csv
 import numpy as np
 import os
-import tensorflow.keras as keras
 import pydensecrf.densecrf as dcrf
-from tensorflow.keras.utils import to_categorical
+from keras.utils import to_categorical
 from pydensecrf.utils import unary_from_labels, create_pairwise_bilateral
-from tensorflow.keras.optimizers import *
 from matplotlib import pyplot as plt
 from img2video import img2video
-from tf_explain.core.grad_cam import GradCAM
+# from tf_explain.core.grad_cam import GradCAM
 import tensorflow as tf
-from tensorflow.keras.optimizers import *
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from keras.optimizers import *
+from keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 # board
-from tensorflow.keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard
 import time
 import datetime
 #模型建立在UnetModel.py
@@ -28,6 +27,11 @@ import tensorflow as tf
 import cv2
 from Deeplab import *
 from sklearn.metrics import jaccard_score, precision_score, recall_score, accuracy_score
+# from transunet import *
+from collections import OrderedDict
+if sys.version_info[:2] < (3, 7):
+    from collections import OrderedDict
+
 model_classes = {
     'UNet': UNet,
     'FRUNet': FRUNet,
@@ -45,6 +49,8 @@ model_classes = {
     'CARUNet' : CARUNet,
     'DeepLabV3Plus101': DeepLabV3Plus101,
     'DeepLabV3Plus50': DeepLabV3Plus50,
+    'ResUNetPLUSPLUS' : ResUNetPLUSPLUS,
+    # 'TransUNet' : TransUNet,
 }
 
 
@@ -98,7 +104,7 @@ def Tversky_similarity_index(y_true, y_pred, alpha=0.3 ):
     false_pos = tf.reduce_sum((1 - y_true) * y_pred)
     return (true_pos + smooth) / (true_pos + alpha * false_neg + (1 - alpha) * false_pos + smooth)
 
-def Tversky_loss(y_true, y_pred, alpha=0.7):
+def Tversky_loss(y_true, y_pred, alpha=0.5):
     return 1.0 - Tversky_similarity_index(y_true, y_pred, alpha)
 
 
@@ -114,8 +120,10 @@ def binary_focal_loss(y_true, y_pred,alpha=0.15, gamma=2):
     
      
 
-def Tv_focal_loss(y_true, y_pred, alpha=0.5, beta=0.5, gamma=2.0):
-    return Tversky_loss(y_true, y_pred, alpha) + binary_focal_loss(y_true, y_pred, beta, gamma) 
+def focal_tversky(y_true, y_pred, alpha=0.7, gamma=2.0):
+    tversky_loss = 1 - Tversky_similarity_index(y_true, y_pred, alpha)
+    # return Tversky_loss(y_true, y_pred, alpha) + binary_focal_loss(y_true, y_pred, beta, gamma) 
+    return tf.pow(tversky_loss, gamma)
 
 def mean_pixel_accuracy(y_true, y_pred):
     # Count the number of matching pixels
@@ -143,7 +151,6 @@ class DataGenerator(tf.keras.utils.Sequence):
         self.batch_size = batch_size
         self.image_size = image_size
         self.on_epoch_end()
-        self.channel = 3
 
     def __len__(self):
         return int(np.ceil(len(self.ids) / float(self.batch_size)))
@@ -153,11 +160,9 @@ class DataGenerator(tf.keras.utils.Sequence):
         mask_path = os.path.join(self.path, "masks", name)
         
         image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)# , cv2.IMREAD_UNCHANGED
-        self.channel = 4
         image = cv2.resize(image, (self.image_size, self.image_size))
         if len(image.shape) == 2:
             image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB) 
-            self.channel = 3
         # print('image.shape',image.shape)
         mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
         mask = cv2.resize(mask, (self.image_size, self.image_size))
@@ -354,9 +359,6 @@ class train():
                              "predict_jaccard_index", 
                              "predict_dice_coefficient",
                              "predict_Sensitivity",
-                             "postprocess_jaccard_index", 
-                             "postprocess_dice_coefficient",
-                             "postprocess_Sensitivity",
                              "postprocess_crf_jaccard_index",
                              "postprocess_crf_dice_coefficient",
                              "postprocess_crf_Sensitivity"
@@ -413,29 +415,22 @@ class train():
 
             cv2.imwrite(os.path.join(img_path, test_ids[i]), cv2.imread(os.path.join(test_path, "images", test_ids[i])))
             cv2.imwrite(os.path.join(mask_path, test_ids[i]), cv2.imread(os.path.join(test_path, "masks", test_ids[i])))
-            jc_post = 0
-            di_post = 0
-            Sensitivity_post = 0
             jc_postcrf = 0
             di_postcrf = 0
             Sensitivity_postcrf = 0
 
             if postprocess_signal:
                 img = item[:, :, 0].copy()
-                # image = cv2.imread(os.path.join(predict_path, test_ids[i]), 0)
-                output_post = self.postproccessing(img, (3,3))
-                cv2.imwrite(os.path.join(post, test_ids[i]), output_post)
-                output_post[output_post < 128] = 0
-                output_post[output_post >= 128] = 1
+                # # image = cv2.imread(os.path.join(predict_path, test_ids[i]), 0)
+                # output_post = self.postproccessing(img, (3,3))
+                # cv2.imwrite(os.path.join(post, test_ids[i]), output_post)
+                # output_post[output_post < 128] = 0
+                # output_post[output_post >= 128] = 1
                 
 
-                jc_post = jaccard_score(mask.ravel(), output_post.ravel())
-                di_post = dice_coef(mask, output_post)
-                di_post = di_post.numpy()
-                Sensitivity_post = mean_pixel_accuracy(mask, output_post)
-                post_iou.append(jc_post)
-                post_dice.append(di_post)
-                post_Sensitivity.append(Sensitivity_post)
+                # jc_post = jaccard_score(mask.ravel(), output_post.ravel())
+                # di_post = dice_coef(mask, output_post)
+                # di_post = di_post.numpy()
                 
                 crf_input = item[:, :, 0].copy()
                 crf_input = np.array(crf_input, dtype=np.uint8)
@@ -451,7 +446,7 @@ class train():
                 postcrf = np.array(postcrf, dtype=np.uint8)
                
                 # remove small area
-                # postcrf = remove_small_area(postcrf)
+                postcrf = remove_small_area(postcrf,50)
                 
 
                 cv2.imwrite(os.path.join(postprocess, test_ids[i]), postcrf)
@@ -481,9 +476,6 @@ class train():
                 jc,
                 di,
                 Sensitivity,
-                jc_post,
-                di_post,
-                Sensitivity_post,
                 jc_postcrf,
                 di_postcrf,
                 Sensitivity_postcrf
@@ -497,8 +489,8 @@ class train():
         # record average jaccard index, dice coefficient  std of jaccard index, dice coefficient
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(["mean", np.mean(iou), np.mean(dice), np.mean(Sensitivitys), np.mean(post_iou), np.mean(post_dice), np.mean(post_Sensitivity), np.mean(post_crf_iou), np.mean(post_crf_dice), np.mean(post_crf_Sensitivity)])
-            writer.writerow(["std", np.std(iou, ddof=1), np.std(dice, ddof=1), np.std(Sensitivitys, ddof=1), np.std(post_iou, ddof=1), np.std(post_dice, ddof=1), np.std(post_Sensitivity, ddof=1), np.std(post_crf_iou, ddof=1), np.std(post_crf_dice, ddof=1), np.std(post_crf_Sensitivity, ddof=1)])
+            writer.writerow(["mean", np.mean(iou), np.mean(dice), np.mean(Sensitivitys), np.mean(post_crf_iou), np.mean(post_crf_dice), np.mean(post_crf_Sensitivity)])
+            writer.writerow(["std", np.std(iou, ddof=1), np.std(dice, ddof=1), np.std(Sensitivitys, ddof=1), np.std(post_crf_iou, ddof=1), np.std(post_crf_dice, ddof=1), np.std(post_crf_Sensitivity, ddof=1)])
         # record best image name ,jaccard index, dice coefficient worst image name ,jaccard index, dice coefficient
         with open(os.path.join(result_path,model_name+'_' + feature, "result.csv"), "a", newline='') as f:
             writer = csv.writer(f)
@@ -507,7 +499,6 @@ class train():
         # record postprocess best image name ,jaccard index, dice coefficient worst image name ,jaccard index, dice coefficient
         if postprocess_signal:
             print(os.path.join("record","CRF",dataset_name+'.csv'))
-            print(os.path.join("record","Morphology",dataset_name+'.csv'))
             postprocess_crf = [
                 model_name,
                 np.mean(iou),
@@ -524,21 +515,6 @@ class train():
                 np.std(post_crf_Sensitivity, ddof=1)
                 
             ]
-            postprocess_Morphology = [
-                model_name,
-                np.mean(iou),
-                np.std(iou, ddof=1),
-                np.mean(dice),
-                np.std(dice, ddof=1),
-                np.mean(Sensitivitys),
-                np.std(Sensitivitys, ddof=1),
-                np.mean(post_iou),
-                np.std(post_iou, ddof=1),
-                np.mean(post_dice),
-                np.std(post_dice, ddof=1),
-                np.mean(post_Sensitivity),
-                np.std(post_Sensitivity, ddof=1)
-            ]
             
             with open(os.path.join("record","CRF",dataset_name+'.csv'), 'a', newline='') as f:
                 writer = csv.writer(f)
@@ -546,9 +522,6 @@ class train():
                 writer.writerow(postprocess_crf)
                 
                 
-            with open(os.path.join("record","Morphology",dataset_name+'.csv'),  'a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(postprocess_Morphology)
 
 
         return np.mean(iou), np.std(iou, ddof=1), np.mean(dice), np.std(dice, ddof=1), np.mean(Sensitivitys), np.std(Sensitivitys, ddof=1)
@@ -560,7 +533,7 @@ class train():
         # earlystopping
         # earlystopping = EarlyStopping(monitor='val_dice_coef', patience=30, verbose=1, mode='max')
         # reduce learning rate
-        reduce_lr = ReduceLROnPlateau(monitor='val_dice_coef', factor=0.5, patience=20, verbose=1, mode='max')
+        reduce_lr = ReduceLROnPlateau(monitor='val_dice_coef', factor=0.5, patience=15, verbose=1, mode='max')
         # board
         log = os.path.join('logs',dataset,data, model_name+'_'+feature)
         tensorboard = TensorBoard(log_dir=log, histogram_freq=0, write_graph=True, write_images=True)
@@ -645,10 +618,6 @@ class train():
                     with open(os.path.join("record","CRF",dataset_name+'.csv'), 'w') as f:
                         writer = csv.writer(f)
                         writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_Sensitivity_score','original_Sensitivity_var','ji_score','ji_var','dice_score','dice_var','Sensitivity_score','Sensitivity_var'])
-                if not os.path.isfile(os.path.join("record","Morphology",dataset_name+'.csv')):
-                    with open(os.path.join("record","Morphology",dataset_name+'.csv'), 'w') as f:
-                        writer = csv.writer(f)
-                        writer.writerow(['model_name','original_ji_score','original_ji_var','original_dice_score','original_dice_var','original_Sensitivity_score','original_Sensitivity_var','ji_score','ji_var','dice_score','dice_var','Sensitivity_score','Sensitivity_var'])
             for data in self.datas: #讀取資料集的訓練資料
                 for model_name in self.models:  # 讀取模型
                     best_model = ''
@@ -665,10 +634,11 @@ class train():
                                 for filter in self.filters:
                                     # 建立模型跟預測結果的資料夾
                                     floder_path = self.data_class + '_' + self.data_date
-                                    print('dataset_name',dataset_name)
-                                    if 'concate34' in dataset_name:
-                                        self.channel = 4
                                     
+                                    if 'concate34OCT' in dataset_name:
+                                        print('dataset_name',dataset_name)
+                                        self.channel = 4
+                                    print("channel",self.channel)
                                     model_path = os.path.join(self.model_path,floder_path,dataset_name,data)
                                     result_path = os.path.join(self.result_path,floder_path,dataset_name,data)
                                     if not os.path.isdir(model_path):
@@ -697,9 +667,11 @@ class train():
                                     print("train model",model_name)
                                     print(model.summary())
                                     # # 編譯模型optimizer=tf.keras.optimizers.Adam(lr=self.learning_rate), loss=self.dice_coef_loss
-                                    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lrn), loss=Tv_focal_loss, metrics=[dice_coef, jaccard_index])
+                                    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=lrn), loss=focal_tversky, metrics=[dice_coef, jaccard_index])
                                     # 訓練模型 
                                     save_model_name = model_name + '_' + epoch.__str__() + '_' + batch.__str__() + '_' + lrn.__str__() + '_' + str(filter[0])
+                                    
+                                    
                                     # 取得字串 用來判斷是否有重複訓練過 去掉最後的_1.h5
 
                                     lists = os.listdir(model_path) #列出資料夾下所有的目錄與檔案
@@ -711,12 +683,12 @@ class train():
                                     time = 0
                                     if train_signal:
                                         count = count +1 # 紀錄模型訓練次數
+                                        
                                         history, time = self.fitModel(model,dataset_name,data ,train_dataset, valid_dataset,epoch, lrn ,model_path,save_model_name,count.__str__())
 
                                         # 紀錄訓練結果
                                         self.record(history, time,model_path,save_model_name,count.__str__())
-
-                                    print("evaluate")
+                                    print("evaluate",save_model_name + '_' + count.__str__())
                                     ji_score, ji_var , dice_score, dice_var , Sensitivity_score, Sensitivity_var = self.evaluateModel(dataset_name,model, dataset, result_path,model_path,save_model_name,count.__str__(),self.predict_threshold,postprocess_signal,gradcam_signal)
                                     
                                     ji_score = ji_score * 100
@@ -752,7 +724,7 @@ class train():
                         self.best_model_record(best_model, dataset_name, best_model_time, best_iou, best_iou_var, best_dice, best_dice_var, best_Sensitivity, best_Sensitivity_var)
 
 
-    def get_best_model(self,model_data,data, model_name,batch,epoch,lrn,filters,channel = 4):# , output_path,model_path, model_name,predict_threshold,postprocess_signal
+    def get_best_model(self,model_data,data, model_name,batch,epoch,lrn,filters,crf= True,channel = 4):# , output_path,model_path, model_name,predict_threshold,postprocess_signal
         self.channel = channel
         getModels = model_classes[model_name]((self.image_size,self.image_size,self.channel) ,lrn)
         model = getModels.build_model(filters)
@@ -770,7 +742,7 @@ class train():
             if item.startswith(save_model_name) and item.endswith('.h5'):
                 count = count +1
 
-        print(count)
+        print(count,os.path.join(model_path, save_model_name + '_'+ count.__str__() + '.h5'))
         model.load_weights(os.path.join(model_path, save_model_name + '_'+ count.__str__() + '.h5'))
         
         # get data 
@@ -804,6 +776,25 @@ class train():
             img[img >= self.predict_threshold] = 255
             img = np.array(img, dtype=np.uint8)
             img = cv2.resize(img, (self.image_size, self.image_size))
+            if crf:
+                crf_input = img.copy()
+                crf_input = np.array(crf_input, dtype=np.uint8)
+                crf_input = cv2.resize(crf_input, (self.image_size, self.image_size)) 
+                 
+                if "images_original" in os.listdir(data_path):
+                    original = cv2.imread(os.path.join(data_path, "images_original", test_ids[i]))
+                else:
+                    original = cv2.imread(os.path.join(data_path, "images", test_ids[i]))
+                
+                img = self.crf_predict(original,crf_input) 
+                if len(img.shape) > 2:
+                    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                img = np.array(img, dtype=np.uint8)
+                
+            # remove small area
+            img = remove_small_area(img,50)
+            
+            
             cv2.imwrite(os.path.join(predict_path, test_ids[i]), img)
             
             predict = cv2.imread(os.path.join(predict_path, test_ids[i]), 0)

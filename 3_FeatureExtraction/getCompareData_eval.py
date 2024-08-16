@@ -244,7 +244,7 @@ def setFloder(path):
 def run():
     
     disease   = 'PCV'
-    date    = '20240418'
+    date    = '20240524'
     PATH_BASE    = "../../Data/" + disease + '_' + date + '/'
     data_groups  = ["CC"]
     dict_origin  = {'CC': "4"}

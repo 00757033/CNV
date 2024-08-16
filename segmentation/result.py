@@ -98,15 +98,3 @@ def getResult(PATH):
     with open("sample4.json", "w") as outfile:
         outfile.write(json_data)    
     
-
-'''
-def main():
-    data_date = "0319"
-    data_class = 'CNV'
-    PATH = 'D:/WeiHao/Result/' + data_class  + '_' + data_date
-    getResult(PATH)
-
-
-if __name__ == '__main__':
-    main()
-'''
